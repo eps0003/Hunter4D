@@ -21,6 +21,8 @@ class Camera
 		Matrix::MakeIdentity(projectionMatrix);
 		Matrix::MakeIdentity(rotationMatrix);
 
+		UpdateViewMatrix();
+		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
 
 		// Render::SetFog(getSkyColor(), SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
@@ -28,9 +30,6 @@ class Camera
 
 	void Render()
 	{
-		UpdateViewMatrix();
-		UpdateRotationMatrix();
-
 		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
 	}
 

@@ -27,4 +27,7 @@ void Render(int id)
 	Render::SetZBuffer(true, true);
 	Render::SetBackfaceCull(true);
 	Render::ClearZ();
+
+	Camera@ camera = Camera::getCamera();
+	camera.Render();
 }
