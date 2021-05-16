@@ -11,7 +11,7 @@ void onInit(CRules@ this)
         for (uint i = 0; i < getPlayerCount(); i++)
         {
             CPlayer@ player = getPlayer(i);
-            Object object(player, Vec2f(100, 100), 20);
+            Object object(player, Vec3f(), 20);
             Object::SetObject(player, object);
 
             CBitStream bs;
@@ -23,7 +23,7 @@ void onInit(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-    Object object(player, Vec2f(100, 100), 20);
+    Object object(player, Vec3f(), 20);
     Object::SetObject(player, object);
 
     for (uint i = 0; i < getPlayerCount(); i++)
@@ -56,6 +56,12 @@ void onTick(CRules@ this)
                 this.SendCommand(this.getCommandID("sync object"), bs, true);
             }
         }
+    }
+
+    Object@[] objects = Object::getObjects();
+    for (uint i = 0; i < objects.size(); i++)
+    {
+        objects[i].Update();
     }
 }
 

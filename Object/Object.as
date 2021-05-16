@@ -1,13 +1,15 @@
 #include "ObjectCommon.as"
+#include "Vec3f.as"
+#include "Camera.as"
 
 class Object
 {
     CPlayer@ player;
-    Vec2f position;
-    Vec2f velocity;
+    Vec3f position;
+    Vec3f velocity;
     private float _radius;
 
-    Object(CPlayer@ player, Vec2f position, float radius)
+    Object(CPlayer@ player, Vec3f position, float radius)
     {
         @this.player = player;
         this.position = position;
@@ -17,8 +19,8 @@ class Object
     Object(CBitStream@ bs)
     {
         @player = getPlayerByNetworkId(bs.read_netid());
-        position = bs.read_Vec2f();
-        velocity = bs.read_Vec2f();
+        position = Vec3f(bs);
+        velocity = Vec3f(bs);
         radius = bs.read_f32();
     }
 
@@ -31,16 +33,16 @@ class Object
     void SerializeInit(CBitStream@ bs)
     {
         bs.write_netid(player.getNetworkID());
-        bs.write_Vec2f(position);
-        bs.write_Vec2f(velocity);
+        position.Serialize(bs);
+        velocity.Serialize(bs);
         bs.write_f32(radius);
     }
 
     void SerializeTick(CBitStream@ bs)
     {
         bs.write_netid(player.getNetworkID());
-        bs.write_Vec2f(position);
-        bs.write_Vec2f(velocity);
+        position.Serialize(bs);
+        velocity.Serialize(bs);
     }
 
     float radius
@@ -75,10 +77,54 @@ class Object
         }
     }
 
+    void Update()
+    {
+        // if (isClient())
+        // {
+        //     CControls@ controls = getControls();
+        //     if (controls.isKeyPressed(KEY_KEY_W))
+        //     {
+        //         position.z += 1.0f;
+        //     }
+        //     if (controls.isKeyPressed(KEY_KEY_S))
+        //     {
+        //         position.z -= 1.0f;
+        //     }
+        // }
+
+        if (isServer())
+        {
+            position.z = Maths::Sin(getGameTime() / 10.0f) * 10.0f;
+        }
+
+        if (isClient())
+        {
+            Camera@ camera = Camera::getCamera();
+            camera.position = position;
+        };
+    }
+
     void Render()
     {
         CTeam@ team = getRules().getTeam(teamNum);
         SColor col = team !is null ? team.color : color_white;
-        GUI::DrawCircle(position, radius, col);
+
+        Vertex[] vertices = {
+            Vertex(-1,  1, 10, 0, 0, col),
+            Vertex( 1,  1, 10, 1, 0, col),
+            Vertex( 1, -1, 10, 1, 1, col),
+            Vertex(-1, -1, 10, 0, 1, col)
+        };
+
+		Render::SetBackfaceCull(false);
+		Render::SetAlphaBlend(true);
+		Render::RawQuads("pixel", vertices);
+		Render::SetAlphaBlend(false);
+		Render::SetBackfaceCull(true);
+    }
+
+    void RenderHUD()
+    {
+        GUI::DrawText("Position: " + position.toString(), Vec2f(10, 10), color_black);
     }
 }

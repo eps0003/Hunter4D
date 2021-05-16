@@ -6,15 +6,21 @@
 void onInit(CRules@ this)
 {
 	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
+	Texture::createFromFile("pixel", "Pixel.png");
 }
 
 void onRender(CRules@ this)
 {
-    Object@[] objects = Object::getObjects();
-    for (uint i = 0; i < objects.size(); i++)
-    {
-        objects[i].Render();
-    }
+	Object@ object = Object::getMyObject();
+	if (object !is null)
+	{
+        object.RenderHUD();
+	}
 }
 
 void Render(int id)
@@ -30,4 +36,10 @@ void Render(int id)
 
 	Camera@ camera = Camera::getCamera();
 	camera.Render();
+
+	Object@ object = Object::getMyObject();
+	if (object !is null)
+	{
+		object.Render();
+	}
 }
