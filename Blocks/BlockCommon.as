@@ -21,7 +21,6 @@ namespace Block
 
 					Block block(name, visible, solid, destructible, collapsible, transparent);
 					blocks.push_back(block);
-					print("a");
 				}
 			}
 		}
@@ -29,7 +28,7 @@ namespace Block
 		getRules().set("blocks", blocks);
 	}
 
-	Block@ getBlock(uint index)
+	Block@ getBlock(u8 index)
 	{
 		Block@[]@ blocks;
 		if (getRules().get("blocks", @blocks) && index < blocks.size())
