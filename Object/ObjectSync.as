@@ -4,7 +4,6 @@ void onInit(CRules@ this)
 {
     this.addCommandID("init object");
     this.addCommandID("sync object");
-    this.addCommandID("set object radius");
 
     if (isServer())
     {
@@ -82,18 +81,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
             if (oldObject !is null)
             {
                 oldObject = newObject;
-            }
-        }
-        else if (cmd == this.getCommandID("set object radius"))
-        {
-            u16 id = params.read_netid();
-
-            CPlayer@ player = getPlayerByNetworkId(id);
-            Object@ object = Object::getObject(player);
-
-            if (object !is null)
-            {
-                object.radius = params.read_f32();
             }
         }
     }

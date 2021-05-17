@@ -1,4 +1,4 @@
-#include "Object.as"
+#include "Actor.as"
 #include "Camera.as"
 
 #define CLIENT_ONLY
@@ -16,10 +16,10 @@ void onRestart(CRules@ this)
 
 void onRender(CRules@ this)
 {
-	Object@ object = Object::getMyObject();
-	if (object !is null)
+	Actor@ actor = Actor::getMyActor();
+	if (actor !is null)
 	{
-        object.RenderHUD();
+        actor.RenderHUD();
 	}
 }
 
@@ -37,9 +37,11 @@ void Render(int id)
 	Camera@ camera = Camera::getCamera();
 	camera.Render();
 
-	Object@ object = Object::getMyObject();
-	if (object !is null)
+	Actor@ actor = Actor::getMyActor();
+	if (actor !is null)
 	{
-		object.Render();
+		actor.Render();
 	}
+
+	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
 }
