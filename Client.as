@@ -43,5 +43,12 @@ void Render(int id)
 		actor.Render();
 	}
 
+	Object@[]@ objects = Object::getObjects();
+	for (uint i = 0; i < objects.size(); i++)
+	{
+		objects[i].Render();
+	}
+
 	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
+	GUI::DrawText("Objects: " + Object::getObjectCount(), Vec2f(10, 50), color_black);
 }
