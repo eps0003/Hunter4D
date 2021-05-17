@@ -47,11 +47,16 @@ class Object
 
     void Render()
     {
+		float[] matrix;
+		Matrix::MakeIdentity(matrix);
+		Matrix::SetTranslation(matrix, position.x, position.y, position.z);
+		Render::SetModelTransform(matrix);
+
         Vertex[] vertices = {
-            Vertex(-1,  1, 10, 0, 0, color_white),
-            Vertex( 1,  1, 10, 1, 0, color_white),
-            Vertex( 1, -1, 10, 1, 1, color_white),
-            Vertex(-1, -1, 10, 0, 1, color_white)
+            Vertex(-1,  1, 0, 0, 0, color_white),
+            Vertex( 1,  1, 0, 1, 0, color_white),
+            Vertex( 1, -1, 0, 1, 1, color_white),
+            Vertex(-1, -1, 0, 0, 1, color_white)
         };
 
 		Render::SetBackfaceCull(false);
