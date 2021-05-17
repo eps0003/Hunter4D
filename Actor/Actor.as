@@ -67,6 +67,14 @@ class Actor : Object
 			{
 				position.x -= 1.0f;
 			}
+			if (controls.isKeyPressed(KEY_SPACE))
+			{
+				position.y += 1.0f;
+			}
+			if (controls.isKeyPressed(KEY_LSHIFT))
+			{
+				position.y -= 1.0f;
+			}
 
 			Camera@ camera = Camera::getCamera();
 			camera.position = position;
