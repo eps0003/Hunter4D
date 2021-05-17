@@ -44,20 +44,6 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
     // Tell clients to spawn actor
     CBitStream bs;
     this.SendCommand(this.getCommandID("spawn actor"), bs, true);
-
-    // Send init command for all actors
-    for (uint i = 0; i < getPlayerCount(); i++)
-    {
-        CPlayer@ player = getPlayer(i);
-        Actor@ actor = Actor::getActor(player);
-
-        if (actor !is null)
-        {
-            CBitStream bs;
-            actor.SerializeInit(bs);
-            this.SendCommand(this.getCommandID("init actor"), bs, true);
-        }
-    }
 }
 
 void onTick(CRules@ this)
@@ -92,6 +78,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
     else if (cmd == this.getCommandID("init actor"))
     {
         Actor actor(params);
+
+        // Don't set my own actor. Already did it on spawn
+        if (actor.player.isMyPlayer()) return;
+
         Actor::SetActor(actor.player, actor);
     }
     else if (cmd == this.getCommandID("sync actor"))

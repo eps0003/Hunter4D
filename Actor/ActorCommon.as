@@ -17,6 +17,8 @@ namespace Actor
     void SetActor(CPlayer@ player, Actor@ actor)
     {
         player.set("actor", @actor);
+
+        print("Set actor: " + player.getUsername());
     }
 
     bool hasActor(CPlayer@ player)

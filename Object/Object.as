@@ -4,6 +4,7 @@
 
 class Object
 {
+    u16 id = 0;
     Vec3f position;
     Vec3f velocity;
 
@@ -14,6 +15,7 @@ class Object
 
     Object(CBitStream@ bs)
     {
+        id = bs.read_u16();
         position = Vec3f(bs);
         velocity = Vec3f(bs);
     }
@@ -26,12 +28,14 @@ class Object
 
     void SerializeInit(CBitStream@ bs)
     {
+        bs.write_u16(id);
         position.Serialize(bs);
         velocity.Serialize(bs);
     }
 
     void SerializeTick(CBitStream@ bs)
     {
+        bs.write_u16(id);
         position.Serialize(bs);
         velocity.Serialize(bs);
     }

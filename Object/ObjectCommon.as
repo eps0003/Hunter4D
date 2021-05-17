@@ -1,44 +1,53 @@
 namespace Object
 {
-    Object@ getObject(CPlayer@ player)
+    Object@ getObject(u16 id)
     {
-        if (player is null) return null;
+        Object@[]@ objects = Object::getObjects();
 
-        Object@ object;
-        player.get("object", @object);
-        return object;
-    }
-
-    Object@ getMyObject()
-    {
-        return Object::getObject(getLocalPlayer());
-    }
-
-    void SetObject(CPlayer@ player, Object@ object)
-    {
-        player.set("object", @object);
-    }
-
-    bool hasObject(CPlayer@ player)
-    {
-        return Object::getObject(player) !is null;
-    }
-
-    Object@[] getObjects()
-    {
-        Object@[] objects;
-
-        for (uint i = 0; i < getPlayerCount(); i++)
+        for (uint i = 0; i < objects.size(); i++)
         {
-            CPlayer@ player = getPlayer(i);
-            Object@ object = Object::getObject(player);
-
-            if (object !is null)
+            Object@ object = objects[i];
+            if (object.id == id)
             {
-                objects.push_back(object);
+                return object;
             }
         }
 
+        return null;
+    }
+
+    void AddObject(Object@ object)
+    {
+        Object@[]@ objects = Object::getObjects();
+        objects.push_back(object);
+
+        print("Added object: " + object.id);
+
+        if (!isClient())
+        {
+            CBitStream bs;
+            object.SerializeInit(bs);
+            getRules().SendCommand(getRules().getCommandID("init object"), bs, true);
+        }
+    }
+
+    bool objectExists(u16 id)
+    {
+        return Object::getObject(id) !is null;
+    }
+
+    Object@[]@ getObjects()
+    {
+        CRules@ rules = getRules();
+
+        if (!rules.exists("objects"))
+        {
+            Object@[] objects;
+            rules.set("objects", @objects);
+        }
+
+        Object@[]@ objects;
+        rules.get("objects", @objects);
         return objects;
     }
 
@@ -49,10 +58,6 @@ namespace Object
 
     void ClearObjects()
     {
-        for (uint i = 0; i < getPlayerCount(); i++)
-        {
-            CPlayer@ player = getPlayer(i);
-            Object::SetObject(player, null);
-        }
+        getRules().clear("objects");
     }
 }
