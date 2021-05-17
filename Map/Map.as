@@ -5,8 +5,8 @@
 
 class Map
 {
-    u8[] blocks;
-    Vec3f dimensions;
+	u8[] blocks;
+	Vec3f dimensions;
 
 	Map(Vec3f dimensions)
 	{
