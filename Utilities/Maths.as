@@ -1,6 +1,6 @@
 namespace Maths
 {
-    s8 Sign(float value)
+	s8 Sign(float value)
 	{
 		if (value > 0)
 			return 1;

@@ -19,7 +19,7 @@ void onRender(CRules@ this)
 	Actor@ actor = Actor::getMyActor();
 	if (actor !is null)
 	{
-        actor.RenderHUD();
+		actor.RenderHUD();
 	}
 }
 
