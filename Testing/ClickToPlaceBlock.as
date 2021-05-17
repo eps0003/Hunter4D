@@ -1,5 +1,7 @@
 #include "Map.as"
 
+uint index = 0;
+
 void onInit(CRules@ this)
 {
 	this.addCommandID("click");
@@ -33,5 +35,5 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 void PlaceBlock()
 {
 	Map@ map = Map::getMap();
-	map.SetBlock(Vec3f(), 1);
+	map.SetBlock(index++, 1);
 }
