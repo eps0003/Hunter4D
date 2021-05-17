@@ -16,12 +16,25 @@ void onInit(CRules@ this)
 
     if (isServer())
     {
-        for (uint i = 0; i < getPlayerCount(); i++)
+        if (isClient())
         {
-            CPlayer@ player = getPlayer(i);
+            // Localhost
+            for (uint i = 0; i < getPlayerCount(); i++)
+            {
+                CPlayer@ player = getPlayer(i);
+                SpawnActor(this, player);
+            }
+        }
+        else
+        {
+            // Server
+            for (uint i = 0; i < getPlayerCount(); i++)
+            {
+                CPlayer@ player = getPlayer(i);
 
-            CBitStream bs;
-            this.SendCommand(this.getCommandID("spawn actor"), bs, true);
+                CBitStream bs;
+                this.SendCommand(this.getCommandID("spawn actor"), bs, true);
+            }
         }
     }
 }
@@ -64,18 +77,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
     if (isClient() && cmd == this.getCommandID("spawn actor"))
     {
-        // Spawn actor
-        CPlayer@ me = getLocalPlayer();
-        Actor actor(me, Vec3f());
-        Actor::SetActor(me, actor);
-
-        // Sync if not localhost
-        if (!isServer())
-        {
-            CBitStream bs;
-            actor.SerializeInit(bs);
-            this.SendCommand(this.getCommandID("init actor"), bs, true);
-        }
+        CPlayer@ player = getLocalPlayer();
+        SpawnActor(this, player);
     }
     else if (cmd == this.getCommandID("init actor"))
     {
@@ -95,5 +98,20 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
         {
             oldActor = newActor;
         }
+    }
+}
+
+void SpawnActor(CRules@ this, CPlayer@ player)
+{
+    // Spawn actor
+    Actor actor(player, Vec3f());
+    Actor::SetActor(player, actor);
+
+    // Sync if not localhost
+    if (!isServer())
+    {
+        CBitStream bs;
+        actor.SerializeInit(bs);
+        this.SendCommand(this.getCommandID("init actor"), bs, true);
     }
 }
