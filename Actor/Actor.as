@@ -48,7 +48,7 @@ class Actor : Object
 
     void Update()
     {
-        if (isClient())
+        if (player.isMyPlayer())
         {
             CControls@ controls = getControls();
             if (controls.isKeyPressed(KEY_KEY_W))

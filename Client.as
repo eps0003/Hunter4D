@@ -37,10 +37,10 @@ void Render(int id)
 	Camera@ camera = Camera::getCamera();
 	camera.Render();
 
-	Actor@ actor = Actor::getMyActor();
-	if (actor !is null)
+	Actor@[] actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
 	{
-		actor.Render();
+		actors[i].Render();
 	}
 
 	Object@[]@ objects = Object::getObjects();
