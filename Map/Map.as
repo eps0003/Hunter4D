@@ -1,5 +1,6 @@
 #include "MapCommon.as"
 #include "Block.as"
+#include "MapRenderer.as"
 #include "Vec3f.as"
 
 class Map
@@ -60,6 +61,11 @@ class Map
 			bs.write_u32(index);
 			bs.write_u8(block);
 			getRules().SendCommand(getRules().getCommandID("sync block"), bs, true);
+		}
+
+		if (isClient())
+		{
+			MapRenderer::getRenderer().GenerateMesh(this);
 		}
 	}
 

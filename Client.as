@@ -1,5 +1,6 @@
 #include "Actor.as"
 #include "Camera.as"
+#include "MapRenderer.as"
 
 #define CLIENT_ONLY
 
@@ -36,6 +37,9 @@ void Render(int id)
 
 	Camera@ camera = Camera::getCamera();
 	camera.Render();
+
+	MapRenderer@ mapRenderer = MapRenderer::getRenderer();
+	mapRenderer.Render();
 
 	Actor@[] actors = Actor::getActors();
 	for (uint i = 0; i < actors.size(); i++)
