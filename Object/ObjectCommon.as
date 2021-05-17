@@ -18,8 +18,11 @@ namespace Object
 
     void AddObject(Object@ object)
     {
+        CRules@ rules = getRules();
+
         Object@[]@ objects = Object::getObjects();
         objects.push_back(object);
+        rules.set("objects", @objects);
 
         print("Added object: " + object.id);
 
@@ -27,7 +30,7 @@ namespace Object
         {
             CBitStream bs;
             object.SerializeInit(bs);
-            getRules().SendCommand(getRules().getCommandID("init object"), bs, true);
+            rules.SendCommand(rules.getCommandID("init object"), bs, true);
         }
     }
 
