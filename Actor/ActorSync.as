@@ -41,9 +41,11 @@ void onInit(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
+    // Tell clients to spawn actor
     CBitStream bs;
     this.SendCommand(this.getCommandID("spawn actor"), bs, true);
 
+    // Send init command for all actors
     for (uint i = 0; i < getPlayerCount(); i++)
     {
         CPlayer@ player = getPlayer(i);
@@ -71,6 +73,13 @@ void onTick(CRules@ this)
             this.SendCommand(this.getCommandID("sync actor"), bs, true);
         }
     }
+
+    // Update actors
+    Actor@[] actors = Actor::getActors();
+    for (uint i = 0; i < actors.size(); i++)
+    {
+        actors[i].Update();
+    }
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -87,13 +96,14 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
     }
     else if (cmd == this.getCommandID("sync actor"))
     {
+        // Deserialize actor
         Actor newActor(params);
 
-        // Don't update my own actor because the client is in control
+        // Don't update my own actor
         if (newActor.player.isMyPlayer()) return;
 
+        // Update actor
         Actor@ oldActor = Actor::getActor(newActor.player);
-
         if (oldActor !is null)
         {
             oldActor = newActor;
