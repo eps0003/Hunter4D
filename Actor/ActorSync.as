@@ -33,6 +33,7 @@ void onInit(CRules@ this)
                 CPlayer@ player = getPlayer(i);
 
                 CBitStream bs;
+                bs.write_netid(player.getNetworkID());
                 this.SendCommand(this.getCommandID("spawn actor"), bs, true);
             }
         }
@@ -43,7 +44,20 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
     // Tell clients to spawn actor
     CBitStream bs;
+    bs.write_netid(player.getNetworkID());
     this.SendCommand(this.getCommandID("spawn actor"), bs, true);
+
+    // Sync all actors
+    Actor@[] actors = Actor::getActors();
+
+    for (uint i = 0; i < actors.size(); i++)
+    {
+        Actor@ actor = actors[i];
+
+        CBitStream bs;
+        actor.SerializeInit(bs);
+        this.SendCommand(this.getCommandID("init actor"), bs, player);
+    }
 }
 
 void onTick(CRules@ this)
@@ -72,8 +86,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
     if (isClient() && cmd == this.getCommandID("spawn actor"))
     {
-        CPlayer@ player = getLocalPlayer();
-        SpawnActor(this, player);
+        CPlayer@ player = getPlayerByNetworkId(params.read_netid());
+        if (player !is null)
+        {
+            SpawnActor(this, player);
+        }
     }
     else if (cmd == this.getCommandID("init actor"))
     {
