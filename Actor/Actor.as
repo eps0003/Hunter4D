@@ -1,5 +1,6 @@
 #include "Object.as"
 #include "ActorCommon.as"
+#include "Mouse.as"
 
 class Actor : Object
 {
@@ -77,7 +78,10 @@ class Actor : Object
 			}
 
 			Camera@ camera = Camera::getCamera();
+			Mouse@ mouse = Mouse::getMouse();
+
 			camera.position = position;
+			camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
 		}
 	}
 }

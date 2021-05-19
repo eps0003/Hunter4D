@@ -4,7 +4,7 @@ class Mouse
 {
 	Vec2f velocity;
 
-	float sensitivity = 1.0f;
+	float sensitivity = 0.7f;
 
 	private bool centerMouse = true;
 
