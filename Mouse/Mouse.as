@@ -6,7 +6,7 @@ class Mouse
 
 	float sensitivity = 0.7f;
 
-	private bool centerMouse = true;
+	private bool wasInControl = false;
 
 	void Update()
 	{
@@ -29,24 +29,29 @@ class Mouse
 		Vec2f mousePos = getControls().getMouseScreenPos();
 		Vec2f center = getDriver().getScreenCenterPos();
 
+		velocity = Vec2f_zero;
+
 		// Calculate velocity
-		if (isInControl() && !centerMouse)
+		if (isInControl())
 		{
-			velocity = center - mousePos;
-			velocity *= sensitivity * 0.2f;
-		}
-		else
-		{
-			velocity = Vec2f_zero;
+			if (wasInControl)
+			{
+				velocity = center - mousePos;
+				velocity *= sensitivity * 0.2f;
+
+				// Recenter mouse
+				if (velocity.LengthSquared() > 0)
+				{
+					getControls().setMousePosition(center);
+				}
+			}
+			else
+			{
+				getControls().setMousePosition(center);
+			}
 		}
 
-		// Recenter mouse
-		if (velocity.LengthSquared() > 0)
-		{
-			getControls().setMousePosition(center);
-		}
-
-		centerMouse = !isInControl();
+		wasInControl = isInControl();
 	}
 
 	private void UpdateVisibility()
