@@ -51,37 +51,41 @@ class Actor : Object
 	{
 		if (player.isMyPlayer())
 		{
-			CControls@ controls = getControls();
-			if (controls.isKeyPressed(KEY_KEY_W))
-			{
-				position.z += 1.0f;
-			}
-			if (controls.isKeyPressed(KEY_KEY_S))
-			{
-				position.z -= 1.0f;
-			}
-			if (controls.isKeyPressed(KEY_KEY_D))
-			{
-				position.x += 1.0f;
-			}
-			if (controls.isKeyPressed(KEY_KEY_A))
-			{
-				position.x -= 1.0f;
-			}
-			if (controls.isKeyPressed(KEY_SPACE))
-			{
-				position.y += 1.0f;
-			}
-			if (controls.isKeyPressed(KEY_LSHIFT))
-			{
-				position.y -= 1.0f;
-			}
-
-			Camera@ camera = Camera::getCamera();
-			Mouse@ mouse = Mouse::getMouse();
-
-			camera.position = position;
-			camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
+			Movement();
 		}
+	}
+
+	private void Movement()
+	{
+		CControls@ controls = getControls();
+		Camera@ camera = Camera::getCamera();
+		Mouse@ mouse = Mouse::getMouse();
+
+		Vec2f dir;
+		s8 verticalDir = 0;
+
+		if (controls.isKeyPressed(KEY_KEY_W)) dir.y++;
+		if (controls.isKeyPressed(KEY_KEY_S)) dir.y--;
+		if (controls.isKeyPressed(KEY_KEY_D)) dir.x++;
+		if (controls.isKeyPressed(KEY_KEY_A)) dir.x--;
+
+		if (controls.isKeyPressed(KEY_SPACE)) verticalDir++;
+		if (controls.isKeyPressed(KEY_LSHIFT)) verticalDir--;
+
+		float len = dir.Length();
+		if (len > 0)
+		{
+			dir /= len; // Normalize
+			dir = dir.RotateBy(camera.rotation.y);
+		}
+
+		// Move actor
+		position.x += dir.x;
+		position.z += dir.y;
+		position.y += verticalDir;
+
+		// Move and rotate camera
+		camera.position = position;
+		camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
 	}
 }
