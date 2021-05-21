@@ -95,5 +95,10 @@ class Actor : Object
 		// Move and rotate camera
 		camera.position = position;
 		camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
+		camera.rotation = Vec3f(
+			Maths::Clamp(camera.rotation.x, -90, 90),
+			camera.rotation.y,
+			Maths::Clamp(camera.rotation.z, -90, 90)
+		);
 	}
 }
