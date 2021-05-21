@@ -1,8 +1,11 @@
 #include "MouseCommon.as"
+#include "Interpolation.as"
 
 class Mouse
 {
 	Vec2f velocity;
+	Vec2f oldVelocity;
+	Vec2f interVelocity;
 
 	float sensitivity = 0.7f;
 
@@ -12,6 +15,11 @@ class Mouse
 	{
 		CalculateVelocity();
 		UpdateVisibility();
+	}
+
+	void Render()
+	{
+		Interpolate();
 	}
 
 	bool isInControl()
@@ -26,6 +34,8 @@ class Mouse
 
 	private void CalculateVelocity()
 	{
+		oldVelocity = velocity;
+
 		Vec2f mousePos = getControls().getMouseScreenPos();
 		Vec2f center = getDriver().getScreenCenterPos();
 
@@ -64,5 +74,11 @@ class Mouse
 		{
 			getHUD().HideCursor();
 		}
+	}
+
+	private void Interpolate()
+	{
+		float t = Interpolation::getFrameTime();
+		interVelocity = Vec2f_lerp(oldVelocity, velocity, t);
 	}
 }

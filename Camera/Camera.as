@@ -1,10 +1,15 @@
 #include "CameraCommon.as"
 #include "Vec3f.as"
+#include "Interpolation.as"
 
 class Camera
 {
-	private Vec3f _position;
-	private Vec3f _rotation;
+	Vec3f position;
+	Vec3f oldPosition;
+	private Vec3f _interPosition;
+	Vec3f rotation;
+	Vec3f oldRotation;
+	private Vec3f _interRotation;
 
 	private float _fov = 70.0f;
 	private float _renderDistance = 70.0f;
@@ -28,33 +33,47 @@ class Camera
 		// Render::SetFog(getSkyColor(), SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
 	}
 
+	void Update()
+	{
+		oldPosition = position;
+		oldRotation = rotation;
+	}
+
 	void Render()
 	{
+		Interpolate();
 		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
 	}
 
-	Vec3f position
+	private void Interpolate()
+	{
+		float t = Interpolation::getFrameTime();
+		interPosition = oldPosition.lerp(position, t);
+		interRotation = oldRotation.lerp(rotation, t);
+	}
+
+	Vec3f interPosition
 	{
 		get const
 		{
-			return _position;
+			return _interPosition;
 		}
 		set
 		{
-			_position = value;
+			_interPosition = value;
 			UpdateViewMatrix();
 		}
 	}
 
-	Vec3f rotation
+	Vec3f interRotation
 	{
 		get const
 		{
-			return _rotation;
+			return _interRotation;
 		}
 		set
 		{
-			_rotation = value;
+			_interRotation = value;
 			UpdateRotationMatrix();
 		}
 	}
@@ -101,7 +120,7 @@ class Camera
 	{
 		float[] translation;
 		Matrix::MakeIdentity(translation);
-		Matrix::SetTranslation(translation, -position.x, -position.y, -position.z);
+		Matrix::SetTranslation(translation, -interPosition.x, -interPosition.y, -interPosition.z);
 
 		float[] thirdPerson;
 		Matrix::MakeIdentity(thirdPerson);
@@ -114,15 +133,15 @@ class Camera
 	{
 		float[] tempX;
 		Matrix::MakeIdentity(tempX);
-		Matrix::SetRotationDegrees(tempX, rotation.x, 0, 0);
+		Matrix::SetRotationDegrees(tempX, interRotation.x, 0, 0);
 
 		float[] tempY;
 		Matrix::MakeIdentity(tempY);
-		Matrix::SetRotationDegrees(tempY, 0, rotation.y, 0);
+		Matrix::SetRotationDegrees(tempY, 0, interRotation.y, 0);
 
 		float[] tempZ;
 		Matrix::MakeIdentity(tempZ);
-		Matrix::SetRotationDegrees(tempZ, 0, 0, rotation.z);
+		Matrix::SetRotationDegrees(tempZ, 0, 0, interRotation.z);
 
 		Matrix::Multiply(tempX, tempZ, rotationMatrix);
 		Matrix::Multiply(rotationMatrix, tempY, rotationMatrix);
