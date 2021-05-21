@@ -8,11 +8,6 @@ void onInit(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	if (isServer() && getGameTime() == 10)
-	{
-		Object::AddObject(Object(Vec3f(2, 0, 10)));
-	}
-
 	Object@[]@ objects = Object::getObjects();
 
 	for (uint i = 0; i < objects.size(); i++)
