@@ -6,30 +6,57 @@ uint index = 0;
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("click");
+	this.addCommandID("place block");
+	this.addCommandID("destroy block");
 }
 
 void onTick(CRules@ this)
 {
-	if (isClient() && getControls().isKeyJustPressed(KEY_LBUTTON))
+	if (isClient())
 	{
-		Camera@ camera = Camera::getCamera();
-		Ray ray(camera.position, camera.rotation.dir());
+		CControls@ controls = getControls();
 
-		RaycastInfo raycast;
-		if (ray.raycastBlock(100, false, raycast))
+		bool left = controls.isKeyJustPressed(KEY_LBUTTON);
+		bool right = controls.isKeyJustPressed(KEY_RBUTTON);
+
+		if (left || right)
 		{
-			Vec3f position = raycast.hitWorldPos + raycast.normal;
+			Camera@ camera = Camera::getCamera();
+			Ray ray(camera.position, camera.rotation.dir());
 
-			if (isServer())
+			RaycastInfo raycast;
+			if (ray.raycastBlock(100, false, raycast))
 			{
-				PlaceBlock(position);
-			}
-			else
-			{
-				CBitStream bs;
-				position.Serialize(bs);
-				this.SendCommand(this.getCommandID("click"), bs, false);
+				if (left)
+				{
+					Vec3f position = raycast.hitWorldPos + raycast.normal;
+
+					if (isServer())
+					{
+						PlaceBlock(position);
+					}
+					else
+					{
+						CBitStream bs;
+						position.Serialize(bs);
+						this.SendCommand(this.getCommandID("place block"), bs, false);
+					}
+				}
+				else if (right)
+				{
+					Vec3f position = raycast.hitWorldPos;
+
+					if (isServer())
+					{
+						DestroyBlock(position);
+					}
+					else
+					{
+						CBitStream bs;
+						position.Serialize(bs);
+						this.SendCommand(this.getCommandID("destroy block"), bs, false);
+					}
+				}
 			}
 		}
 	}
@@ -37,10 +64,18 @@ void onTick(CRules@ this)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isServer() && cmd == this.getCommandID("click"))
+	if (isServer())
 	{
-		Vec3f position(params);
-		PlaceBlock(position);
+		if (cmd == this.getCommandID("place block"))
+		{
+			Vec3f position(params);
+			PlaceBlock(position);
+		}
+		else if (cmd == this.getCommandID("destroy block"))
+		{
+			Vec3f position(params);
+			DestroyBlock(position);
+		}
 	}
 }
 
@@ -48,4 +83,10 @@ void PlaceBlock(Vec3f position)
 {
 	Map@ map = Map::getMap();
 	map.SetBlockSafe(position, 1);
+}
+
+void DestroyBlock(Vec3f position)
+{
+	Map@ map = Map::getMap();
+	map.SetBlockSafe(position, 0);
 }
