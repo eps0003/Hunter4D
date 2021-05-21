@@ -70,19 +70,19 @@ class Chunk
 				float w = 1;
 
 				SColor col;
-				// float shade = 12;
-				// SColor[] colors = {
-				// 	SColor(255, 255 - shade * 2, 255 - shade * 2, 255 - shade * 2),
-				// 	SColor(255, 255 - shade * 3, 255 - shade * 3, 255 - shade * 3),
-				// 	SColor(255, 255 - shade * 5, 255 - shade * 5, 255 - shade * 5),
-				// 	SColor(255, 255 - shade * 0, 255 - shade * 0, 255 - shade * 0),
-				// 	SColor(255, 255 - shade * 1, 255 - shade * 1, 255 - shade * 1),
-				// 	SColor(255, 255 - shade * 4, 255 - shade * 4, 255 - shade * 4),
-				// };
+				float shade = 12;
+				SColor[] colors = {
+					SColor(255, 255 - shade * 2, 255 - shade * 2, 255 - shade * 2),
+					SColor(255, 255 - shade * 3, 255 - shade * 3, 255 - shade * 3),
+					SColor(255, 255 - shade * 5, 255 - shade * 5, 255 - shade * 5),
+					SColor(255, 255 - shade * 0, 255 - shade * 0, 255 - shade * 0),
+					SColor(255, 255 - shade * 1, 255 - shade * 1, 255 - shade * 1),
+					SColor(255, 255 - shade * 4, 255 - shade * 4, 255 - shade * 4),
+				};
 
 				if (blockHasFace(faces, FaceFlag::Left))
 				{
-					col = color_white;
+					col = colors[0];
 					vertices.push_back(Vertex(x, y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x, y + w, z    , x2, y1, col));
 					vertices.push_back(Vertex(x, y    , z    , x2, y2, col));
@@ -92,7 +92,7 @@ class Chunk
 
 				if (blockHasFace(faces, FaceFlag::Right))
 				{
-					col = color_white;
+					col = colors[1];
 					vertices.push_back(Vertex(x + w, y + w, z    , x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y    , z + w, x2, y2, col));
@@ -102,7 +102,7 @@ class Chunk
 
 				if (blockHasFace(faces, FaceFlag::Down))
 				{
-					col = color_white;
+					col = colors[2];
 					vertices.push_back(Vertex(x + w, y, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x    , y, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x    , y, z    , x2, y2, col));
@@ -112,7 +112,7 @@ class Chunk
 
 				if (blockHasFace(faces, FaceFlag::Up))
 				{
-					col = color_white;
+					col = colors[3];
 					vertices.push_back(Vertex(x    , y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z    , x2, y2, col));
@@ -122,7 +122,7 @@ class Chunk
 
 				if (blockHasFace(faces, FaceFlag::Front))
 				{
-					col = color_white;
+					col = colors[4];
 					vertices.push_back(Vertex(x    , y + w, z, x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y    , z, x2, y2, col));
@@ -132,7 +132,7 @@ class Chunk
 
 				if (blockHasFace(faces, FaceFlag::Back))
 				{
-					col = color_white;
+					col = colors[5];
 					vertices.push_back(Vertex(x + w, y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x    , y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x    , y    , z + w, x2, y2, col));
