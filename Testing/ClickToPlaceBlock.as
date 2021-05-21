@@ -1,4 +1,6 @@
 #include "Map.as"
+#include "Ray.as"
+#include "Camera.as"
 
 uint index = 0;
 
@@ -11,15 +13,24 @@ void onTick(CRules@ this)
 {
 	if (isClient() && getControls().isKeyJustPressed(KEY_LBUTTON))
 	{
-		if (isServer())
+		Camera@ camera = Camera::getCamera();
+		Ray ray(camera.position, camera.rotation.dir());
+
+		RaycastInfo raycast;
+		if (ray.raycastBlock(100, false, raycast))
 		{
-			PlaceBlock();
-		}
-		else
-		{
-			CBitStream bs;
-			bs.write_netid(getLocalPlayer().getNetworkID());
-			this.SendCommand(this.getCommandID("click"), bs, false);
+			Vec3f position = raycast.hitWorldPos + raycast.normal;
+
+			if (isServer())
+			{
+				PlaceBlock(position);
+			}
+			else
+			{
+				CBitStream bs;
+				position.Serialize(bs);
+				this.SendCommand(this.getCommandID("click"), bs, false);
+			}
 		}
 	}
 }
@@ -28,12 +39,13 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (isServer() && cmd == this.getCommandID("click"))
 	{
-		PlaceBlock();
+		Vec3f position(params);
+		PlaceBlock(position);
 	}
 }
 
-void PlaceBlock()
+void PlaceBlock(Vec3f position)
 {
 	Map@ map = Map::getMap();
-	map.SetBlock(index++, 1);
+	map.SetBlockSafe(position, 1);
 }

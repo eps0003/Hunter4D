@@ -46,7 +46,8 @@ class MapRenderer
 
 	void GenerateMesh(Vec3f position)
 	{
-		int index = posToChunkIndex(position);
+		Vec3f chunkPos = worldPosToChunkPos(position);
+		int index = chunkPosToChunkIndex(chunkPos);
 		if (isValidChunk(index))
 		{
 			Chunk@ chunk = chunks[index];
@@ -148,12 +149,22 @@ class MapRenderer
 		faceFlags[index] = faces;
 	}
 
-	int posToChunkIndex(Vec3f position)
+	Vec3f worldPosToChunkPos(Vec3f position)
 	{
-		return posToChunkIndex(position.x, position.y, position.z);
+		return position / chunkDimension;
 	}
 
-	int posToChunkIndex(int x, int y, int z)
+	Vec3f worldPosToChunkPos(float x, float y, float z)
+	{
+		return worldPosToChunkPos(Vec3f(x, y, z));
+	}
+
+	int chunkPosToChunkIndex(Vec3f position)
+	{
+		return chunkPosToChunkIndex(position.x, position.y, position.z);
+	}
+
+	int chunkPosToChunkIndex(int x, int y, int z)
 	{
 		return x + (y * chunkDimensions.x) + (z * chunkDimensions.z * chunkDimensions.y);
 	}
