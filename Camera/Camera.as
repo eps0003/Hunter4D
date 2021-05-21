@@ -7,6 +7,7 @@ class Camera
 	Vec3f position;
 	Vec3f oldPosition;
 	private Vec3f _interPosition;
+
 	Vec3f rotation;
 	Vec3f oldRotation;
 	private Vec3f _interRotation;
@@ -121,10 +122,6 @@ class Camera
 		float[] translation;
 		Matrix::MakeIdentity(translation);
 		Matrix::SetTranslation(translation, -interPosition.x, -interPosition.y, -interPosition.z);
-
-		float[] thirdPerson;
-		Matrix::MakeIdentity(thirdPerson);
-		Matrix::SetTranslation(thirdPerson, 0, 0, 10);
 
 		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
 	}

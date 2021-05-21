@@ -72,7 +72,7 @@ class MapRenderer
 				chunk.GenerateMesh(map, i);
 
 				Vec3f pos = chunkIndexToPos(i);
-				print("Rebuilded chunk mesh: " + pos.toString());
+				print("Rebuild chunk mesh: " + pos.toString());
 			}
 
 			chunk.Render();
