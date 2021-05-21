@@ -6,7 +6,7 @@ namespace Camera
 		if (!getRules().get("camera", @camera))
 		{
 			@camera = Camera();
-			getRules().set("camera", camera);
+			getRules().set("camera", @camera);
 		}
 		return camera;
 	}

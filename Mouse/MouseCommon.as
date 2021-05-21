@@ -6,7 +6,7 @@ namespace Mouse
 		if (!getRules().get("mouse", @mouse))
 		{
 			@mouse = Mouse();
-			getRules().set("mouse", mouse);
+			getRules().set("mouse", @mouse);
 		}
 		return mouse;
 	}

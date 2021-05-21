@@ -6,7 +6,7 @@ namespace Map
 		if (!getRules().get("map", @map))
 		{
 			@map = Map(Vec3f(32, 8, 32));
-			getRules().set("map", map);
+			getRules().set("map", @map);
 		}
 		return map;
 	}
