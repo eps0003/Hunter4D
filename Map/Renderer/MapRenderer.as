@@ -5,9 +5,13 @@
 
 class MapRenderer
 {
+	Map@ map;
+
 	Chunk@[] chunks;
 	u8[] faceFlags;
+
 	u8 chunkDimension = 8;
+	Vec3f chunkDimensions;
 
 	string texture = "BlocksMC.png";
 	SMaterial@ material = SMaterial();
@@ -15,9 +19,13 @@ class MapRenderer
 	MapRenderer()
 	{
 		InitMaterial();
-		faceFlags.set_length(Map::getMap().blocks.size());
 
-		Map@ map = Map::getMap();
+		@map = Map::getMap();
+
+		chunkDimensions = (map.dimensions / chunkDimension).ceil();
+
+		faceFlags.set_length(map.blocks.size());
+
 		Vec3f chunkCount = (map.dimensions / chunkDimension).ceil();
 		chunks.set_length(chunkCount.x * chunkCount.y * chunkCount.z);
 
@@ -36,12 +44,19 @@ class MapRenderer
 		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 	}
 
-	void GenerateMesh(Map@ map)
+	void GenerateMesh(Vec3f position)
 	{
-		for (uint i = 0; i < chunks.size(); i++)
+		int index = posToChunkIndex(position);
+		if (isValidChunk(index))
 		{
-			chunks[i].GenerateMesh(map, i);
+			Chunk@ chunk = chunks[index];
+			chunk.rebuild = true;
 		}
+	}
+
+	bool isValidChunk(int index)
+	{
+		return index >= 0 && index < chunks.size();
 	}
 
 	void Render()
@@ -50,11 +65,21 @@ class MapRenderer
 
 		for (uint i = 0; i < chunks.size(); i++)
 		{
-			chunks[i].Render();
+			Chunk@ chunk = chunks[i];
+
+			if (chunk.rebuild)
+			{
+				chunk.GenerateMesh(map, i);
+
+				Vec3f pos = chunkIndexToPos(i);
+				print("Rebuilded chunk mesh: " + pos.toString());
+			}
+
+			chunk.Render();
 		}
 	}
 
-	void UpdateBlockFaces(Map@ map, int x, int y, int z)
+	void UpdateBlockFaces(int x, int y, int z)
 	{
 		int index = map.posToIndex(x, y, z);
 		u8 block = map.getBlock(index);
@@ -121,5 +146,24 @@ class MapRenderer
 		}
 
 		faceFlags[index] = faces;
+	}
+
+	int posToChunkIndex(Vec3f position)
+	{
+		return posToChunkIndex(position.x, position.y, position.z);
+	}
+
+	int posToChunkIndex(int x, int y, int z)
+	{
+		return x + (y * chunkDimensions.x) + (z * chunkDimensions.z * chunkDimensions.y);
+	}
+
+	Vec3f chunkIndexToPos(int index)
+	{
+		Vec3f vec;
+		vec.x = index % chunkDimensions.x;
+		vec.y = Maths::Floor(index / chunkDimensions.x) % chunkDimensions.y;
+		vec.z = Maths::Floor(index / (chunkDimensions.x * chunkDimensions.y));
+		return vec;
 	}
 }

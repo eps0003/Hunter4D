@@ -6,6 +6,8 @@ class Chunk
 	Vertex[] vertices;
 	u16[] indices;
 
+	bool rebuild = true;
+
 	Chunk(MapRenderer@ renderer, uint index)
 	{
 		@this.renderer = renderer;
@@ -34,28 +36,14 @@ class Chunk
 		return (flags & face) == face;
 	}
 
-	int posToIndex(int x, int y, int z)
-	{
-		u8 dim = renderer.chunkDimension;
-		return x + (y * dim) + (z * dim * dim);
-	}
-
-	Vec3f indexToPos(int index)
-	{
-		u8 dim = renderer.chunkDimension;
-		Vec3f vec;
-		vec.x = index % dim;
-		vec.y = Maths::Floor(index / dim) % dim;
-		vec.z = Maths::Floor(index / (dim * dim));
-		return vec;
-	}
-
 	void GenerateMesh(Map@ map, uint chunkIndex)
 	{
+		rebuild = false;
+
 		vertices.clear();
 		indices.clear();
 
-		Vec3f chunkPos = indexToPos(chunkIndex);
+		Vec3f chunkPos = renderer.chunkIndexToPos(chunkIndex);
 
 		Vec3f startWorldPos = chunkPos * renderer.chunkDimension;
 		Vec3f endWorldPos = (startWorldPos + renderer.chunkDimension).min(map.dimensions);
@@ -66,7 +54,7 @@ class Chunk
 		{
 			int index = map.posToIndex(x, y, z);
 
-			renderer.UpdateBlockFaces(map, x, y, z);
+			renderer.UpdateBlockFaces(x, y, z);
 			u8 faces = renderer.faceFlags[index];
 
 			if (faces != FaceFlag::None)

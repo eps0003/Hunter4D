@@ -65,7 +65,7 @@ class Map
 
 		if (isClient())
 		{
-			MapRenderer::getRenderer().GenerateMesh(this);
+			MapRenderer::getRenderer().GenerateMesh(pos);
 		}
 	}
 
