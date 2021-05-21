@@ -55,6 +55,14 @@ class Actor : Object
 		}
 	}
 
+	void Render()
+	{
+		if (!player.isMyPlayer())
+		{
+			Object::Render();
+		}
+	}
+
 	private void Movement()
 	{
 		CControls@ controls = getControls();
