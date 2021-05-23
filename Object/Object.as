@@ -5,8 +5,14 @@
 class Object
 {
 	u16 id = 0;
+
 	Vec3f position;
+	Vec3f oldPosition;
+	Vec3f interPosition;
+
 	Vec3f velocity;
+	Vec3f oldVelocity;
+	Vec3f interVelocity;
 
 	Object(Vec3f position)
 	{
@@ -17,12 +23,16 @@ class Object
 	{
 		id = bs.read_u16();
 		position = Vec3f(bs);
+		oldPosition = position;
 		velocity = Vec3f(bs);
+		oldVelocity = velocity;
 	}
 
 	void opAssign(Object object)
 	{
+		oldPosition = position;
 		position = object.position;
+		oldVelocity = velocity;
 		velocity = object.velocity;
 	}
 
@@ -42,14 +52,15 @@ class Object
 
 	void Update()
 	{
-
+		oldPosition = position;
+		oldVelocity = velocity;
 	}
 
 	void Render()
 	{
 		float[] matrix;
 		Matrix::MakeIdentity(matrix);
-		Matrix::SetTranslation(matrix, position.x, position.y, position.z);
+		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
 		Render::SetModelTransform(matrix);
 
 		Vertex[] vertices = {
@@ -69,5 +80,12 @@ class Object
 	void RenderHUD()
 	{
 		GUI::DrawText("Position: " + position.toString(), Vec2f(10, 10), color_black);
+	}
+
+	void Interpolate()
+	{
+		float t = Interpolation::getFrameTime();
+		interPosition = oldPosition.lerp(position, t);
+		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 }

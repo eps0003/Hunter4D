@@ -51,12 +51,17 @@ class Actor : Object
 	{
 		if (player.isMyPlayer())
 		{
+			oldPosition = position;
+			oldVelocity = velocity;
+
 			Movement();
 		}
 	}
 
 	void Render()
 	{
+		Interpolate();
+
 		if (!player.isMyPlayer())
 		{
 			Object::Render();
