@@ -10,6 +10,7 @@ class Actor : Object
 	{
 		super(position);
 		@this.player = player;
+		SetCollisionFlags(CollisionFlag::All);
 	}
 
 	Actor(CBitStream@ bs)
@@ -55,6 +56,8 @@ class Actor : Object
 			oldVelocity = velocity;
 
 			Movement();
+			Collision();
+			UpdateCamera();
 		}
 	}
 
@@ -72,7 +75,6 @@ class Actor : Object
 	{
 		CControls@ controls = getControls();
 		Camera@ camera = Camera::getCamera();
-		Mouse@ mouse = Mouse::getMouse();
 
 		Vec2f dir;
 		s8 verticalDir = 0;
@@ -93,9 +95,15 @@ class Actor : Object
 		}
 
 		// Move actor
-		position.x += dir.x;
-		position.z += dir.y;
-		position.y += verticalDir;
+		velocity.x = dir.x;
+		velocity.z = dir.y;
+		velocity.y = verticalDir;
+	}
+
+	private void UpdateCamera()
+	{
+		Camera@ camera = Camera::getCamera();
+		Mouse@ mouse = Mouse::getMouse();
 
 		// Move and rotate camera
 		camera.position = position;
