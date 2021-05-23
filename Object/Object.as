@@ -212,11 +212,41 @@ class Object
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
 		Render::SetModelTransform(matrix);
 
+		Vec3f min = collider.min;
+		Vec3f max = collider.max;
+		SColor col = color_white;
+
 		Vertex[] vertices = {
-			Vertex(-1,  1, 0, 0, 0, color_white),
-			Vertex( 1,  1, 0, 1, 0, color_white),
-			Vertex( 1, -1, 0, 1, 1, color_white),
-			Vertex(-1, -1, 0, 0, 1, color_white)
+			// Left
+			Vertex(min.x, max.y, max.z, 0, 0, col),
+			Vertex(min.x, max.y, min.z, 1, 0, col),
+			Vertex(min.x, min.y, min.z, 1, 1, col),
+			Vertex(min.x, min.y, max.z, 0, 1, col),
+			// Right
+			Vertex(max.x, max.y, min.z, 0, 0, col),
+			Vertex(max.x, max.y, max.z, 1, 0, col),
+			Vertex(max.x, min.y, max.z, 1, 1, col),
+			Vertex(max.x, min.y, min.z, 0, 1, col),
+			// Front
+			Vertex(min.x, max.y, min.z, 0, 0, col),
+			Vertex(max.x, max.y, min.z, 1, 0, col),
+			Vertex(max.x, min.y, min.z, 1, 1, col),
+			Vertex(min.x, min.y, min.z, 0, 1, col),
+			// Back
+			Vertex(max.x, max.y, max.z, 0, 0, col),
+			Vertex(min.x, max.y, max.z, 1, 0, col),
+			Vertex(min.x, min.y, max.z, 1, 1, col),
+			Vertex(max.x, min.y, max.z, 0, 1, col),
+			// Down
+			Vertex(max.x, min.y, max.z, 0, 0, col),
+			Vertex(min.x, min.y, max.z, 1, 0, col),
+			Vertex(min.x, min.y, min.z, 1, 1, col),
+			Vertex(max.x, min.y, min.z, 0, 1, col),
+			// Up
+			Vertex(min.x, max.y, max.z, 0, 0, col),
+			Vertex(max.x, max.y, max.z, 1, 0, col),
+			Vertex(max.x, max.y, min.z, 1, 1, col),
+			Vertex(min.x, max.y, min.z, 0, 1, col)
 		};
 
 		Render::SetBackfaceCull(false);
