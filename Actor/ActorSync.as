@@ -121,7 +121,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 void SpawnActor(CRules@ this, CPlayer@ player)
 {
 	// Spawn actor
-	Actor actor(player, Vec3f());
+	Actor actor(player, Vec3f(10, 2, 10));
 	Actor::SetActor(player, actor);
 
 	// Sync if not localhost
