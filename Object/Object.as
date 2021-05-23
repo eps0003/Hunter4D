@@ -16,7 +16,7 @@ class Object
 	Vec3f oldVelocity;
 	Vec3f interVelocity;
 
-	AABB@ bounds = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.0f, 0.5f));
+	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.0f, 0.5f));
 	private uint collisionFlags = 0;
 
 	private bool collisionX = false;
@@ -89,42 +89,42 @@ class Object
 		collisionY = false;
 		collisionZ = false;
 
-		if (bounds !is null)
+		if (collider !is null)
 		{
 			bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
 			bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
 			Vec3f mapDim = Map::getMap().dimensions;
 
-			Vec3f min = (position + bounds.min).floor();
-			Vec3f max = (position + bounds.max).ceil();
+			Vec3f min = (position + collider.min).floor();
+			Vec3f max = (position + collider.max).ceil();
 
 			// x collision
 			if (velocity.x != 0)
 			{
 				Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
 
-				if (collideBlocks && bounds.intersectsNewSolid(position, xPosition))
+				if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
 				{
 					if (velocity.x > 0)
 					{
-						position.x = max.x - bounds.max.x;
+						position.x = max.x - collider.max.x;
 					}
 					else
 					{
-						position.x = min.x - bounds.min.x;
+						position.x = min.x - collider.min.x;
 					}
 
 					collisionX = true;
 				}
-				else if (collideMapEdge && bounds.intersectsMapEdge(xPosition))
+				else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
 				{
 					if (velocity.x > 0)
 					{
-						position.x = mapDim.x - bounds.max.x;
+						position.x = mapDim.x - collider.max.x;
 					}
 					else
 					{
-						position.x = -bounds.min.x;
+						position.x = -collider.min.x;
 					}
 
 					collisionX = true;
@@ -141,28 +141,28 @@ class Object
 			{
 				Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
 
-				if (collideBlocks && bounds.intersectsNewSolid(position, zPosition))
+				if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
 				{
 					if (velocity.z > 0)
 					{
-						position.z = max.z - bounds.max.z;
+						position.z = max.z - collider.max.z;
 					}
 					else
 					{
-						position.z = min.z - bounds.min.z;
+						position.z = min.z - collider.min.z;
 					}
 
 					collisionZ = true;
 				}
-				else if (collideMapEdge && bounds.intersectsMapEdge(zPosition))
+				else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
 				{
 					if (velocity.z > 0)
 					{
-						position.z = mapDim.z - bounds.max.z;
+						position.z = mapDim.z - collider.max.z;
 					}
 					else
 					{
-						position.z = -bounds.min.z;
+						position.z = -collider.min.z;
 					}
 
 					collisionZ = true;
@@ -179,15 +179,15 @@ class Object
 			{
 				Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
 
-				if (collideBlocks && bounds.intersectsNewSolid(position, yPosition))
+				if (collideBlocks && collider.intersectsNewSolid(position, yPosition))
 				{
 					if (velocity.y > 0)
 					{
-						position.y = max.y - bounds.max.y;
+						position.y = max.y - collider.max.y;
 					}
 					else
 					{
-						position.y = min.y - bounds.min.y;
+						position.y = min.y - collider.min.y;
 					}
 
 					collisionY = true;
