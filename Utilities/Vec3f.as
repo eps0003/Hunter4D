@@ -23,6 +23,13 @@ class Vec3f
 		z = vec.z * mag;
 	}
 
+	Vec3f(Vec3f vec)
+	{
+		x = vec.x;
+		y = vec.y;
+		z = vec.z;
+	}
+
 	Vec3f(CBitStream@ bs)
 	{
 		x = bs.read_f32();
