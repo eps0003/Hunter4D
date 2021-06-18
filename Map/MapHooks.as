@@ -5,12 +5,17 @@ void onInit(CRules@ this)
 	this.addCommandID("sync block");
 	this.addCommandID("sync map");
 
-	Map@ map = Map::getMap();
-
-	for (uint x = 0; x < map.dimensions.x; x++)
-	for (uint z = 0; z < map.dimensions.z; z++)
+	if (isServer())
 	{
-		map.SetBlock(x, 0, z, 1);
+		Map@ map = Map::getMap();
+
+		for (uint x = 0; x < map.dimensions.x; x++)
+		for (uint z = 0; z < map.dimensions.z; z++)
+		{
+			map.SetBlock(x, 0, z, 1);
+		}
+
+		Map::getMapSyncer().AddRequestForEveryone();
 	}
 }
 
@@ -34,12 +39,21 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isClient() && cmd == this.getCommandID("sync block"))
+	if (isClient())
 	{
-		uint index = params.read_u32();
-		u8 block = params.read_u8();
+		if (cmd == this.getCommandID("sync block"))
+		{
+			uint index = params.read_u32();
+			u8 block = params.read_u8();
 
-		Map@ map = Map::getMap();
-		map.SetBlockSafe(index, block);
+			Map@ map = Map::getMap();
+			map.SetBlockSafe(index, block);
+		}
+		else if (cmd == this.getCommandID("sync map"))
+		{
+			CBitStream bs = params;
+			bs.SetBitIndex(params.getBitIndex());
+			Map::getMapSyncer().AddPacket(bs);
+		}
 	}
 }

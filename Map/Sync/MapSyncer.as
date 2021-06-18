@@ -52,7 +52,7 @@ class MapSyncer
 	CBitStream@ getNextPacket()
 	{
 		CBitStream@ packet;
-		if (hasRequests())
+		if (hasPackets())
 		{
 			@packet = mapPackets[0];
 			mapPackets.removeAt(0);
