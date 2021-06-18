@@ -16,7 +16,7 @@ class Object
 	Vec3f oldVelocity;
 	Vec3f interVelocity;
 
-	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.0f, 0.5f));
+	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.6f, 0.5f));
 	private uint collisionFlags = 0;
 
 	private bool collisionX = false;
