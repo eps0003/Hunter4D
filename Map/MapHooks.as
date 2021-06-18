@@ -3,6 +3,7 @@
 void onInit(CRules@ this)
 {
 	this.addCommandID("sync block");
+	this.addCommandID("sync map");
 
 	Map@ map = Map::getMap();
 
@@ -11,6 +12,24 @@ void onInit(CRules@ this)
 	{
 		map.SetBlock(x, 0, z, 1);
 	}
+}
+
+void onTick(CRules@ this)
+{
+	if (isServer())
+	{
+		Map::getMapSyncer().ServerSync();
+	}
+
+	if (isClient())
+	{
+		Map::getMapSyncer().ClientReceive();
+	}
+}
+
+void onNewPlayerJoin(CRules@ this, CPlayer@ player)
+{
+	Map::getMapSyncer().AddRequest(player);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

@@ -2,15 +2,20 @@
 #include "Block.as"
 #include "MapRenderer.as"
 #include "Vec3f.as"
+#include "MapSyncer.as"
 
 class Map
 {
 	u8[] blocks;
 	Vec3f dimensions;
+	uint blockCount = 0;
+
+	Map() {}
 
 	Map(Vec3f dimensions)
 	{
 		this.dimensions = dimensions;
+		blockCount = dimensions.x * dimensions.y * dimensions.z;
 		blocks.set_length(dimensions.x * dimensions.y * dimensions.z);
 	}
 
