@@ -3,15 +3,15 @@
 
 class MapSyncer
 {
-    Map@ map;
+	Map@ map;
 	private MapRequest@[] mapRequests;
 	private CBitStream@[] mapPackets;
 	private uint blocksPerPacket = 10000;
 
-    MapSyncer()
-    {
-        @map = Map::getMap();
-    }
+	MapSyncer()
+	{
+		@map = Map::getMap();
+	}
 
 	void AddRequest(CPlayer@ player, uint packet = 0)
 	{
@@ -66,7 +66,7 @@ class MapSyncer
 	}
 
 	bool hasPackets()
-    {
+	{
 		return !mapPackets.empty();
 	}
 
@@ -75,89 +75,89 @@ class MapSyncer
 		return Maths::Ceil(map.blockCount / float(blocksPerPacket));
 	}
 
-    void ServerSync()
-    {
+	void ServerSync()
+	{
 		MapRequest@ request = getNextRequest();
-        if (request is null) return;
+		if (request is null) return;
 
-        CPlayer@ player = request.player;
-        u16 index = request.packet;
+		CPlayer@ player = request.player;
+		u16 index = request.packet;
 
 		// Move straight onto next request if the player of this one doesn't exist
-        if (player is null)
-        {
-            ServerSync();
-            return;
-        }
+		if (player is null)
+		{
+			ServerSync();
+			return;
+		}
 
-        // Get index of first and last block to sync
-        uint firstBlock = index * blocksPerPacket;
-        uint lastBlock = firstBlock + blocksPerPacket;
+		// Get index of first and last block to sync
+		uint firstBlock = index * blocksPerPacket;
+		uint lastBlock = firstBlock + blocksPerPacket;
 
-        // Serialize index
-        CBitStream bs;
-        bs.write_u16(index);
+		// Serialize index
+		CBitStream bs;
+		bs.write_u16(index);
 
-        // Serialize map size
-        if (index == 0)
-        {
-            map.dimensions.Serialize(bs);
-        }
+		// Serialize map size
+		if (index == 0)
+		{
+			map.dimensions.Serialize(bs);
+		}
 
-        // Loop through these blocks and serialize
-        for (uint i = firstBlock; i < lastBlock; i++)
-        {
-            if (i >= map.blockCount) break;
+		// Loop through these blocks and serialize
+		for (uint i = firstBlock; i < lastBlock; i++)
+		{
+			if (i >= map.blockCount) break;
 
-            u8 block = map.getBlock(i);
-            bs.write_u8(block);
+			u8 block = map.getBlock(i);
+			bs.write_u8(block);
 
-            getNet().server_KeepConnectionsAlive();
-        }
+			getNet().server_KeepConnectionsAlive();
+		}
 
-        // Send to requesting player
-        getRules().SendCommand(getRules().getCommandID("sync map"), bs, player);
+		// Send to requesting player
+		getRules().SendCommand(getRules().getCommandID("sync map"), bs, player);
 
-        // Request next packet
-        index++;
-        if (index < getTotalPackets())
-        {
-            AddRequest(player, index);
-        }
-        else
-        {
-            print("Map syncing complete!");
-        }
-    }
+		// Request next packet
+		index++;
+		if (index < getTotalPackets())
+		{
+			AddRequest(player, index);
+		}
+		else
+		{
+			print("Map syncing complete!");
+		}
+	}
 
-    void ClientReceive()
-    {
-        CBitStream@ packet = getNextPacket();
-        if (packet is null) return;
+	void ClientReceive()
+	{
+		CBitStream@ packet = getNextPacket();
+		if (packet is null) return;
 
-        u16 index = packet.read_u16();
-        uint firstBlock = index * blocksPerPacket;
-        uint lastBlock = firstBlock + blocksPerPacket;
+		u16 index = packet.read_u16();
+		uint firstBlock = index * blocksPerPacket;
+		uint lastBlock = firstBlock + blocksPerPacket;
 
-        if (index == 0)
-        {
-            Map::SetMap(Map(Vec3f(packet)));
-        }
+		if (index == 0)
+		{
+			Map::SetMap(Map(Vec3f(packet)));
+		}
 
-        // Loop through these blocks and serialize
-        for (uint i = firstBlock; i < lastBlock; i++)
-        {
-            if (i >= map.blockCount) break;
+		// Loop through these blocks and serialize
+		for (uint i = firstBlock; i < lastBlock; i++)
+		{
+			if (i >= map.blockCount) break;
 
-            u8 block = packet.read_u8();
-            map.SetBlock(i, block);
+			u8 block = packet.read_u8();
+			map.SetBlock(i, block);
 
-            getNet().server_KeepConnectionsAlive();
-        }
+			getNet().server_KeepConnectionsAlive();
+		}
 
-        if (index == getTotalPackets() - 1)
-        {
-            print("Map syncing complete!");
-        }
-    }
+		if (index == getTotalPackets() - 1)
+		{
+			print("Map syncing complete!");
+		}
+	}
 }

@@ -2,10 +2,10 @@
 
 class Loader
 {
-    bool loaded = true;
+	bool loaded = true;
 
-    void Load()
-    {
-        if (loaded) return;
-    }
+	void Load()
+	{
+		if (loaded) return;
+	}
 }

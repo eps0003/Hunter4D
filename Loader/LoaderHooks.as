@@ -2,5 +2,5 @@
 
 void onTick(CRules@ this)
 {
-    Loader::getLoader().Load();
+	Loader::getLoader().Load();
 }
