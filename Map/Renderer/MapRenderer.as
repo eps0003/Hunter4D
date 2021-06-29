@@ -1,4 +1,3 @@
-#include "MapRendererCommon.as"
 #include "Map.as"
 #include "Chunk.as"
 #include "FaceFlags.as"
@@ -63,7 +62,7 @@ class MapRenderer
 	{
 		material.SetVideoMaterial();
 
-		bool synced = Map::getMapSyncer().synced;
+		bool synced = Map::getSyncer().isSynced();
 
 		for (uint i = 0; i < chunks.size(); i++)
 		{

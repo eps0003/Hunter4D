@@ -41,7 +41,7 @@ void Render(int id)
 	Render::ClearZ();
 
 	Camera::getCamera().Render();
-	MapRenderer::getRenderer().Render();
+	Map::getRenderer().Render();
 
 	Actor@[] actors = Actor::getActors();
 	for (uint i = 0; i < actors.size(); i++)

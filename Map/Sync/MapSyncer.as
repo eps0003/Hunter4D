@@ -6,8 +6,8 @@ class MapSyncer
 	private Map@ map;
 	private MapRequest@[] mapRequests;
 	CBitStream@[] mapPackets;
-	private uint blocksPerPacket = 100;
-	bool synced = false;
+	private uint blocksPerPacket = 5000;
+	private bool synced = false;
 	private int index = 0;
 
 	MapSyncer()
@@ -62,7 +62,7 @@ class MapSyncer
 		return packet;
 	}
 
-	int getCurrentPacketIndex()
+	int getCurrentIndex()
 	{
 		return index;
 	}
@@ -93,7 +93,7 @@ class MapSyncer
 		if (request is null) return;
 
 		CPlayer@ player = request.player;
-		u16 index = request.packet;
+		index = request.packet;
 
 		// Move straight onto next request if the player of this one doesn't exist
 		if (player is null)
@@ -138,7 +138,6 @@ class MapSyncer
 		}
 		else
 		{
-			print("Map syncing complete!");
 			synced = true;
 		}
 	}

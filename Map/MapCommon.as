@@ -11,7 +11,7 @@ namespace Map
 		return map;
 	}
 
-	MapSyncer@ getMapSyncer()
+	MapSyncer@ getSyncer()
 	{
 		MapSyncer@ syncer;
 		if (!getRules().get("map syncer", @syncer))
@@ -20,5 +20,16 @@ namespace Map
 			getRules().set("map syncer", @syncer);
 		}
 		return syncer;
+	}
+
+	MapRenderer@ getRenderer()
+	{
+		MapRenderer@ renderer;
+		if (!getRules().get("map renderer", @renderer))
+		{
+			@renderer = MapRenderer();
+			getRules().set("map renderer", @renderer);
+		}
+		return renderer;
 	}
 }

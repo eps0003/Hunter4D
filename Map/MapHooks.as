@@ -6,17 +6,9 @@ void onInit(CRules@ this)
 	this.addCommandID("sync map");
 }
 
-void onTick(CRules@ this)
-{
-	if (isServer())
-	{
-		Map::getMapSyncer().ServerSync();
-	}
-}
-
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	Map::getMapSyncer().AddRequest(player);
+	Map::getSyncer().AddRequest(player);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -35,7 +27,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		{
 			CBitStream bs = params;
 			bs.SetBitIndex(params.getBitIndex());
-			Map::getMapSyncer().AddPacket(bs);
+			Map::getSyncer().AddPacket(bs);
 		}
 	}
 }
