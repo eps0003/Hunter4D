@@ -1,12 +1,6 @@
 #include "Actor.as"
 
-// Server tells client to spawn actor
-// Client spawns actor and send init command to server and clients
-// Both server and client inits actor
-
-// Client syncs actor each tick to server only
-// If actor exists on server, update and sync to clients
-// Else, ignore
+Vec3f SPAWN_POSITION = Vec3f(10, 2, 10);
 
 void onInit(CRules@ this)
 {
@@ -16,25 +10,12 @@ void onInit(CRules@ this)
 
 	if (isServer())
 	{
-		if (isClient())
+		for (uint i = 0; i < getPlayerCount(); i++)
 		{
-			// Localhost
-			for (uint i = 0; i < getPlayerCount(); i++)
+			CPlayer@ player = getPlayer(i);
+			if (player !is null)
 			{
-				CPlayer@ player = getPlayer(i);
-				SpawnActor(this, player);
-			}
-		}
-		else
-		{
-			// Server
-			for (uint i = 0; i < getPlayerCount(); i++)
-			{
-				CPlayer@ player = getPlayer(i);
-
-				CBitStream bs;
-				bs.write_netid(player.getNetworkID());
-				this.SendCommand(this.getCommandID("spawn actor"), bs, true);
+				SpawnActor(this, player, SPAWN_POSITION);
 			}
 		}
 	}
@@ -42,10 +23,7 @@ void onInit(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	// Tell clients to spawn actor
-	CBitStream bs;
-	bs.write_netid(player.getNetworkID());
-	this.SendCommand(this.getCommandID("spawn actor"), bs, true);
+	SpawnActor(this, player, SPAWN_POSITION);
 
 	// Sync all actors
 	Actor@[] actors = Actor::getActors();
@@ -62,6 +40,13 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onTick(CRules@ this)
 {
+	// Update actors
+	Actor@[] actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
+	{
+		actors[i].Update();
+	}
+
 	if (!isServer())
 	{
 		// Sync my actor
@@ -73,13 +58,6 @@ void onTick(CRules@ this)
 			this.SendCommand(this.getCommandID("sync actor"), bs, true);
 		}
 	}
-
-	// Update actors
-	Actor@[] actors = Actor::getActors();
-	for (uint i = 0; i < actors.size(); i++)
-	{
-		actors[i].Update();
-	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -87,9 +65,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (isClient() && cmd == this.getCommandID("spawn actor"))
 	{
 		CPlayer@ player = getPlayerByNetworkId(params.read_netid());
+		Vec3f position(params);
+
 		if (player !is null)
 		{
-			SpawnActor(this, player);
+			SpawnActor(this, player, position);
 		}
 	}
 	else if (cmd == this.getCommandID("init actor"))
@@ -118,17 +98,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 }
 
-void SpawnActor(CRules@ this, CPlayer@ player)
+void SpawnActor(CRules@ this, CPlayer@ player, Vec3f position)
 {
-	// Spawn actor
-	Actor actor(player, Vec3f(10, 2, 10));
+	Actor actor(player, position);
 	Actor::SetActor(player, actor);
 
-	// Sync if not localhost
-	if (!isServer())
+	if (!isClient())
 	{
 		CBitStream bs;
-		actor.SerializeInit(bs);
-		this.SendCommand(this.getCommandID("init actor"), bs, true);
+		bs.write_netid(player.getNetworkID());
+		position.Serialize(bs);
+		this.SendCommand(this.getCommandID("spawn actor"), bs, true);
 	}
 }
