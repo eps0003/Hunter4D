@@ -11,6 +11,7 @@ void onTick(CRules@ this)
 	if (isServer())
 	{
 		Map@ map = Map::getMap();
+		map = Map(Vec3f(32, 8, 32));
 
 		for (uint x = 0; x < map.dimensions.x; x++)
 		for (uint z = 0; z < map.dimensions.z; z++)
