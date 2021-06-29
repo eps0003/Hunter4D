@@ -6,14 +6,9 @@ namespace Map
 		if (!getRules().get("map", @map))
 		{
 			@map = Map(Vec3f(32, 8, 32));
-			Map::SetMap(map);
+			getRules().set("map", @map);
 		}
 		return map;
-	}
-
-	void SetMap(Map@ map)
-	{
-		getRules().set("map", @map);
 	}
 
 	MapSyncer@ getMapSyncer()

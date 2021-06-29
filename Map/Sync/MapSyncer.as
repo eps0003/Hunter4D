@@ -141,7 +141,7 @@ class MapSyncer
 
 		if (index == 0)
 		{
-			Map::SetMap(Map(Vec3f(packet)));
+			map = Map(Vec3f(packet));
 		}
 
 		// Loop through these blocks and serialize

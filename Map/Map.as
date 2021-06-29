@@ -16,7 +16,14 @@ class Map
 	{
 		this.dimensions = dimensions;
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
-		blocks.set_length(dimensions.x * dimensions.y * dimensions.z);
+		blocks.set_length(blockCount);
+	}
+
+	void opAssign(Map map)
+	{
+		blocks = map.blocks;
+		dimensions = map.dimensions;
+		blockCount = map.blockCount;
 	}
 
 	void SetBlockSafe(Vec3f position, u8 block)
