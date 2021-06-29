@@ -1,41 +1,14 @@
-#include "LoadStage.as"
+#include "Loader.as"
 #include "Map.as"
 
-class DeserializeMapStage : LoadStage
+void onTick(CRules@ this)
 {
-    bool loaded = false;
-    private MapSyncer@ mapSyncer;
+    MapSyncer@ mapSyncer = Map::getMapSyncer();
 
-    DeserializeMapStage()
+    mapSyncer.ClientReceive();
+
+    if (mapSyncer.isSynced())
     {
-        super("Receiving map...");
-        @mapSyncer = Map::getMapSyncer();
-    }
-
-    void OnStart()
-    {
-
-    }
-
-    void Load()
-    {
-        if (!isClient()) return;
-
-        mapSyncer.ClientReceive();
-
-        if (mapSyncer.isSynced())
-        {
-            loaded = true;
-        }
-    }
-
-    void OnEnd()
-    {
-
-    }
-
-    bool isLoaded()
-    {
-        return loaded;
+        Loader::getLoader().NextStage();
     }
 }

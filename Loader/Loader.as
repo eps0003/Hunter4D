@@ -1,53 +1,41 @@
 #include "LoaderCommon.as"
-#include "LoadStage.as"
 
 class Loader
 {
-	private LoadStage@ stage;
-	private LoadStage@[] stages;
-	private u8 index = 0;
+	private CRules@ rules;
+	private string[] stages;
+	private int index = -1;
 
-	void AddStage(LoadStage@ stage)
+	Loader()
 	{
-		stages.push_back(stage);
-
-		if (stages.size() == 1)
-		{
-			@this.stage = stage;
-			stage.Start();
-		}
+		@rules = getRules();
 	}
 
-	void Load()
+	void AddStage(string stage)
 	{
-		if (isLoaded())
+		stages.push_back(stage);
+	}
+
+	void NextStage()
+	{
+		if (index > -1)
 		{
-			getRules().RemoveScript("LoaderHooks.as");
-			print("Hunter3D loaded!", ConsoleColour::CRAZY);
-			return;
+			rules.RemoveScript(stages[index]);
 		}
 
-		stage.Load();
-
-		if (stage.isLoaded())
+		index++;
+		if (index < stages.size())
 		{
-			stage.End();
-
-			index++;
-			if (index < stages.size())
-			{
-				@stage = stages[index];
-				stage.Start();
-			}
-			else
-			{
-				@stage = null;
-			}
+			rules.AddScript(stages[index]);
+		}
+		else
+		{
+			print("Hunter3D loaded!", ConsoleColour::CRAZY);
 		}
 	}
 
 	bool isLoaded()
 	{
-		return stage is null;
+		return stages.size() == 0 || index >= stages.size();
 	}
 }
