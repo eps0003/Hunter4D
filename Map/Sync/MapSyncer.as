@@ -3,7 +3,7 @@
 
 class MapSyncer
 {
-	Map@ map;
+	private Map@ map;
 	private MapRequest@[] mapRequests;
 	private CBitStream@[] mapPackets;
 	private uint blocksPerPacket = 10000;
@@ -74,6 +74,11 @@ class MapSyncer
 	uint getTotalPackets()
 	{
 		return Maths::Ceil(map.blockCount / float(blocksPerPacket));
+	}
+
+	bool isSynced()
+	{
+		return synced;
 	}
 
 	void ServerSync()

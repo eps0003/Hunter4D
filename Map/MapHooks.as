@@ -25,11 +25,6 @@ void onTick(CRules@ this)
 	{
 		Map::getMapSyncer().ServerSync();
 	}
-
-	if (isClient())
-	{
-		Map::getMapSyncer().ClientReceive();
-	}
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
