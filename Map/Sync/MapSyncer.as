@@ -5,9 +5,10 @@ class MapSyncer
 {
 	private Map@ map;
 	private MapRequest@[] mapRequests;
-	private CBitStream@[] mapPackets;
-	private uint blocksPerPacket = 10000;
+	CBitStream@[] mapPackets;
+	private uint blocksPerPacket = 100;
 	bool synced = false;
+	private int index = 0;
 
 	MapSyncer()
 	{
@@ -59,6 +60,11 @@ class MapSyncer
 			mapPackets.removeAt(0);
 		}
 		return packet;
+	}
+
+	int getCurrentPacketIndex()
+	{
+		return index;
 	}
 
 	bool hasRequests()
@@ -142,7 +148,7 @@ class MapSyncer
 		CBitStream@ packet = getNextPacket();
 		if (packet is null) return;
 
-		u16 index = packet.read_u16();
+		index = packet.read_u16();
 		uint firstBlock = index * blocksPerPacket;
 		uint lastBlock = firstBlock + blocksPerPacket;
 

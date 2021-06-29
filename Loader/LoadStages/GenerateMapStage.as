@@ -1,6 +1,11 @@
 #include "Loader.as"
 #include "Map.as"
 
+void onInit(CRules@ this)
+{
+    this.set_string("loading message", "Generating map...");
+}
+
 void onTick(CRules@ this)
 {
 	if (isServer())
