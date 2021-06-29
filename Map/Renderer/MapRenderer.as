@@ -47,10 +47,9 @@ class MapRenderer
 	void GenerateMesh(Vec3f position)
 	{
 		Vec3f chunkPos = worldPosToChunkPos(position);
-		int index = chunkPosToChunkIndex(chunkPos);
-		if (isValidChunk(index))
+		Chunk@ chunk = getChunk(chunkPos);
+		if (chunk !is null)
 		{
-			Chunk@ chunk = chunks[index];
 			chunk.rebuild = true;
 		}
 	}
@@ -64,11 +63,13 @@ class MapRenderer
 	{
 		material.SetVideoMaterial();
 
+		bool synced = Map::getMapSyncer().synced;
+
 		for (uint i = 0; i < chunks.size(); i++)
 		{
 			Chunk@ chunk = chunks[i];
 
-			if (chunk.rebuild)
+			if (synced && chunk.rebuild)
 			{
 				chunk.GenerateMesh(map, i);
 
@@ -147,6 +148,20 @@ class MapRenderer
 		}
 
 		faceFlags[index] = faces;
+	}
+
+	Chunk@ getChunk(Vec3f position)
+	{
+		return getChunk(chunkPosToChunkIndex(position));
+	}
+
+	Chunk@ getChunk(int index)
+	{
+		if (isValidChunk(index))
+		{
+			return chunks[index];
+		}
+		return null;
 	}
 
 	Vec3f worldPosToChunkPos(Vec3f position)

@@ -64,7 +64,7 @@ class Map
 
 		string name = Block::getBlock(block).name;
 		Vec3f pos = indexToPos(index);
-		print("Set block: " + name + " at " + pos.toString());
+		// print("Set block: " + name + " at " + pos.toString());
 
 		// Sync block to clients
 		if (!isClient())

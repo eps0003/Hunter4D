@@ -7,6 +7,7 @@ class MapSyncer
 	private MapRequest@[] mapRequests;
 	private CBitStream@[] mapPackets;
 	private uint blocksPerPacket = 10000;
+	bool synced = false;
 
 	MapSyncer()
 	{
@@ -127,6 +128,7 @@ class MapSyncer
 		else
 		{
 			print("Map syncing complete!");
+			synced = true;
 		}
 	}
 
@@ -158,6 +160,7 @@ class MapSyncer
 		if (index == getTotalPackets() - 1)
 		{
 			print("Map syncing complete!");
+			synced = true;
 		}
 	}
 }
