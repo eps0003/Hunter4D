@@ -164,7 +164,6 @@ class MapSyncer
 
 		if (index == getTotalPackets() - 1)
 		{
-			print("Map syncing complete!");
 			synced = true;
 		}
 	}
