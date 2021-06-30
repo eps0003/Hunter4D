@@ -1,7 +1,6 @@
 #include "Loader.as"
 #include "Map.as"
 
-
 Map@ map;
 uint sectionIndex = 0;
 uint blocksPerSection = 50;
@@ -49,15 +48,17 @@ void onTick(CRules@ this)
 		{
 			// Map generation complete
 			print("Map generated");
+			this.set_bool("map generated", true);
+			this.Sync("map generated", true);
 			Map::getSyncer().AddRequestForEveryone();
 			Loader::getLoader().NextStage();
 		}
 	}
 	else
 	{
-		if (Map::getSyncer().hasPackets())
+		if (this.get_bool("map generated"))
 		{
-			print("Map generated");
+			print("Map generated on server");
 			Loader::getLoader().NextStage();
 		}
 	}

@@ -23,14 +23,17 @@ class Loader
 			rules.RemoveScript(stages[index]);
 		}
 
-		index++;
 		if (index < stages.size())
 		{
-			rules.AddScript(stages[index]);
-		}
-		else
-		{
-			print("Hunter3D loaded!", ConsoleColour::CRAZY);
+			index++;
+			if (index < stages.size())
+			{
+				rules.AddScript(stages[index]);
+			}
+			else
+			{
+				print("Hunter3D loaded!", ConsoleColour::CRAZY);
+			}
 		}
 	}
 

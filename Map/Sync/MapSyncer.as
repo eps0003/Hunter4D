@@ -6,7 +6,7 @@ class MapSyncer
 	private Map@ map;
 	private MapRequest@[] mapRequests;
 	CBitStream@[] mapPackets;
-	private uint blocksPerPacket = 5000;
+	private uint blocksPerPacket = 100;
 	private bool synced = false;
 	private int index = 0;
 

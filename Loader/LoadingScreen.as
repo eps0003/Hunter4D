@@ -2,25 +2,16 @@
 
 #define CLIENT_ONLY
 
-Loader@ loader;
-Driver@ driver;
-
-void onInit(CRules@ this)
-{
-	@loader = Loader::getLoader();
-	@driver = getDriver();
-}
-
 void onRender(CRules@ this)
 {
-	if (loader.isLoaded())
+	if (Loader::getLoader().isLoaded())
 	{
 		this.RemoveScript(getCurrentScriptName());
 		return;
 	}
 
 	//background colour
-	Vec2f screenDim = driver.getScreenDimensions();
+	Vec2f screenDim = getDriver().getScreenDimensions();
 	SColor color(255, 165, 189, 200);
 	GUI::DrawRectangle(Vec2f_zero, screenDim, color);
 
@@ -29,6 +20,7 @@ void onRender(CRules@ this)
 
 void DrawLoadingBar(CRules@ this)
 {
+	Driver@ driver = getDriver();
 	Vec2f dim = driver.getScreenDimensions();
 	Vec2f center = driver.getScreenCenterPos();
 
