@@ -18,7 +18,7 @@ void onTick(CRules@ this)
 	uint chunksThisTick = Maths::Ceil(Maths::Pow(1.015f, Interpolation::getFPS()));
 
 	int seconds = Maths::Ceil(secondsUntilDone(chunksThisTick, renderer.chunkCount, index));
-	this.set_string("loading message", "[" + Maths::Floor(index / float(Maths::Max(1, renderer.chunkCount)) * 100) + "%] Generating chunks... (" + seconds + "s left)");
+	this.set_string("loading message", "[" + Maths::Floor(index / Maths::Max(1, renderer.chunkCount) * 100) + "%] Generating chunks... (" + seconds + "s left)");
 
     for (uint i = 0; i < chunksThisTick; i++)
     {
@@ -38,7 +38,7 @@ void onTick(CRules@ this)
         }
     }
 
-	this.set_f32("loading progress", index / float(Maths::Max(1, renderer.chunkCount)));
+	this.set_f32("loading progress", index / Maths::Max(1, renderer.chunkCount));
 }
 
 float secondsUntilDone(uint thingsPerTick, uint totalThings, uint index)

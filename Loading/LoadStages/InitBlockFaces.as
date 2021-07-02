@@ -18,7 +18,7 @@ void onTick(CRules@ this)
 	uint blocksThisTick = Maths::Ceil(Interpolation::getFPS() / 0.03f);
 
 	int seconds = Maths::Ceil(secondsUntilDone(blocksThisTick, map.blockCount, index));
-	this.set_string("loading message", "[" + Maths::Floor(index / float(Maths::Max(1, map.blockCount)) * 100) + "%] Initializing block faces... (" + seconds + "s left)");
+	this.set_string("loading message", "[" + Maths::Floor(index / Maths::Max(1, map.blockCount) * 100) + "%] Initializing block faces... (" + seconds + "s left)");
 
 	for (uint i = 0; i < blocksThisTick; i++)
 	{
@@ -36,7 +36,7 @@ void onTick(CRules@ this)
 		}
 	}
 
-	this.set_f32("loading progress", index / float(Maths::Max(1, map.blockCount)));
+	this.set_f32("loading progress", index / Maths::Max(1, map.blockCount));
 }
 
 float secondsUntilDone(uint thingsPerTick, uint totalThings, uint index)

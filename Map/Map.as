@@ -59,12 +59,7 @@ class Map
 
 	void SetBlock(int index, u8 block)
 	{
-		u8 oldBlock = blocks[index];
 		blocks[index] = block;
-
-		string name = Block::getBlock(block).name;
-		Vec3f pos = indexToPos(index);
-		// print("Set block: " + name + " at " + pos.toString());
 
 		// Sync block to clients
 		if (!isClient() && !getRules().hasScript("GenerateMap.as"))
@@ -77,7 +72,7 @@ class Map
 
 		if (isClient() && !getRules().hasScript("SyncMap.as"))
 		{
-			Map::getRenderer().GenerateMesh(pos);
+			Map::getRenderer().GenerateMesh(indexToPos(index));
 		}
 	}
 
