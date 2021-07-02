@@ -1,12 +1,12 @@
 #include "Actor.as"
 #include "Camera.as"
 #include "MapRenderer.as"
-#include "Loader.as"
 
 #define CLIENT_ONLY
 
 void onInit(CRules@ this)
 {
+	print("Hunter3D loaded!", ConsoleColour::CRAZY);
 	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 	onRestart(this);
 }
@@ -18,8 +18,6 @@ void onRestart(CRules@ this)
 
 void onRender(CRules@ this)
 {
-	if (!Loader::getLoader().isLoaded()) return;
-
 	Actor@ actor = Actor::getMyActor();
 	if (actor !is null)
 	{
@@ -32,8 +30,6 @@ void Render(int id)
 	// Background color
 	Vec2f screenDim = getDriver().getScreenDimensions();
 	GUI::DrawRectangle(Vec2f_zero, screenDim, SColor(255, 165, 189, 200));
-
-	if (!Loader::getLoader().isLoaded()) return;
 
 	Render::SetAlphaBlend(false);
 	Render::SetZBuffer(true, true);

@@ -4,12 +4,6 @@
 
 void onRender(CRules@ this)
 {
-	if (Loader::getLoader().isLoaded())
-	{
-		this.RemoveScript(getCurrentScriptName());
-		return;
-	}
-
 	//background colour
 	Vec2f screenDim = getDriver().getScreenDimensions();
 	SColor color(255, 165, 189, 200);

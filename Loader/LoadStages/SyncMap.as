@@ -21,11 +21,14 @@ void onTick(CRules@ this)
 
 		float progress = mapSyncer.getCurrentIndex() / float(Maths::Max(1, mapSyncer.getTotalPackets() - 2));
 		this.set_f32("loading progress", progress);
-	}
 
-	if (mapSyncer.isSynced())
-	{
-		print("Map synced!");
-		Loader::getLoader().NextStage();
+		if (mapSyncer.isSynced())
+		{
+			print("Map synced!");
+
+			this.RemoveScript("SyncMap.as");
+			this.RemoveScript("LoadingScreen.as");
+			this.AddScript("Client.as");
+		}
 	}
 }

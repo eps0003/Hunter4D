@@ -36,8 +36,8 @@ void onTick(CRules@ this)
 		uint sectionCount = getSectionCount();
 
 		// Set loading progress
-		this.set_f32("loading progress", sectionIndex / float(Maths::Max(1, sectionCount - 2)));
-		this.Sync("loading progress", true);
+		this.set_f32("map gen progress", sectionIndex / float(Maths::Max(1, sectionCount - 2)));
+		this.Sync("map gen progress", true);
 
 		if (sectionIndex < sectionCount - 1)
 		{
@@ -47,20 +47,21 @@ void onTick(CRules@ this)
 		else
 		{
 			// Map generation complete
-			print("Map generated");
 			this.set_bool("map generated", true);
 			this.Sync("map generated", true);
-			Map::getSyncer().AddRequestForEveryone();
-			Loader::getLoader().NextStage();
 		}
 	}
-	else
+
+	if (isClient())
 	{
-		if (this.get_bool("map generated"))
-		{
-			print("Map generated on server");
-			Loader::getLoader().NextStage();
-		}
+		this.set_f32("loading progress", this.get_f32("map gen progress"));
+	}
+
+	if (this.get_bool("map generated"))
+	{
+		print("Map generated!");
+		this.RemoveScript("GenerateMap.as");
+		this.AddScript("SyncMap.as");
 	}
 }
 

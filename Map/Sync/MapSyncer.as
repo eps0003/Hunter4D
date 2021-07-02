@@ -84,7 +84,7 @@ class MapSyncer
 
 	bool isSynced()
 	{
-		return synced;
+		return synced || isClient() == isServer();
 	}
 
 	void ServerSync()
