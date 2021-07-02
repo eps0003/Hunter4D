@@ -1,4 +1,3 @@
-#include "Loader.as"
 #include "Map.as"
 
 Map@ map;
@@ -19,7 +18,7 @@ void onTick(CRules@ this)
 		// Initialize map
 		if (sectionIndex == 0)
 		{
-			map = Map(Vec3f(96, 24, 96));
+			map = Map(Vec3f(24, 8, 24));
 			sectionCount = Maths::Ceil(map.blockCount / float(blocksPerSection));
 		}
 
@@ -31,7 +30,7 @@ void onTick(CRules@ this)
 		for (uint i = startIndex; i < endIndex; i++)
 		{
 			Vec3f pos = map.indexToPos(i);
-			u8 type = (pos.x + pos.y + pos.z) % 2 == 0 ? 1 : 0;
+			u8 type = pos.y == 0 ? 1 : 0;
 			map.SetBlock(i, type);
 		}
 

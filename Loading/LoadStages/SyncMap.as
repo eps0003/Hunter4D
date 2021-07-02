@@ -1,4 +1,3 @@
-#include "Loader.as"
 #include "Map.as"
 
 MapSyncer@ mapSyncer;
@@ -27,8 +26,7 @@ void onTick(CRules@ this)
 			print("Map synced!");
 
 			this.RemoveScript("SyncMap.as");
-			this.RemoveScript("LoadingScreen.as");
-			this.AddScript("Client.as");
+			this.AddScript("InitBlockFaces.as");
 		}
 	}
 }

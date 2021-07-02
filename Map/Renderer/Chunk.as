@@ -1,6 +1,9 @@
 class Chunk
 {
+	Map@ map;
 	MapRenderer@ renderer;
+
+	uint index;
 
 	SMesh mesh;
 	Vertex[] vertices;
@@ -11,8 +14,11 @@ class Chunk
 	Chunk(MapRenderer@ renderer, uint index)
 	{
 		@this.renderer = renderer;
+		@this.map = renderer.map;
+		this.index = index;
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
+		GenerateMesh(index);
 	}
 
 	void Render()
@@ -36,7 +42,7 @@ class Chunk
 		return (flags & face) == face;
 	}
 
-	void GenerateMesh(Map@ map, uint chunkIndex)
+	void GenerateMesh(uint chunkIndex)
 	{
 		rebuild = false;
 
@@ -52,9 +58,7 @@ class Chunk
 		for (uint y = startWorldPos.y; y < endWorldPos.y; y++)
 		for (uint z = startWorldPos.z; z < endWorldPos.z; z++)
 		{
-			int index = map.posToIndex(x, y, z);
-
-			renderer.UpdateBlockFaces(x, y, z);
+			int index = renderer.map.posToIndex(x, y, z);
 			u8 faces = renderer.faceFlags[index];
 
 			if (faces != FaceFlag::None)

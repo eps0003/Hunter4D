@@ -1,5 +1,3 @@
-#include "Loader.as"
-
 #define CLIENT_ONLY
 
 void onRender(CRules@ this)

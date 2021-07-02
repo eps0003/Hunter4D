@@ -11,6 +11,7 @@ class MapRenderer
 
 	u8 chunkDimension = 8;
 	Vec3f chunkDimensions;
+	uint chunkCount = 0;
 
 	string texture = "BlocksMC.png";
 	SMaterial@ material = SMaterial();
@@ -25,13 +26,9 @@ class MapRenderer
 
 		faceFlags.set_length(map.blocks.size());
 
-		Vec3f chunkCount = (map.dimensions / chunkDimension).ceil();
-		chunks.set_length(chunkCount.x * chunkCount.y * chunkCount.z);
-
-		for (uint i = 0; i < chunks.size(); i++)
-		{
-			@chunks[i] = Chunk(this, i);
-		}
+		Vec3f chunkCountVec = (map.dimensions / chunkDimension).ceil();
+		chunkCount = chunkCountVec.x * chunkCountVec.y * chunkCountVec.z;
+		chunks.set_length(chunkCount);
 	}
 
 	private void InitMaterial()
@@ -70,7 +67,7 @@ class MapRenderer
 
 			if (synced && chunk.rebuild)
 			{
-				chunk.GenerateMesh(map, i);
+				chunk.GenerateMesh(i);
 
 				Vec3f pos = chunkIndexToPos(i);
 				print("Rebuild chunk mesh: " + pos.toString());
@@ -80,69 +77,52 @@ class MapRenderer
 		}
 	}
 
+	void UpdateBlockFaces(int index)
+	{
+		Vec3f pos = map.indexToPos(index);
+		UpdateBlockFaces(index, pos.x, pos.y, pos.z);
+	}
+
 	void UpdateBlockFaces(int x, int y, int z)
 	{
 		int index = map.posToIndex(x, y, z);
-		u8 block = map.getBlock(index);
-		Block@ blockType = Block::getBlock(block);
+		UpdateBlockFaces(index, x, y, z);
+	}
 
+	private void UpdateBlockFaces(int index, int x, int y, int z)
+	{
 		u8 faces = FaceFlag::None;
 
-		if (blockType.visible)
+		if (Block::getBlock(map.getBlock(index)).visible)
 		{
+			if (x == 0 || Block::getBlock(map.getBlock(x - 1, y, z)).transparent)
 			{
-				block = map.getBlock(x - 1, y, z);
-				@blockType = Block::getBlock(block);
-
-				if (x == 0 || blockType.transparent)
-				{
-					faces |= FaceFlag::Left;
-				}
+				faces |= FaceFlag::Left;
 			}
-			{
-				block = map.getBlock(x + 1, y, z);
-				@blockType = Block::getBlock(block);
 
-				if (x == map.dimensions.x - 1 || blockType.transparent)
-				{
-					faces |= FaceFlag::Right;
-				}
+			if (x == map.dimensions.x - 1 || Block::getBlock(map.getBlock(x + 1, y, z)).transparent)
+			{
+				faces |= FaceFlag::Right;
 			}
-			{
-				block = map.getBlock(x, y - 1, z);
-				@blockType = Block::getBlock(block);
 
-				if (y == 0 || blockType.transparent)
-				{
-					faces |= FaceFlag::Down;
-				}
+			if (y == 0 || Block::getBlock(map.getBlock(x, y - 1, z)).transparent)
+			{
+				faces |= FaceFlag::Down;
 			}
-			{
-				block = map.getBlock(x, y + 1, z);
-				@blockType = Block::getBlock(block);
 
-				if (y == map.dimensions.y - 1 || blockType.transparent)
-				{
-					faces |= FaceFlag::Up;
-				}
+			if (y == map.dimensions.y - 1 || Block::getBlock(map.getBlock(x, y + 1, z)).transparent)
+			{
+				faces |= FaceFlag::Up;
 			}
-			{
-				block = map.getBlock(x, y, z - 1);
-				@blockType = Block::getBlock(block);
 
-				if (z == 0 || blockType.transparent)
-				{
-					faces |= FaceFlag::Front;
-				}
+			if (z == 0 || Block::getBlock(map.getBlock(x, y, z - 1)).transparent)
+			{
+				faces |= FaceFlag::Front;
 			}
-			{
-				block = map.getBlock(x, y, z + 1);
-				@blockType = Block::getBlock(block);
 
-				if (z == map.dimensions.z - 1 || blockType.transparent)
-				{
-					faces |= FaceFlag::Back;
-				}
+			if (z == map.dimensions.z - 1 || Block::getBlock(map.getBlock(x, y, z + 1)).transparent)
+			{
+				faces |= FaceFlag::Back;
 			}
 		}
 
