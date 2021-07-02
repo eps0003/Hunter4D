@@ -30,7 +30,7 @@ void onTick(CRules@ this)
 		for (uint i = startIndex; i < endIndex; i++)
 		{
 			Vec3f pos = map.indexToPos(i);
-			u8 type = (pos.x + pos.y + pos.z) % 2 == 0 && pos.y < 24 ? 1 : 0;
+			u8 type = (pos.x + pos.y + pos.z) % 2 == 0 && pos.y < 32 ? 1 : 0;
 			map.SetBlock(i, type);
 		}
 

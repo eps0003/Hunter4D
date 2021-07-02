@@ -10,7 +10,7 @@ class MapRenderer
 	Chunk@[] chunks;
 	u8[] faceFlags;
 
-	u8 chunkDimension = 8;
+	u8 chunkDimension = 14;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 
@@ -24,12 +24,10 @@ class MapRenderer
 		@map = Map::getMap();
 		@blocks = Blocks::getBlocks();
 
-		chunkDimensions = (map.dimensions / chunkDimension).ceil();
-
 		faceFlags.set_length(map.blocks.size());
 
-		Vec3f chunkCountVec = (map.dimensions / chunkDimension).ceil();
-		chunkCount = chunkCountVec.x * chunkCountVec.y * chunkCountVec.z;
+		chunkDimensions = (map.dimensions / chunkDimension).ceil();
+		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;
 		chunks.set_length(chunkCount);
 	}
 

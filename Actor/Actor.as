@@ -10,7 +10,7 @@ class Actor : Object
 	{
 		super(position);
 		@this.player = player;
-		// SetCollisionFlags(CollisionFlag::All);
+		SetCollisionFlags(CollisionFlag::Blocks);
 	}
 
 	void opAssign(Actor actor)
