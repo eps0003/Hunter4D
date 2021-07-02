@@ -6,7 +6,7 @@ class MapSyncer
 	private Map@ map;
 	private MapRequest@[] mapRequests;
 	CBitStream@[] mapPackets;
-	private uint blocksPerPacket = 5000;
+	private uint blocksPerPacket = 10000;
 	private bool synced = false;
 	private int index = 0;
 
@@ -123,8 +123,6 @@ class MapSyncer
 
 			u8 block = map.getBlock(i);
 			bs.write_u8(block);
-
-			getNet().server_KeepConnectionsAlive();
 		}
 
 		// Send to requesting player
@@ -135,10 +133,6 @@ class MapSyncer
 		if (index < getTotalPackets())
 		{
 			AddRequest(player, index);
-		}
-		else
-		{
-			synced = true;
 		}
 	}
 
@@ -163,8 +157,6 @@ class MapSyncer
 
 			u8 block = packet.read_u8();
 			map.SetBlock(i, block);
-
-			getNet().server_KeepConnectionsAlive();
 		}
 
 		if (index == getTotalPackets() - 1)
