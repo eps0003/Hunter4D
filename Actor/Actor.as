@@ -10,13 +10,7 @@ class Actor : Object
 	{
 		super(position);
 		@this.player = player;
-		SetCollisionFlags(CollisionFlag::All);
-	}
-
-	Actor(CBitStream@ bs)
-	{
-		super(bs);
-		@this.player = getPlayerByNetworkId(bs.read_netid());
+		// SetCollisionFlags(CollisionFlag::All);
 	}
 
 	void opAssign(Actor actor)
@@ -34,6 +28,18 @@ class Actor : Object
 	{
 		Object::SerializeTick(bs);
 		bs.write_netid(player.getNetworkID());
+	}
+
+	void DeserializeInit(CBitStream@ bs)
+	{
+		Object::DeserializeInit(bs);
+		@this.player = getPlayerByNetworkId(bs.read_netid());
+	}
+
+	void DeserializeTick(CBitStream@ bs)
+	{
+		Object::DeserializeTick(bs);
+		@this.player = getPlayerByNetworkId(bs.read_netid());
 	}
 
 	u8 teamNum

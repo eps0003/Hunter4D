@@ -17,8 +17,14 @@ namespace Actor
 	void SetActor(CPlayer@ player, Actor@ actor)
 	{
 		player.set("actor", @actor);
-
 		print("Set actor: " + player.getUsername());
+
+		if (!isClient() && actor !is null)
+		{
+			CBitStream bs;
+			actor.SerializeInit(bs);
+			getRules().SendCommand(getRules().getCommandID("init actor"), bs, true);
+		}
 	}
 
 	bool hasActor(CPlayer@ player)

@@ -47,12 +47,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		if (cmd == this.getCommandID("init object"))
 		{
-			Object object(params);
+			Object object;
+			object.DeserializeInit(params);
 			Object::AddObject(object);
 		}
 		else if (cmd == this.getCommandID("sync object"))
 		{
-			Object newObject(params);
+			Object newObject;
+			newObject.DeserializeTick(params);
+
 			Object@ oldObject = Object::getObject(newObject.id);
 			if (oldObject !is null)
 			{

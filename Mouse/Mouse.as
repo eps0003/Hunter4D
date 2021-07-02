@@ -24,7 +24,7 @@ class Mouse
 
 	bool isInControl()
 	{
-		return isWindowFocused() && !isVisible();
+		return isWindowFocused() && !isVisible() && !getRules().hasScript("LoadingScreen.as");
 	}
 
 	bool isVisible()

@@ -17,7 +17,7 @@ class Object
 	Vec3f interVelocity;
 
 	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.6f, 0.5f));
-	private uint collisionFlags = 0;
+	private u8 collisionFlags = 0;
 
 	private bool collisionX = false;
 	private bool collisionY = false;
@@ -26,15 +26,6 @@ class Object
 	Object(Vec3f position)
 	{
 		this.position = position;
-	}
-
-	Object(CBitStream@ bs)
-	{
-		id = bs.read_u16();
-		position = Vec3f(bs);
-		oldPosition = position;
-		velocity = Vec3f(bs);
-		oldVelocity = velocity;
 	}
 
 	void opAssign(Object object)
@@ -50,6 +41,7 @@ class Object
 		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
+		bs.write_u8(collisionFlags);
 	}
 
 	void SerializeTick(CBitStream@ bs)
@@ -57,6 +49,23 @@ class Object
 		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
+	}
+
+	void DeserializeInit(CBitStream@ bs)
+	{
+		id = bs.read_u16();
+		position = Vec3f(bs);
+		oldPosition = position;
+		velocity = Vec3f(bs);
+		oldVelocity = velocity;
+		collisionFlags = bs.read_u8();
+	}
+
+	void DeserializeTick(CBitStream@ bs)
+	{
+		id = bs.read_u16();
+		position = Vec3f(bs);
+		velocity = Vec3f(bs);
 	}
 
 	void Update()

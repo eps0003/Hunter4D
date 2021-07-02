@@ -67,7 +67,7 @@ class Map
 		// print("Set block: " + name + " at " + pos.toString());
 
 		// Sync block to clients
-		if (!isClient())
+		if (!isClient() && !getRules().hasScript("GenerateMap.as"))
 		{
 			CBitStream bs;
 			bs.write_u32(index);
@@ -75,7 +75,7 @@ class Map
 			getRules().SendCommand(getRules().getCommandID("sync block"), bs, true);
 		}
 
-		if (isClient())
+		if (isClient() && !getRules().hasScript("SyncMap.as"))
 		{
 			Map::getRenderer().GenerateMesh(pos);
 		}

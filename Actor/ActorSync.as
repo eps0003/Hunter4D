@@ -6,7 +6,6 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("init actor");
 	this.addCommandID("sync actor");
-	this.addCommandID("spawn actor");
 
 	if (isServer())
 	{
@@ -15,7 +14,8 @@ void onInit(CRules@ this)
 			CPlayer@ player = getPlayer(i);
 			if (player !is null)
 			{
-				SpawnActor(this, player, SPAWN_POSITION);
+				Actor actor(player, SPAWN_POSITION);
+				Actor::SetActor(player, actor);
 			}
 		}
 	}
@@ -23,7 +23,8 @@ void onInit(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	SpawnActor(this, player, SPAWN_POSITION);
+	Actor actor(player, SPAWN_POSITION);
+	Actor::SetActor(player, actor);
 
 	// Sync all actors
 	Actor@[] actors = Actor::getActors();
@@ -31,6 +32,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	for (uint i = 0; i < actors.size(); i++)
 	{
 		Actor@ actor = actors[i];
+		if (actor.player is player) continue;
 
 		CBitStream bs;
 		actor.SerializeInit(bs);
@@ -62,29 +64,17 @@ void onTick(CRules@ this)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isClient() && cmd == this.getCommandID("spawn actor"))
+	if (!isServer() && cmd == this.getCommandID("init actor"))
 	{
-		CPlayer@ player = getPlayerByNetworkId(params.read_netid());
-		Vec3f position(params);
-
-		if (player !is null)
-		{
-			SpawnActor(this, player, position);
-		}
-	}
-	else if (cmd == this.getCommandID("init actor"))
-	{
-		Actor actor(params);
-
-		// Don't set my own actor. Already did it on spawn
-		if (actor.player.isMyPlayer()) return;
-
+		Actor actor;
+		actor.DeserializeInit(params);
 		Actor::SetActor(actor.player, actor);
 	}
 	else if (cmd == this.getCommandID("sync actor"))
 	{
 		// Deserialize actor
-		Actor newActor(params);
+		Actor newActor;
+		newActor.DeserializeTick(params);
 
 		// Don't update my own actor
 		if (newActor.player.isMyPlayer()) return;
@@ -95,19 +85,5 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		{
 			oldActor = newActor;
 		}
-	}
-}
-
-void SpawnActor(CRules@ this, CPlayer@ player, Vec3f position)
-{
-	Actor actor(player, position);
-	Actor::SetActor(player, actor);
-
-	if (!isClient())
-	{
-		CBitStream bs;
-		bs.write_netid(player.getNetworkID());
-		position.Serialize(bs);
-		this.SendCommand(this.getCommandID("spawn actor"), bs, true);
 	}
 }

@@ -3,7 +3,8 @@
 
 Map@ map;
 uint sectionIndex = 0;
-uint blocksPerSection = 50;
+uint blocksPerSection = 10000;
+uint sectionCount;
 
 void onInit(CRules@ this)
 {
@@ -18,7 +19,8 @@ void onTick(CRules@ this)
 		// Initialize map
 		if (sectionIndex == 0)
 		{
-			map = Map(Vec3f(32, 8, 32));
+			map = Map(Vec3f(96, 24, 96));
+			sectionCount = Maths::Ceil(map.blockCount / float(blocksPerSection));
 		}
 
 		// Get start and end block index
@@ -29,11 +31,9 @@ void onTick(CRules@ this)
 		for (uint i = startIndex; i < endIndex; i++)
 		{
 			Vec3f pos = map.indexToPos(i);
-			u8 type = pos.y == 0 ? 1 : 0;
+			u8 type = (pos.x + pos.y + pos.z) % 2 == 0 ? 1 : 0;
 			map.SetBlock(i, type);
 		}
-
-		uint sectionCount = getSectionCount();
 
 		// Set loading progress
 		this.set_f32("map gen progress", sectionIndex / float(Maths::Max(1, sectionCount - 2)));
@@ -63,9 +63,4 @@ void onTick(CRules@ this)
 		this.RemoveScript("GenerateMap.as");
 		this.AddScript("SyncMap.as");
 	}
-}
-
-uint getSectionCount()
-{
-	return Maths::Ceil(map.blockCount / float(blocksPerSection));
 }
