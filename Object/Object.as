@@ -273,16 +273,8 @@ class Object
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-
-		if (oldPosition != position)
-		{
-			interPosition = oldPosition.lerp(oldPosition + velocity, t);
-			interPosition = interPosition.clamp(oldPosition, position);
-		}
-
-		if (oldVelocity != velocity)
-		{
-			interVelocity = oldVelocity.lerp(velocity, t);
-		}
+		interPosition = oldPosition.lerp(oldPosition + velocity, t);
+		interPosition = interPosition.clamp(oldPosition, position);
+		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 }
