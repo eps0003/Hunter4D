@@ -1,8 +1,19 @@
-namespace Block
+namespace Blocks
 {
+	Blocks@ getBlocks()
+	{
+		Blocks@ blocks;
+		if (!getRules().get("blocks", @blocks))
+		{
+			@blocks = Blocks();
+			getRules().set("blocks", @blocks);
+		}
+		return blocks;
+	}
+
 	void LoadBlocks()
 	{
-		Block@[] blocks;
+		Blocks@ blocks = Blocks::getBlocks();
 
 		ConfigFile@ cfg = ConfigFile();
 		if (cfg.loadFile("Blocks.cfg"))
@@ -19,22 +30,9 @@ namespace Block
 					bool collapsible = data[i + 4] == "true";
 					bool transparent = data[i + 5] == "true";
 
-					Block block(name, visible, solid, destructible, collapsible, transparent);
-					blocks.push_back(block);
+					blocks.AddBlock(name, visible, solid, destructible, collapsible, transparent);
 				}
 			}
 		}
-
-		getRules().set("blocks", blocks);
-	}
-
-	Block@ getBlock(u8 index)
-	{
-		Block@[]@ blocks;
-		if (getRules().get("blocks", @blocks) && index < blocks.size())
-		{
-			return blocks[index];
-		}
-		return null;
 	}
 }

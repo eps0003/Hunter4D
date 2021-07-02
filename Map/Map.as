@@ -1,5 +1,5 @@
 #include "MapCommon.as"
-#include "Block.as"
+#include "Blocks.as"
 #include "MapRenderer.as"
 #include "Vec3f.as"
 #include "MapSyncer.as"

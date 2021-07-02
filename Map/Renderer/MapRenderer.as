@@ -5,6 +5,7 @@
 class MapRenderer
 {
 	Map@ map;
+	private Blocks@ blocks;
 
 	Chunk@[] chunks;
 	u8[] faceFlags;
@@ -21,6 +22,7 @@ class MapRenderer
 		InitMaterial();
 
 		@map = Map::getMap();
+		@blocks = Blocks::getBlocks();
 
 		chunkDimensions = (map.dimensions / chunkDimension).ceil();
 
@@ -93,34 +95,34 @@ class MapRenderer
 	{
 		u8 faces = FaceFlag::None;
 
-		if (Block::getBlock(map.getBlock(index)).visible)
+		if (blocks.isVisible(map.getBlock(index)))
 		{
-			if (x == 0 || Block::getBlock(map.getBlock(x - 1, y, z)).transparent)
+			if (x == 0 || blocks.isTransparent(map.getBlock(x - 1, y, z)))
 			{
 				faces |= FaceFlag::Left;
 			}
 
-			if (x == map.dimensions.x - 1 || Block::getBlock(map.getBlock(x + 1, y, z)).transparent)
+			if (x == map.dimensions.x - 1 || blocks.isTransparent(map.getBlock(x + 1, y, z)))
 			{
 				faces |= FaceFlag::Right;
 			}
 
-			if (y == 0 || Block::getBlock(map.getBlock(x, y - 1, z)).transparent)
+			if (y == 0 || blocks.isTransparent(map.getBlock(x, y - 1, z)))
 			{
 				faces |= FaceFlag::Down;
 			}
 
-			if (y == map.dimensions.y - 1 || Block::getBlock(map.getBlock(x, y + 1, z)).transparent)
+			if (y == map.dimensions.y - 1 || blocks.isTransparent(map.getBlock(x, y + 1, z)))
 			{
 				faces |= FaceFlag::Up;
 			}
 
-			if (z == 0 || Block::getBlock(map.getBlock(x, y, z - 1)).transparent)
+			if (z == 0 || blocks.isTransparent(map.getBlock(x, y, z - 1)))
 			{
 				faces |= FaceFlag::Front;
 			}
 
-			if (z == map.dimensions.z - 1 || Block::getBlock(map.getBlock(x, y, z + 1)).transparent)
+			if (z == map.dimensions.z - 1 || blocks.isTransparent(map.getBlock(x, y, z + 1)))
 			{
 				faces |= FaceFlag::Back;
 			}

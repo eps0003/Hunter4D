@@ -59,6 +59,7 @@ class AABB : IBounds
 	bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
 	{
 		Map@ map = Map::getMap();
+		Blocks@ blocks = Blocks::getBlocks();
 
 		for (int x = worldPos.x + min.x; x < worldPos.x + max.x; x++)
 		for (int y = worldPos.y + min.y; y < worldPos.y + max.y; y++)
@@ -80,8 +81,7 @@ class AABB : IBounds
 			}
 
 			u8 block = map.getBlockSafe(x, y, z);
-			Block@ blockType = Block::getBlock(block);
-			if (blockType.solid)
+			if (blocks.isSolid(block))
 			{
 				return true;
 			}

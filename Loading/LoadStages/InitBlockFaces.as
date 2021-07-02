@@ -11,20 +11,20 @@ void onInit(CRules@ this)
 {
 	@map = Map::getMap();
 	@renderer = Map::getRenderer();
+
+	this.set_string("loading message", "Initializing block faces...");
 }
 
 void onTick(CRules@ this)
 {
 	uint blocksThisTick = Maths::Ceil(Interpolation::getFPS() / 0.03f);
-
-	int seconds = Maths::Ceil(secondsUntilDone(blocksThisTick, map.blockCount, index));
-	this.set_string("loading message", "[" + Maths::Floor(index / Maths::Max(1, map.blockCount) * 100) + "%] Initializing block faces... (" + seconds + "s left)");
+	print("" + blocksThisTick);
 
 	for (uint i = 0; i < blocksThisTick; i++)
 	{
 		renderer.UpdateBlockFaces(index);
-		index++;
 
+		index++;
 		if (index >= map.blockCount)
 		{
 			print("Block faces initialized!");
@@ -37,11 +37,4 @@ void onTick(CRules@ this)
 	}
 
 	this.set_f32("loading progress", index / Maths::Max(1, map.blockCount));
-}
-
-float secondsUntilDone(uint thingsPerTick, uint totalThings, uint index)
-{
-	uint thingsASecond = thingsPerTick * getTicksASecond();
-	float progress = 1 - index / Maths::Max(1, totalThings);
-	return totalThings / Maths::Max(1, thingsASecond) * progress;
 }

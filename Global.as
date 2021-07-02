@@ -1,6 +1,6 @@
-#include "Block.as"
+#include "Blocks.as"
 
 void onInit(CRules@ this)
 {
-	Block::LoadBlocks();
+	Blocks::LoadBlocks();
 }

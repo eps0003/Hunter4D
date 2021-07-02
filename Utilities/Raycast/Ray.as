@@ -1,5 +1,5 @@
 #include "RaycastInfo.as"
-#include "Block.as"
+#include "Blocks.as"
 #include "Vec3f.as"
 #include "Map.as"
 
@@ -18,6 +18,7 @@ class Ray
 	bool raycastBlock(float distance, bool solidOnly, RaycastInfo &out raycastInfo)
 	{
 		Map@ map = Map::getMap();
+		Blocks@ blocks = Blocks::getBlocks();
 
 		Vec3f worldPos = position.floor();
 
@@ -68,10 +69,9 @@ class Ray
 		while (distance > 0 && dist < distance)
 		{
 			u8 block = map.getBlockSafe(worldPos);
-			Block@ blockType = Block::getBlock(block);
 
 			//hit a block
-			bool hit = solidOnly ? blockType.solid : blockType.visible;
+			bool hit = solidOnly ? blocks.isSolid(block) : blocks.isVisible(block);
 			if (hit)
 			{
 				dist = Maths::Max(0, dist);
