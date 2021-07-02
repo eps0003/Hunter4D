@@ -162,15 +162,15 @@ class MapRenderer
 
 	int chunkPosToChunkIndex(int x, int y, int z)
 	{
-		return x + (y * chunkDimensions.x) + (z * chunkDimensions.z * chunkDimensions.y);
+		return x + (z * chunkDimensions.x) + (y * chunkDimensions.x * chunkDimensions.z);
 	}
 
 	Vec3f chunkIndexToPos(int index)
 	{
 		Vec3f vec;
 		vec.x = index % chunkDimensions.x;
-		vec.y = Maths::Floor(index / chunkDimensions.x) % chunkDimensions.y;
-		vec.z = Maths::Floor(index / (chunkDimensions.x * chunkDimensions.y));
+		vec.z = Maths::Floor(index / chunkDimensions.x) % chunkDimensions.z;
+		vec.y = Maths::Floor(index / (chunkDimensions.x * chunkDimensions.z));
 		return vec;
 	}
 }

@@ -141,15 +141,15 @@ class Map
 
 	int posToIndex(int x, int y, int z)
 	{
-		return x + (y * dimensions.x) + (z * dimensions.z * dimensions.y);
+		return x + (z * dimensions.x) + (y * dimensions.x * dimensions.z);
 	}
 
 	Vec3f indexToPos(int index)
 	{
 		Vec3f vec;
 		vec.x = index % dimensions.x;
-		vec.y = Maths::Floor(index / dimensions.x) % dimensions.y;
-		vec.z = Maths::Floor(index / (dimensions.x * dimensions.y));
+		vec.z = Maths::Floor(index / dimensions.x) % dimensions.z;
+		vec.y = Maths::Floor(index / (dimensions.x * dimensions.z));
 		return vec;
 	}
 }

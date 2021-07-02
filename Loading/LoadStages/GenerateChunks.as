@@ -17,7 +17,7 @@ void onInit(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint chunksThisTick = Interpolation::getFPS() * 0.05f;
+	uint chunksThisTick = Interpolation::getFPS() * 0.03f;
 
     for (uint i = 0; i < chunksThisTick; i++)
     {
