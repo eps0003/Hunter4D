@@ -17,8 +17,7 @@ void onInit(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint blocksThisTick = Maths::Ceil(Interpolation::getFPS() / 0.03f);
-	print("" + blocksThisTick);
+	uint blocksThisTick = Interpolation::getFPS() * 30;
 
 	for (uint i = 0; i < blocksThisTick; i++)
 	{

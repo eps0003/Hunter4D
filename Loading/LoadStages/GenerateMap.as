@@ -10,7 +10,7 @@ void onInit(CRules@ this)
 	if (isServer())
 	{
 		@map = Map::getMap();
-		map = Map(Vec3f(256, 64, 256));
+		map = Map(Vec3f(128, 64, 128));
 		sectionCount = Maths::Ceil(map.blockCount / float(blocksPerSection));
 	}
 
