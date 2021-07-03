@@ -136,6 +136,12 @@ class Actor : Object
 		}
 	}
 
+	void RenderHUD()
+	{
+		Object::RenderHUD();
+		DrawCrosshair(0, 8, 1, color_white);
+	}
+
 	private void Movement()
 	{
 		CControls@ controls = getControls();
@@ -183,5 +189,23 @@ class Actor : Object
 	void OnRemove()
 	{
 		Actor::RemoveActor(player);
+	}
+
+	private void DrawCrosshair(int spacing, int length, int thickness, SColor color)
+	{
+		Vec2f center = getDriver().getScreenCenterPos();
+
+		Vec2f x1(length + spacing, thickness);
+		Vec2f x2(spacing, -thickness);
+		Vec2f y1(thickness, length + spacing);
+		Vec2f y2(-thickness, spacing);
+
+		//left/right
+		GUI::DrawRectangle(center - x1, center - x2, color);
+		GUI::DrawRectangle(center + x2, center + x1, color);
+
+		//top/bottom
+		GUI::DrawRectangle(center - y1, center - y2, color);
+		GUI::DrawRectangle(center + y2, center + y1, color);
 	}
 }
