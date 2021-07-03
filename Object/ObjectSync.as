@@ -1,9 +1,13 @@
 #include "Object.as"
+#include "Actor.as"
+
+Vec3f SPAWN_POSITION = Vec3f(-1, 0, -1);
 
 void onInit(CRules@ this)
 {
 	this.addCommandID("init object");
 	this.addCommandID("sync object");
+	this.addCommandID("set object color");
 }
 
 void onTick(CRules@ this)
@@ -13,16 +17,8 @@ void onTick(CRules@ this)
 	for (uint i = 0; i < objects.size(); i++)
 	{
 		Object@ object = objects[i];
-
-		objects[i].Update();
-
-		// Sync to clients if not localhost
-		if (!isClient())
-		{
-			CBitStream bs;
-			object.SerializeTick(bs);
-			this.SendCommand(this.getCommandID("sync object"), bs, true);
-		}
+		object.Update();
+		object.HandleSerializeTick();
 	}
 }
 
@@ -33,34 +29,31 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 	for (uint i = 0; i < objects.size(); i++)
 	{
-		Object@ object = objects[i];
-
-		CBitStream bs;
-		object.SerializeInit(bs);
-		this.SendCommand(this.getCommandID("init object"), bs, player);
+		objects[i].HandleSerializeInit(player);
 	}
+
+	Actor actor(player, SPAWN_POSITION);
+	Actor::SetActor(player, actor);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isClient())
+	if (cmd == this.getCommandID("init object"))
 	{
-		if (cmd == this.getCommandID("init object"))
+		Object object;
+		object.HandleDeserializeInit(params);
+	}
+	else if (cmd == this.getCommandID("sync object"))
+	{
+		Object object;
+		object.HandleDeserializeTick(params);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object color"))
+	{
+		Object@ object = Object::getObject(params.read_u16());
+		if (object !is null)
 		{
-			Object object;
-			object.DeserializeInit(params);
-			Object::AddObject(object);
-		}
-		else if (cmd == this.getCommandID("sync object"))
-		{
-			Object newObject;
-			newObject.DeserializeTick(params);
-
-			Object@ oldObject = Object::getObject(newObject.id);
-			if (oldObject !is null)
-			{
-				oldObject = newObject;
-			}
+			object.color = SColor(params.read_u32());
 		}
 	}
 }

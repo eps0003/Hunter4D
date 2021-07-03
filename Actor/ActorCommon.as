@@ -16,6 +16,7 @@ namespace Actor
 
 	void SetActor(CPlayer@ player, Actor@ actor)
 	{
+		Object::AddObject(actor, false);
 		player.set("actor", @actor);
 		print("Set actor: " + player.getUsername());
 
@@ -53,14 +54,5 @@ namespace Actor
 	uint getActorCount()
 	{
 		return Actor::getActors().size();
-	}
-
-	void ClearActors()
-	{
-		for (uint i = 0; i < getPlayerCount(); i++)
-		{
-			CPlayer@ player = getPlayer(i);
-			Actor::SetActor(player, null);
-		}
 	}
 }

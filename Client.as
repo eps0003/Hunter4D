@@ -23,6 +23,9 @@ void onRender(CRules@ this)
 	{
 		actor.RenderHUD();
 	}
+
+	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
+	GUI::DrawText("Objects: " + Object::getObjectCount(), Vec2f(10, 50), color_black);
 }
 
 void Render(int id)
@@ -39,18 +42,9 @@ void Render(int id)
 	Camera::getCamera().Render();
 	Map::getRenderer().Render();
 
-	Actor@[] actors = Actor::getActors();
-	for (uint i = 0; i < actors.size(); i++)
-	{
-		actors[i].Render();
-	}
-
 	Object@[]@ objects = Object::getObjects();
 	for (uint i = 0; i < objects.size(); i++)
 	{
 		objects[i].Render();
 	}
-
-	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
-	GUI::DrawText("Objects: " + Object::getObjectCount(), Vec2f(10, 50), color_black);
 }

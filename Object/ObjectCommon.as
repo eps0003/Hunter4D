@@ -16,7 +16,7 @@ namespace Object
 		return null;
 	}
 
-	void AddObject(Object@ object)
+	void AddObject(Object@ object, bool sync = true)
 	{
 		CRules@ rules = getRules();
 
@@ -26,7 +26,7 @@ namespace Object
 
 		print("Added object: " + object.id);
 
-		if (!isClient())
+		if (!isClient() && sync)
 		{
 			CBitStream bs;
 			object.SerializeInit(bs);

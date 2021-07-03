@@ -2,8 +2,6 @@
 #include "Ray.as"
 #include "Camera.as"
 
-uint index = 0;
-
 void onInit(CRules@ this)
 {
 	this.addCommandID("place block");

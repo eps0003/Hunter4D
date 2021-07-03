@@ -16,6 +16,8 @@ class Object
 	Vec3f oldVelocity;
 	Vec3f interVelocity;
 
+	private SColor _color = color_white;
+
 	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.6f, 0.5f));
 	private u8 collisionFlags = 0;
 
@@ -23,9 +25,30 @@ class Object
 	private bool collisionY = false;
 	private bool collisionZ = false;
 
+	SColor color
+	{
+		get const
+		{
+			return _color;
+		}
+		set
+		{
+			_color = value;
+
+			if (!isClient())
+			{
+				CBitStream bs;
+				bs.write_u16(id);
+				bs.write_u32(value.color);
+				getRules().SendCommand(getRules().getCommandID("set object color"), bs, true);
+			}
+		}
+	}
+
 	Object(Vec3f position)
 	{
 		this.position = position;
+		AssignUniqueID();
 	}
 
 	void opAssign(Object object)
@@ -36,12 +59,21 @@ class Object
 		velocity = object.velocity;
 	}
 
+	void AssignUniqueID()
+	{
+		if (isServer())
+		{
+			id = getRules().add_u32("object id", 1);
+		}
+	}
+
 	void SerializeInit(CBitStream@ bs)
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 		bs.write_u8(collisionFlags);
+		bs.write_u32(color.color);
 	}
 
 	void SerializeTick(CBitStream@ bs)
@@ -59,6 +91,7 @@ class Object
 		velocity = Vec3f(bs);
 		oldVelocity = velocity;
 		collisionFlags = bs.read_u8();
+		color = SColor(bs.read_u32());
 	}
 
 	void DeserializeTick(CBitStream@ bs)
@@ -66,6 +99,46 @@ class Object
 		id = bs.read_u16();
 		position = Vec3f(bs);
 		velocity = Vec3f(bs);
+	}
+
+	void HandleSerializeInit(CPlayer@ player)
+	{
+		// Sync to player
+		CBitStream bs;
+		SerializeInit(bs);
+		getRules().SendCommand(getRules().getCommandID("init object"), bs, player);
+	}
+
+	void HandleSerializeTick()
+	{
+		// Sync to clients if not localhost
+		if (!isClient())
+		{
+			CBitStream bs;
+			SerializeTick(bs);
+			getRules().SendCommand(getRules().getCommandID("sync object"), bs, true);
+		}
+	}
+
+	void HandleDeserializeInit(CBitStream@ bs)
+	{
+		if (!isClient()) return;
+
+		DeserializeInit(bs);
+		Object::AddObject(this);
+	}
+
+	void HandleDeserializeTick(CBitStream@ bs)
+	{
+		if (!isClient()) return;
+
+		DeserializeTick(bs);
+
+		Object@ oldObject = Object::getObject(id);
+		if (oldObject !is null)
+		{
+			oldObject = this;
+		}
 	}
 
 	void Update()
@@ -216,6 +289,8 @@ class Object
 
 	void Render()
 	{
+		Interpolate();
+
 		float[] matrix;
 		Matrix::MakeIdentity(matrix);
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
@@ -223,39 +298,38 @@ class Object
 
 		Vec3f min = collider.min;
 		Vec3f max = collider.max;
-		SColor col = color_white;
 
 		Vertex[] vertices = {
 			// Left
-			Vertex(min.x, max.y, max.z, 0, 0, col),
-			Vertex(min.x, max.y, min.z, 1, 0, col),
-			Vertex(min.x, min.y, min.z, 1, 1, col),
-			Vertex(min.x, min.y, max.z, 0, 1, col),
+			Vertex(min.x, max.y, max.z, 0, 0, color),
+			Vertex(min.x, max.y, min.z, 1, 0, color),
+			Vertex(min.x, min.y, min.z, 1, 1, color),
+			Vertex(min.x, min.y, max.z, 0, 1, color),
 			// Right
-			Vertex(max.x, max.y, min.z, 0, 0, col),
-			Vertex(max.x, max.y, max.z, 1, 0, col),
-			Vertex(max.x, min.y, max.z, 1, 1, col),
-			Vertex(max.x, min.y, min.z, 0, 1, col),
+			Vertex(max.x, max.y, min.z, 0, 0, color),
+			Vertex(max.x, max.y, max.z, 1, 0, color),
+			Vertex(max.x, min.y, max.z, 1, 1, color),
+			Vertex(max.x, min.y, min.z, 0, 1, color),
 			// Front
-			Vertex(min.x, max.y, min.z, 0, 0, col),
-			Vertex(max.x, max.y, min.z, 1, 0, col),
-			Vertex(max.x, min.y, min.z, 1, 1, col),
-			Vertex(min.x, min.y, min.z, 0, 1, col),
+			Vertex(min.x, max.y, min.z, 0, 0, color),
+			Vertex(max.x, max.y, min.z, 1, 0, color),
+			Vertex(max.x, min.y, min.z, 1, 1, color),
+			Vertex(min.x, min.y, min.z, 0, 1, color),
 			// Back
-			Vertex(max.x, max.y, max.z, 0, 0, col),
-			Vertex(min.x, max.y, max.z, 1, 0, col),
-			Vertex(min.x, min.y, max.z, 1, 1, col),
-			Vertex(max.x, min.y, max.z, 0, 1, col),
+			Vertex(max.x, max.y, max.z, 0, 0, color),
+			Vertex(min.x, max.y, max.z, 1, 0, color),
+			Vertex(min.x, min.y, max.z, 1, 1, color),
+			Vertex(max.x, min.y, max.z, 0, 1, color),
 			// Down
-			Vertex(max.x, min.y, max.z, 0, 0, col),
-			Vertex(min.x, min.y, max.z, 1, 0, col),
-			Vertex(min.x, min.y, min.z, 1, 1, col),
-			Vertex(max.x, min.y, min.z, 0, 1, col),
+			Vertex(max.x, min.y, max.z, 0, 0, color),
+			Vertex(min.x, min.y, max.z, 1, 0, color),
+			Vertex(min.x, min.y, min.z, 1, 1, color),
+			Vertex(max.x, min.y, min.z, 0, 1, color),
 			// Up
-			Vertex(min.x, max.y, max.z, 0, 0, col),
-			Vertex(max.x, max.y, max.z, 1, 0, col),
-			Vertex(max.x, max.y, min.z, 1, 1, col),
-			Vertex(min.x, max.y, min.z, 0, 1, col)
+			Vertex(min.x, max.y, max.z, 0, 0, color),
+			Vertex(max.x, max.y, max.z, 1, 0, color),
+			Vertex(max.x, max.y, min.z, 1, 1, color),
+			Vertex(min.x, max.y, min.z, 0, 1, color)
 		};
 
 		Render::SetBackfaceCull(false);

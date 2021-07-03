@@ -42,6 +42,56 @@ class Actor : Object
 		@this.player = getPlayerByNetworkId(bs.read_netid());
 	}
 
+	void HandleSerializeInit(CPlayer@ player)
+	{
+		// Sync to player if it isn't my player
+		if (this.player !is player)
+		{
+			CBitStream bs;
+			SerializeInit(bs);
+			getRules().SendCommand(getRules().getCommandID("init actor"), bs, player);
+		}
+	}
+
+	void HandleSerializeTick()
+	{
+		// Sync to server if not localhost
+		if (!isServer())
+		{
+			// Sync my actor
+			Actor@ actor = Actor::getMyActor();
+			if (actor !is null)
+			{
+				CBitStream bs;
+				SerializeTick(bs);
+				getRules().SendCommand(getRules().getCommandID("sync actor"), bs, true);
+			}
+		}
+	}
+
+	void HandleDeserializeInit(CBitStream@ bs)
+	{
+		if (!isClient()) return;
+
+		DeserializeInit(bs);
+		Actor::SetActor(player, this);
+	}
+
+	void HandleDeserializeTick(CBitStream@ bs)
+	{
+		DeserializeTick(bs);
+
+		// Don't update my own actor
+		if (player.isMyPlayer()) return;
+
+		// Update actor
+		Actor@ oldActor = Actor::getActor(player);
+		if (oldActor !is null)
+		{
+			oldActor = this;
+		}
+	}
+
 	u8 teamNum
 	{
 		get const
@@ -69,11 +119,13 @@ class Actor : Object
 
 	void Render()
 	{
-		Interpolate();
-
 		if (!player.isMyPlayer())
 		{
 			Object::Render();
+		}
+		else
+		{
+			Interpolate();
 		}
 	}
 
