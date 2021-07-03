@@ -16,21 +16,28 @@ namespace Object
 		return null;
 	}
 
-	void AddObject(Object@ object, bool sync = true)
+	void AddObject(Object@ object)
 	{
-		CRules@ rules = getRules();
-
 		Object@[]@ objects = Object::getObjects();
 		objects.push_back(object);
-		rules.set("objects", @objects);
+		getRules().set("objects", @objects);
 
 		print("Added object: " + object.id);
 
-		if (!isClient() && sync)
+		object.HandleSerializeInit(null);
+	}
+
+	void RemoveObject(u16 id)
+	{
+		Object@[]@ objects = Object::getObjects();
+		for (uint i = 0; i < objects.size(); i++)
 		{
-			CBitStream bs;
-			object.SerializeInit(bs);
-			rules.SendCommand(rules.getCommandID("init object"), bs, true);
+			Object@ object = objects[i];
+			if (object.id == id)
+			{
+				objects.removeAt(i);
+				return;
+			}
 		}
 	}
 

@@ -103,26 +103,36 @@ class Object
 
 	void HandleSerializeInit(CPlayer@ player)
 	{
-		// Sync to player
+		// Sync to player if server not localhost
+		if (isClient()) return;
+
 		CBitStream bs;
 		SerializeInit(bs);
-		getRules().SendCommand(getRules().getCommandID("init object"), bs, player);
+
+		if (player !is null)
+		{
+			getRules().SendCommand(getRules().getCommandID("init object"), bs, player);
+		}
+		else
+		{
+			getRules().SendCommand(getRules().getCommandID("init object"), bs, true);
+		}
 	}
 
 	void HandleSerializeTick()
 	{
-		// Sync to clients if not localhost
-		if (!isClient())
-		{
-			CBitStream bs;
-			SerializeTick(bs);
-			getRules().SendCommand(getRules().getCommandID("sync object"), bs, true);
-		}
+		// Sync to players if server not localhost
+		if (isClient()) return;
+
+		CBitStream bs;
+		SerializeTick(bs);
+		getRules().SendCommand(getRules().getCommandID("sync object"), bs, true);
 	}
 
 	void HandleDeserializeInit(CBitStream@ bs)
 	{
-		if (!isClient()) return;
+		// Deserialize if client not localhost
+		if (isServer()) return;
 
 		DeserializeInit(bs);
 		Object::AddObject(this);
@@ -130,7 +140,8 @@ class Object
 
 	void HandleDeserializeTick(CBitStream@ bs)
 	{
-		if (!isClient()) return;
+		// Deserialize if client not localhost
+		if (isServer()) return;
 
 		DeserializeTick(bs);
 
@@ -350,5 +361,10 @@ class Object
 		interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		interPosition = interPosition.clamp(oldPosition, position);
 		interVelocity = oldVelocity.lerp(velocity, t);
+	}
+
+	void OnRemove()
+	{
+		print("Removed object: " + id);
 	}
 }

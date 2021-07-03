@@ -15,10 +15,15 @@ void onInit(CRules@ this)
 			if (player !is null)
 			{
 				Actor actor(player, SPAWN_POSITION);
-				Actor::SetActor(player, actor);
+				Actor::AddActor(actor);
 			}
 		}
 	}
+}
+
+void onPlayerLeave(CRules@ this, CPlayer@ player)
+{
+	Actor::RemoveActor(player);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

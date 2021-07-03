@@ -33,7 +33,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	}
 
 	Actor actor(player, SPAWN_POSITION);
-	Actor::SetActor(player, actor);
+	Actor::AddActor(actor);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

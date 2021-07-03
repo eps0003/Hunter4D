@@ -2,10 +2,11 @@ namespace Actor
 {
 	Actor@ getActor(CPlayer@ player)
 	{
-		if (player is null) return null;
-
 		Actor@ actor;
-		player.get("actor", @actor);
+		if (player !is null)
+		{
+			player.get("actor", @actor);
+		}
 		return actor;
 	}
 
@@ -14,17 +15,20 @@ namespace Actor
 		return Actor::getActor(getLocalPlayer());
 	}
 
-	void SetActor(CPlayer@ player, Actor@ actor)
+	void AddActor(Actor@ actor)
 	{
-		Object::AddObject(actor, false);
-		player.set("actor", @actor);
-		print("Set actor: " + player.getUsername());
+		Object::AddObject(actor);
+		actor.player.set("actor", @actor);
+		print("Set actor: " + actor.player.getUsername());
+	}
 
-		if (!isClient() && actor !is null)
+	void RemoveActor(CPlayer@ player)
+	{
+		Actor@ actor = Actor::getActor(player);
+		if (actor !is null)
 		{
-			CBitStream bs;
-			actor.SerializeInit(bs);
-			getRules().SendCommand(getRules().getCommandID("init actor"), bs, true);
+			Object::RemoveObject(actor.id);
+			player.set("actor", null);
 		}
 	}
 

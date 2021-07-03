@@ -44,37 +44,44 @@ class Actor : Object
 
 	void HandleSerializeInit(CPlayer@ player)
 	{
-		// Sync to player if it isn't my player
-		if (this.player !is player)
+		// Sync to player if server not localhost
+		if (isClient()) return;
+
+		CBitStream bs;
+		SerializeInit(bs);
+
+		if (player !is null)
 		{
-			CBitStream bs;
-			SerializeInit(bs);
 			getRules().SendCommand(getRules().getCommandID("init actor"), bs, player);
+		}
+		else
+		{
+			getRules().SendCommand(getRules().getCommandID("init actor"), bs, true);
 		}
 	}
 
 	void HandleSerializeTick()
 	{
-		// Sync to server if not localhost
-		if (!isServer())
+		// Sync to server if client not localhost
+		if (isServer()) return;
+
+		// Sync my actor
+		Actor@ actor = Actor::getMyActor();
+		if (actor !is null)
 		{
-			// Sync my actor
-			Actor@ actor = Actor::getMyActor();
-			if (actor !is null)
-			{
-				CBitStream bs;
-				SerializeTick(bs);
-				getRules().SendCommand(getRules().getCommandID("sync actor"), bs, true);
-			}
+			CBitStream bs;
+			SerializeTick(bs);
+			getRules().SendCommand(getRules().getCommandID("sync actor"), bs, true);
 		}
 	}
 
 	void HandleDeserializeInit(CBitStream@ bs)
 	{
-		if (!isClient()) return;
+		// Deserialize if client not localhost
+		if (isServer()) return;
 
 		DeserializeInit(bs);
-		Actor::SetActor(player, this);
+		Actor::AddActor(this);
 	}
 
 	void HandleDeserializeTick(CBitStream@ bs)
@@ -171,5 +178,10 @@ class Actor : Object
 			camera.rotation.y,
 			Maths::Clamp(camera.rotation.z, -90, 90)
 		);
+	}
+
+	void OnRemove()
+	{
+		Actor::RemoveActor(player);
 	}
 }

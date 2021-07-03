@@ -42,6 +42,6 @@ void ChangeColor(Object@ object)
 {
 	if (object !is null)
 	{
-		object.color = SColor(255, 255, 0, 0);
+		object.color = SColor(255, XORRandom(255), XORRandom(255), XORRandom(255));
 	}
 }
