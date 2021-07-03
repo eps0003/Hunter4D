@@ -13,7 +13,7 @@ class Camera
 	private Vec3f _interRotation;
 
 	private float _fov = 70.0f;
-	private float _renderDistance = 70.0f;
+	private float _renderDistance = 150.0f;
 
 	private float[] modelMatrix;
 	private float[] viewMatrix;
@@ -31,7 +31,7 @@ class Camera
 		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
 
-		// Render::SetFog(getSkyColor(), SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+		Render::SetFog(SColor(255, 165, 189, 200), SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
 	}
 
 	void Update()

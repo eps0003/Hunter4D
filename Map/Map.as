@@ -6,7 +6,7 @@
 
 class Map
 {
-	u8[] blocks;
+	SColor[] blocks;
 	Vec3f dimensions;
 	uint blockCount = 0;
 
@@ -16,7 +16,7 @@ class Map
 	{
 		this.dimensions = dimensions;
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
-		blocks.set_length(blockCount);
+		blocks = array<SColor>(blockCount, 0);
 	}
 
 	void opAssign(Map map)
@@ -26,12 +26,12 @@ class Map
 		blockCount = map.blockCount;
 	}
 
-	void SetBlockSafe(Vec3f position, u8 block)
+	void SetBlockSafe(Vec3f position, SColor block)
 	{
 		SetBlockSafe(position.x, position.y, position.z, block);
 	}
 
-	void SetBlockSafe(int x, int y, int z, u8 block)
+	void SetBlockSafe(int x, int y, int z, SColor block)
 	{
 		if (isValidBlock(x, y, z))
 		{
@@ -39,7 +39,7 @@ class Map
 		}
 	}
 
-	void SetBlockSafe(int index, u8 block)
+	void SetBlockSafe(int index, SColor block)
 	{
 		if (isValidBlock(index))
 		{
@@ -47,17 +47,17 @@ class Map
 		}
 	}
 
-	void SetBlock(Vec3f position, u8 block)
+	void SetBlock(Vec3f position, SColor block)
 	{
 		SetBlock(position.x, position.y, position.z, block);
 	}
 
-	void SetBlock(int x, int y, int z, u8 block)
+	void SetBlock(int x, int y, int z, SColor block)
 	{
 		SetBlock(posToIndex(x, y, z), block);
 	}
 
-	void SetBlock(int index, u8 block)
+	void SetBlock(int index, SColor block)
 	{
 		blocks[index] = block;
 
@@ -66,7 +66,7 @@ class Map
 		{
 			CBitStream bs;
 			bs.write_u32(index);
-			bs.write_u8(block);
+			bs.write_u32(block.color);
 			getRules().SendCommand(getRules().getCommandID("sync block"), bs, true);
 		}
 
@@ -76,12 +76,12 @@ class Map
 		}
 	}
 
-	u8 getBlockSafe(Vec3f position)
+	SColor getBlockSafe(Vec3f position)
 	{
 		return getBlockSafe(position.x, position.y, position.z);
 	}
 
-	u8 getBlockSafe(int x, int y, int z)
+	SColor getBlockSafe(int x, int y, int z)
 	{
 		if (isValidBlock(x, y, z))
 		{
@@ -90,7 +90,7 @@ class Map
 		return 0;
 	}
 
-	u8 getBlockSafe(int index)
+	SColor getBlockSafe(int index)
 	{
 		if (isValidBlock(index))
 		{
@@ -99,17 +99,17 @@ class Map
 		return 0;
 	}
 
-	u8 getBlock(Vec3f position)
+	SColor getBlock(Vec3f position)
 	{
 		return getBlock(position.x, position.y, position.z);
 	}
 
-	u8 getBlock(int x, int y, int z)
+	SColor getBlock(int x, int y, int z)
 	{
 		return getBlock(posToIndex(x, y, z));
 	}
 
-	u8 getBlock(int index)
+	SColor getBlock(int index)
 	{
 		return blocks[index];
 	}

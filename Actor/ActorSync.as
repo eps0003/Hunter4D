@@ -1,6 +1,6 @@
 #include "Actor.as"
 
-Vec3f SPAWN_POSITION = Vec3f(-1, 0, -1);
+Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
 
 void onInit(CRules@ this)
 {
@@ -19,6 +19,12 @@ void onInit(CRules@ this)
 			}
 		}
 	}
+}
+
+void onNewPlayerJoin(CRules@ this, CPlayer@ player)
+{
+	Actor actor(player, SPAWN_POSITION);
+	Actor::AddActor(actor);
 }
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)

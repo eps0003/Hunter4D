@@ -80,7 +80,7 @@ class AABB : IBounds
 				continue;
 			}
 
-			u8 block = map.getBlockSafe(x, y, z);
+			SColor block = map.getBlockSafe(x, y, z);
 			if (blocks.isSolid(block))
 			{
 				return true;

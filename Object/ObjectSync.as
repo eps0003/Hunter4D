@@ -1,8 +1,6 @@
 #include "Object.as"
 #include "Actor.as"
 
-Vec3f SPAWN_POSITION = Vec3f(-1, 0, -1);
-
 void onInit(CRules@ this)
 {
 	this.addCommandID("init object");
@@ -31,9 +29,6 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	{
 		objects[i].HandleSerializeInit(player);
 	}
-
-	Actor actor(player, SPAWN_POSITION);
-	Actor::AddActor(actor);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

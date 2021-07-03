@@ -65,24 +65,28 @@ class Chunk
 
 			if (faces != FaceFlag::None)
 			{
-				u8 block = map.getBlock(index);
+				SColor block = map.getBlock(index);
 
-				float x1 = block / 8.0f;
-				float y1 = Maths::Floor(x1) / 32.0f;
-				float x2 = x1 + (1.0f / 32.0f);
-				float y2 = y1 + (1.0f / 32.0f);
+				float x1 = 0;
+				float y1 = 0;
+				float x2 = 1;
+				float y2 = 1;
 
 				float w = 1;
 
 				SColor col;
-				float shade = 12;
+				float shade = 0.07f;
+				u8 red = block.getRed();
+				u8 green = block.getGreen();
+				u8 blue = block.getBlue();
+				u8 alpha = block.getAlpha();
 				SColor[] colors = {
-					SColor(255, 255 - shade * 2, 255 - shade * 2, 255 - shade * 2),
-					SColor(255, 255 - shade * 3, 255 - shade * 3, 255 - shade * 3),
-					SColor(255, 255 - shade * 5, 255 - shade * 5, 255 - shade * 5),
-					SColor(255, 255 - shade * 0, 255 - shade * 0, 255 - shade * 0),
-					SColor(255, 255 - shade * 1, 255 - shade * 1, 255 - shade * 1),
-					SColor(255, 255 - shade * 4, 255 - shade * 4, 255 - shade * 4),
+					SColor(alpha, red * (1 - shade * 2), green * (1 - shade * 2), blue * (1 - shade * 2)),
+					SColor(alpha, red * (1 - shade * 3), green * (1 - shade * 3), blue * (1 - shade * 3)),
+					SColor(alpha, red * (1 - shade * 5), green * (1 - shade * 5), blue * (1 - shade * 5)),
+					SColor(alpha, red * (1 - shade * 0), green * (1 - shade * 0), blue * (1 - shade * 0)),
+					SColor(alpha, red * (1 - shade * 1), green * (1 - shade * 1), blue * (1 - shade * 1)),
+					SColor(alpha, red * (1 - shade * 4), green * (1 - shade * 4), blue * (1 - shade * 4)),
 				};
 
 				if (blockHasFace(faces, FaceFlag::Left))

@@ -14,7 +14,7 @@ class MapRenderer
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 
-	string texture = "BlocksMC.png";
+	string texture = "Pixel.png";
 	SMaterial@ material = SMaterial();
 
 	MapRenderer()

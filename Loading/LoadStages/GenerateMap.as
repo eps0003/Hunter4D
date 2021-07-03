@@ -30,8 +30,8 @@ void onTick(CRules@ this)
 		for (uint i = startIndex; i < endIndex; i++)
 		{
 			Vec3f pos = map.indexToPos(i);
-			u8 type = pos.y == 0 ? 1 : 0;
-			map.SetBlock(i, type);
+			SColor color = pos.y == 0 ? SColor(255, 255, 100, 100) : 0;
+			map.SetBlock(i, color);
 		}
 
 		// Set loading progress

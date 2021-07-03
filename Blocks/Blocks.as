@@ -19,33 +19,33 @@ class Blocks
 		this.transparent.push_back(transparent);
 	}
 
-    string getName(u8 block)
+	string getName(SColor block)
 	{
-		return name[block];
+		return "";
 	}
 
-	bool isVisible(u8 block)
+	bool isVisible(SColor block)
 	{
-		return visible[block];
+		return block.getAlpha() > 0;
 	}
 
-	bool isSolid(u8 block)
+	bool isSolid(SColor block)
 	{
-		return solid[block];
+		return isVisible(block);
 	}
 
-	bool isDestructible(u8 block)
+	bool isDestructible(SColor block)
 	{
-		return destructible[block];
+		return true;
 	}
 
-	bool isCollapsible(u8 block)
+	bool isCollapsible(SColor block)
 	{
-		return collapsible[block];
+		return false;
 	}
 
-	bool isTransparent(u8 block)
+	bool isTransparent(SColor block)
 	{
-		return transparent[block];
+		return block.getAlpha() < 255;
 	}
 }

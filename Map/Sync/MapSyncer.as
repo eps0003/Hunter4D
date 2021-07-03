@@ -121,8 +121,8 @@ class MapSyncer
 		{
 			if (i >= map.blockCount) break;
 
-			u8 block = map.getBlock(i);
-			bs.write_u8(block);
+			SColor block = map.getBlock(i);
+			bs.write_u32(block.color);
 		}
 
 		// Send to requesting player
@@ -155,7 +155,7 @@ class MapSyncer
 		{
 			if (i >= map.blockCount) break;
 
-			u8 block = packet.read_u8();
+			SColor block(packet.read_u32());
 			map.SetBlock(i, block);
 		}
 
