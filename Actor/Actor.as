@@ -146,6 +146,20 @@ class Actor : Object
 		return player.isMyPlayer();
 	}
 
+	void Collision()
+	{
+		if (collider is null) return;
+
+		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
+		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
+
+		if (velocity.x != 0) CollisionX(collideBlocks, collideMapEdge);
+		if (velocity.z != 0) CollisionZ(collideBlocks, collideMapEdge);
+		if (collisionX) CollisionX(collideBlocks, collideMapEdge);
+		if (collisionZ) CollisionZ(collideBlocks, collideMapEdge);
+		if (velocity.y != 0) CollisionY(collideBlocks);
+	}
+
 	void RenderHUD()
 	{
 		Object::RenderHUD();

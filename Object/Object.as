@@ -218,7 +218,7 @@ class Object
 		collisionFlags = flags;
 	}
 
-	private bool hasCollisionFlags(u8 flags)
+	bool hasCollisionFlags(u8 flags)
 	{
 		return (collisionFlags & flags) == flags;
 	}
@@ -230,179 +230,114 @@ class Object
 		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
 		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
 
-		// x collision
-		if (velocity.x != 0)
+		if (velocity.x != 0) CollisionX(collideBlocks, collideMapEdge);
+		if (velocity.z != 0) CollisionZ(collideBlocks, collideMapEdge);
+		if (velocity.y != 0) CollisionY(collideBlocks);
+	}
+
+	void CollisionX(bool blocks, bool mapEdge)
+	{
+		Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
+
+		if (blocks && collider.intersectsNewSolid(position, xPosition))
 		{
-			Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
+			Vec3f min = (position + collider.min).floor();
+			Vec3f max = (position + collider.max).ceil();
 
-			if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
+			if (velocity.x > 0)
 			{
-				Vec3f min = (position + collider.min).floor();
-				Vec3f max = (position + collider.max).ceil();
-
-				if (velocity.x > 0)
-				{
-					position.x = max.x - collider.max.x - 0.0001f;
-				}
-				else
-				{
-					position.x = min.x - collider.min.x + 0.0001f;
-				}
-
-				collisionX = true;
-			}
-			else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
-			{
-				if (velocity.x > 0)
-				{
-					position.x = map.dimensions.x - collider.max.x - 0.0001f;
-				}
-				else
-				{
-					position.x = -collider.min.x;
-				}
-
-				collisionX = true;
-			}
-
-			if (!collisionX) position.x += velocity.x;
-		}
-
-		// z collision
-		if (velocity.z != 0)
-		{
-			Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
-
-			if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
-			{
-				Vec3f min = (position + collider.min).floor();
-				Vec3f max = (position + collider.max).ceil();
-
-				if (velocity.z > 0)
-				{
-					position.z = max.z - collider.max.z - 0.0001f;
-				}
-				else
-				{
-					position.z = min.z - collider.min.z + 0.0001f;
-				}
-
-				collisionZ = true;
-			}
-			else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
-			{
-				if (velocity.z > 0)
-				{
-					position.z = map.dimensions.z - collider.max.z - 0.0001f;
-				}
-				else
-				{
-					position.z = -collider.min.z;
-				}
-				collisionZ = true;
-			}
-
-			if (!collisionZ) position.z += velocity.z;
-		}
-
-		// x collision again
-		if (collisionX)
-		{
-			Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
-
-			if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
-			{
-				Vec3f min = (position + collider.min).floor();
-				Vec3f max = (position + collider.max).ceil();
-
-				if (velocity.x > 0)
-				{
-					position.x = max.x - collider.max.x - 0.0001f;
-				}
-				else
-				{
-					position.x = min.x - collider.min.x + 0.0001f;
-				}
-			}
-			else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
-			{
-				if (velocity.x > 0)
-				{
-					position.x = map.dimensions.x - collider.max.x - 0.0001f;
-				}
-				else
-				{
-					position.x = -collider.min.x;
-				}
+				position.x = max.x - collider.max.x - 0.0001f;
 			}
 			else
 			{
-				collisionX = false;
-				position.x += velocity.x;
+				position.x = min.x - collider.min.x + 0.0001f;
 			}
+
+			collisionX = true;
 		}
-
-		// z collision again
-		if (collisionZ)
+		else if (mapEdge && collider.intersectsMapEdge(xPosition))
 		{
-			Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
-
-			if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
+			if (velocity.x > 0)
 			{
-				Vec3f min = (position + collider.min).floor();
-				Vec3f max = (position + collider.max).ceil();
-
-				if (velocity.z > 0)
-				{
-					position.z = max.z - collider.max.z - 0.0001f;
-				}
-				else
-				{
-					position.z = min.z - collider.min.z + 0.0001f;
-				}
-			}
-			else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
-			{
-				if (velocity.z > 0)
-				{
-					position.z = map.dimensions.z - collider.max.z - 0.0001f;
-				}
-				else
-				{
-					position.z = -collider.min.z;
-				}
-				collisionZ = true;
+				position.x = map.dimensions.x - collider.max.x - 0.0001f;
 			}
 			else
 			{
-				collisionZ = false;
-				position.z += velocity.z;
+				position.x = -collider.min.x;
 			}
+
+			collisionX = true;
 		}
-
-		// y collision
-		if (velocity.y != 0)
+		else
 		{
-			Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
+			collisionX = false;
+			position.x += velocity.x;
+		}
+	}
 
-			if (collideBlocks && collider.intersectsNewSolid(position, yPosition))
+	void CollisionZ(bool blocks, bool mapEdge)
+	{
+		Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
+
+		if (blocks && collider.intersectsNewSolid(position, zPosition))
+		{
+			Vec3f min = (position + collider.min).floor();
+			Vec3f max = (position + collider.max).ceil();
+
+			if (velocity.z > 0)
 			{
-				Vec3f min = (position + collider.min).floor();
-				Vec3f max = (position + collider.max).ceil();
-
-				if (velocity.y > 0)
-				{
-					position.y = max.y - collider.max.y - 0.0001f;
-				}
-				else
-				{
-					position.y = min.y - collider.min.y + 0.0001f;
-				}
-
-				collisionY = true;
+				position.z = max.z - collider.max.z - 0.0001f;
+			}
+			else
+			{
+				position.z = min.z - collider.min.z + 0.0001f;
 			}
 
-			if (!collisionY) position.y += velocity.y;
+			collisionZ = true;
+		}
+		else if (mapEdge && collider.intersectsMapEdge(zPosition))
+		{
+			if (velocity.z > 0)
+			{
+				position.z = map.dimensions.z - collider.max.z - 0.0001f;
+			}
+			else
+			{
+				position.z = -collider.min.z;
+			}
+
+			collisionZ = true;
+		}
+		else
+		{
+			collisionZ = false;
+			position.z += velocity.z;
+		}
+	}
+
+	void CollisionY(bool blocks)
+	{
+		Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
+
+		if (blocks && collider.intersectsNewSolid(position, yPosition))
+		{
+			Vec3f min = (position + collider.min).floor();
+			Vec3f max = (position + collider.max).ceil();
+
+			if (velocity.y > 0)
+			{
+				position.y = max.y - collider.max.y - 0.0001f;
+			}
+			else
+			{
+				position.y = min.y - collider.min.y + 0.0001f;
+			}
+
+			collisionY = true;
+		}
+		else
+		{
+			position.y += velocity.y;
 		}
 	}
 
