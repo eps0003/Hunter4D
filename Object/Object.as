@@ -89,11 +89,12 @@ class Object
 
 	void DeserializeInit(CBitStream@ bs)
 	{
+		oldPosition = position;
+		oldVelocity = velocity;
+
 		id = bs.read_u16();
 		position = Vec3f(bs);
-		oldPosition = position;
 		velocity = Vec3f(bs);
-		oldVelocity = velocity;
 		collisionFlags = bs.read_u8();
 		color = SColor(bs.read_u32());
 		gravity = Vec3f(bs);
@@ -101,6 +102,9 @@ class Object
 
 	void DeserializeTick(CBitStream@ bs)
 	{
+		oldPosition = position;
+		oldVelocity = velocity;
+
 		id = bs.read_u16();
 		position = Vec3f(bs);
 		velocity = Vec3f(bs);
@@ -230,13 +234,15 @@ class Object
 		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
 		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
 
-		if (velocity.x != 0) CollisionX(collideBlocks, collideMapEdge);
-		if (velocity.z != 0) CollisionZ(collideBlocks, collideMapEdge);
-		if (velocity.y != 0) CollisionY(collideBlocks);
+		CollisionX(collideBlocks, collideMapEdge);
+		CollisionZ(collideBlocks, collideMapEdge);
+		CollisionY(collideBlocks);
 	}
 
 	void CollisionX(bool blocks, bool mapEdge)
 	{
+		if (velocity.x == 0) return;
+
 		Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
 
 		if (blocks && collider.intersectsNewSolid(position, xPosition))
@@ -277,6 +283,8 @@ class Object
 
 	void CollisionZ(bool blocks, bool mapEdge)
 	{
+		if (velocity.z == 0) return;
+
 		Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
 
 		if (blocks && collider.intersectsNewSolid(position, zPosition))
@@ -317,6 +325,8 @@ class Object
 
 	void CollisionY(bool blocks)
 	{
+		if (velocity.y == 0) return;
+
 		Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
 
 		if (blocks && collider.intersectsNewSolid(position, yPosition))
@@ -399,8 +409,8 @@ class Object
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-		interPosition = oldPosition.lerp(oldPosition + velocity, t);
-		interPosition = interPosition.clamp(oldPosition, position);
+		interPosition = oldPosition.lerp(position, t);
+		// interPosition = interPosition.clamp(oldPosition, position);
 		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 

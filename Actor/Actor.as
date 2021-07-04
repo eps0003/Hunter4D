@@ -123,12 +123,6 @@ class Actor : Object
 		{
 			Movement();
 		}
-
-		if (isClient() && oldPosition != position)
-		{
-			print("old: "+oldPosition.toString());
-			print("new: "+position.toString());
-		}
 	}
 
 	void PostUpdate()
@@ -153,11 +147,10 @@ class Actor : Object
 		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
 		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
 
-		if (velocity.x != 0) CollisionX(collideBlocks, collideMapEdge);
-		if (velocity.z != 0) CollisionZ(collideBlocks, collideMapEdge);
+		CollisionX(collideBlocks, collideMapEdge);
+		CollisionZ(collideBlocks, collideMapEdge);
 		if (collisionX) CollisionX(collideBlocks, collideMapEdge);
-		if (collisionZ) CollisionZ(collideBlocks, collideMapEdge);
-		if (velocity.y != 0) CollisionY(collideBlocks);
+		CollisionY(collideBlocks);
 	}
 
 	void RenderHUD()
@@ -166,10 +159,10 @@ class Actor : Object
 		DrawCrosshair(0, 8, 1, color_white);
 	}
 
-	// bool isVisible()
-	// {
-	// 	return !player.isMyPlayer();
-	// }
+	bool isVisible()
+	{
+		return !player.isMyPlayer();
+	}
 
 	private void Movement()
 	{
