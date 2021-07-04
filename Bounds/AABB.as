@@ -61,13 +61,13 @@ class AABB : IBounds
 		Map@ map = Map::getMap();
 		Blocks@ blocks = Blocks::getBlocks();
 
+		Vec3f floor = (currentPos + min).floor();
+		Vec3f ceil = (currentPos + max).ceil();
+
 		for (int x = worldPos.x + min.x; x < worldPos.x + max.x; x++)
 		for (int y = worldPos.y + min.y; y < worldPos.y + max.y; y++)
 		for (int z = worldPos.z + min.z; z < worldPos.z + max.z; z++)
 		{
-			Vec3f floor = (currentPos + min).floor();
-			Vec3f ceil = (currentPos + max).ceil();
-
 			bool alreadyIntersecting = (
 				x >= floor.x && x < ceil.x &&
 				y >= floor.y && y < ceil.y &&

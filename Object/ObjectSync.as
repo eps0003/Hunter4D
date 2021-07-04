@@ -14,8 +14,18 @@ void onTick(CRules@ this)
 
 	for (uint i = 0; i < objects.size(); i++)
 	{
+		objects[i].PreUpdate();
+	}
+
+	for (uint i = 0; i < objects.size(); i++)
+	{
+		objects[i].Update();
+	}
+
+	for (uint i = 0; i < objects.size(); i++)
+	{
 		Object@ object = objects[i];
-		object.Update();
+		object.PostUpdate();
 		object.HandleSerializeTick();
 	}
 }

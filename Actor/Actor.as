@@ -5,12 +5,16 @@
 class Actor : Object
 {
 	CPlayer@ player;
+	float acceleration = 0.08;
+	float friction = 0.3f;
+	float jumpForce = 0.35f;
 
 	Actor(CPlayer@ player, Vec3f position)
 	{
 		super(position);
 		@this.player = player;
-		SetCollisionFlags(CollisionFlag::Blocks);
+		SetCollisionFlags(CollisionFlag::All);
+		gravity = Vec3f(0, -0.04, 0);
 	}
 
 	void opAssign(Actor actor)
@@ -113,15 +117,27 @@ class Actor : Object
 
 	void Update()
 	{
+		Object::Update();
+
+		if (doPhysicsUpdate())
+		{
+			Movement();
+		}
+	}
+
+	void PostUpdate()
+	{
+		Object::PostUpdate();
+
 		if (player.isMyPlayer())
 		{
-			oldPosition = position;
-			oldVelocity = velocity;
-
-			Movement();
-			Collision();
 			UpdateCamera();
 		}
+	}
+
+	bool doPhysicsUpdate()
+	{
+		return player.isMyPlayer();
 	}
 
 	void Render()
@@ -155,9 +171,6 @@ class Actor : Object
 		if (controls.isKeyPressed(KEY_KEY_D)) dir.x++;
 		if (controls.isKeyPressed(KEY_KEY_A)) dir.x--;
 
-		if (controls.isKeyPressed(KEY_SPACE)) verticalDir++;
-		if (controls.isKeyPressed(KEY_LSHIFT)) verticalDir--;
-
 		float len = dir.Length();
 		if (len > 0)
 		{
@@ -165,10 +178,14 @@ class Actor : Object
 			dir = dir.RotateBy(camera.rotation.y);
 		}
 
+		if (controls.isKeyPressed(KEY_SPACE) && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0)))
+		{
+			velocity.y = jumpForce;
+		}
+
 		// Move actor
-		velocity.x = dir.x;
-		velocity.z = dir.y;
-		velocity.y = verticalDir;
+		velocity.x += dir.x * acceleration - friction * velocity.x;
+		velocity.z += dir.y * acceleration - friction * velocity.z;
 	}
 
 	private void UpdateCamera()

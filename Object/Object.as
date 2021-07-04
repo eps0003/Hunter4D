@@ -16,10 +16,13 @@ class Object
 	Vec3f oldVelocity;
 	Vec3f interVelocity;
 
+	Vec3f gravity;
+
 	private SColor _color = color_white;
 
-	AABB@ collider = AABB(Vec3f(-0.5f, -1.0f, -0.5f), Vec3f(0.5f, 0.6f, 0.5f));
+	AABB@ collider = AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f));
 	private u8 collisionFlags = 0;
+	private Map@ map = Map::getMap();
 
 	private bool collisionX = false;
 	private bool collisionY = false;
@@ -74,6 +77,7 @@ class Object
 		velocity.Serialize(bs);
 		bs.write_u8(collisionFlags);
 		bs.write_u32(color.color);
+		gravity.Serialize(bs);
 	}
 
 	void SerializeTick(CBitStream@ bs)
@@ -92,6 +96,7 @@ class Object
 		oldVelocity = velocity;
 		collisionFlags = bs.read_u8();
 		color = SColor(bs.read_u32());
+		gravity = Vec3f(bs);
 	}
 
 	void DeserializeTick(CBitStream@ bs)
@@ -152,17 +157,60 @@ class Object
 		}
 	}
 
-	void Update()
+	void PreUpdate()
 	{
 		oldPosition = position;
 		oldVelocity = velocity;
 
 		// Reset velocity from collision last tick
-		if (collisionX) velocity.x = 0;
-		if (collisionY) velocity.y = 0;
-		if (collisionZ) velocity.z = 0;
+		if (doPhysicsUpdate())
+		{
+			if (collisionX)
+			{
+				velocity.x = 0;
+				collisionX = false;
+			}
 
-		Collision();
+			if (collisionY)
+			{
+				velocity.y = 0;
+				collisionY = false;
+			}
+
+			if (collisionZ)
+			{
+				velocity.z = 0;
+				collisionZ = false;
+			}
+		}
+	}
+
+	void Update()
+	{
+		if (doPhysicsUpdate())
+		{
+			velocity += gravity;
+		}
+	}
+
+	void PostUpdate()
+	{
+		if (doPhysicsUpdate())
+		{
+			velocity.y = Maths::Clamp(velocity.y, -1, 1);
+
+			//set velocity to zero if low enough
+			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
+			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
+			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
+
+			Collision();
+		}
+	}
+
+	bool doPhysicsUpdate()
+	{
+		return isServer();
 	}
 
 	void SetCollisionFlags(u8 flags)
@@ -177,125 +225,110 @@ class Object
 
 	void Collision()
 	{
-		// Reset collisions
-		collisionX = false;
-		collisionY = false;
-		collisionZ = false;
+		if (collider is null) return;
 
-		if (collider !is null)
+		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
+		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
+
+		// x collision
+		if (velocity.x != 0)
 		{
-			bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
-			bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
-			Vec3f mapDim = Map::getMap().dimensions;
+			Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
 
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
-			// x collision
-			if (velocity.x != 0)
+			if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
 			{
-				Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
+				Vec3f min = (position + collider.min).floor();
+				Vec3f max = (position + collider.max).ceil();
 
-				if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
+				if (velocity.x > 0)
 				{
-					if (velocity.x > 0)
-					{
-						position.x = max.x - collider.max.x;
-					}
-					else
-					{
-						position.x = min.x - collider.min.x;
-					}
-
-					collisionX = true;
+					position.x = max.x - collider.max.x - 0.0001f;
 				}
-				else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
+				else
 				{
-					if (velocity.x > 0)
-					{
-						position.x = mapDim.x - collider.max.x;
-					}
-					else
-					{
-						position.x = -collider.min.x;
-					}
-
-					collisionX = true;
-
-					if (position.x == oldPosition.x)
-					{
-						velocity.x = 0;
-					}
+					position.x = min.x - collider.min.x + 0.0001f;
 				}
+
+				collisionX = true;
+			}
+			else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
+			{
+				if (velocity.x > 0)
+				{
+					position.x = map.dimensions.x - collider.max.x - 0.0001f;
+				}
+				else
+				{
+					position.x = -collider.min.x;
+				}
+
+				collisionX = true;
 			}
 
-			// z collision
-			if (velocity.z != 0)
-			{
-				Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
-
-				if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
-				{
-					if (velocity.z > 0)
-					{
-						position.z = max.z - collider.max.z;
-					}
-					else
-					{
-						position.z = min.z - collider.min.z;
-					}
-
-					collisionZ = true;
-				}
-				else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
-				{
-					if (velocity.z > 0)
-					{
-						position.z = mapDim.z - collider.max.z;
-					}
-					else
-					{
-						position.z = -collider.min.z;
-					}
-
-					collisionZ = true;
-
-					if (position.z == oldPosition.z)
-					{
-						velocity.z = 0;
-					}
-				}
-			}
-
-			// y collision
-			if (velocity.y != 0)
-			{
-				Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
-
-				if (collideBlocks && collider.intersectsNewSolid(position, yPosition))
-				{
-					if (velocity.y > 0)
-					{
-						position.y = max.y - collider.max.y;
-					}
-					else
-					{
-						position.y = min.y - collider.min.y;
-					}
-
-					collisionY = true;
-
-					if (position.y == oldPosition.y)
-					{
-						velocity.y = 0;
-					}
-				}
-			}
+			if (!collisionX) position.x += velocity.x;
 		}
 
-		if (!collisionX) position.x += velocity.x;
-		if (!collisionY) position.y += velocity.y;
-		if (!collisionZ) position.z += velocity.z;
+		// z collision
+		if (velocity.z != 0)
+		{
+			Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
+
+			if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
+			{
+				Vec3f min = (position + collider.min).floor();
+				Vec3f max = (position + collider.max).ceil();
+
+				if (velocity.z > 0)
+				{
+					position.z = max.z - collider.max.z - 0.0001f;
+				}
+				else
+				{
+					position.z = min.z - collider.min.z + 0.0001f;
+				}
+
+				collisionZ = true;
+			}
+			else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
+			{
+				if (velocity.z > 0)
+				{
+					position.z = map.dimensions.z - collider.max.z - 0.0001f;
+				}
+				else
+				{
+					position.z = -collider.min.z;
+				}
+				collisionZ = true;
+			}
+
+			if (!collisionZ) position.z += velocity.z;
+		}
+
+		// y collision
+		if (velocity.y != 0)
+		{
+			Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
+
+			if (collideBlocks && collider.intersectsNewSolid(position, yPosition))
+			{
+				Vec3f min = (position + collider.min).floor();
+				Vec3f max = (position + collider.max).ceil();
+
+				if (velocity.y > 0)
+				{
+					position.y = max.y - collider.max.y - 0.0001f;
+				}
+				else
+				{
+					position.y = min.y - collider.min.y + 0.0001f;
+				}
+
+				collisionY = true;
+			}
+
+			if (!collisionY) position.y += velocity.y;
+		}
 	}
 
 	void Render()

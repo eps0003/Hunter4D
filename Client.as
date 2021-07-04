@@ -8,6 +8,11 @@ void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
 	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
+
+	CBitStream bs;
+	bs.write_netid(getLocalPlayer().getNetworkID());
+	this.SendCommand(this.getCommandID("spawn actor"), bs, false);
+
 	onRestart(this);
 }
 

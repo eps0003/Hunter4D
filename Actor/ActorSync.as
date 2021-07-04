@@ -6,6 +6,7 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("init actor");
 	this.addCommandID("sync actor");
+	this.addCommandID("spawn actor");
 
 	if (isServer())
 	{
@@ -19,12 +20,6 @@ void onInit(CRules@ this)
 			}
 		}
 	}
-}
-
-void onNewPlayerJoin(CRules@ this, CPlayer@ player)
-{
-	Actor actor(player, SPAWN_POSITION);
-	Actor::AddActor(actor);
 }
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
@@ -43,5 +38,14 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		Actor actor;
 		actor.HandleDeserializeTick(params);
+	}
+	else if (isServer() && cmd == this.getCommandID("spawn actor"))
+	{
+		CPlayer@ player = getPlayerByNetworkId(params.read_netid());
+		if (player !is null)
+		{
+			Actor actor(player, SPAWN_POSITION);
+			Actor::AddActor(actor);
+		}
 	}
 }
