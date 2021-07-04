@@ -50,6 +50,11 @@ void Render(int id)
 	Object@[]@ objects = Object::getObjects();
 	for (uint i = 0; i < objects.size(); i++)
 	{
-		objects[i].Render();
+		Object@ object = objects[i];
+		object.Interpolate();
+		if (object.isVisible())
+		{
+			object.Render();
+		}
 	}
 }

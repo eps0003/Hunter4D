@@ -123,6 +123,12 @@ class Actor : Object
 		{
 			Movement();
 		}
+
+		if (isClient() && oldPosition != position)
+		{
+			print("old: "+oldPosition.toString());
+			print("new: "+position.toString());
+		}
 	}
 
 	void PostUpdate()
@@ -140,23 +146,16 @@ class Actor : Object
 		return player.isMyPlayer();
 	}
 
-	void Render()
-	{
-		if (!player.isMyPlayer())
-		{
-			Object::Render();
-		}
-		else
-		{
-			Interpolate();
-		}
-	}
-
 	void RenderHUD()
 	{
 		Object::RenderHUD();
 		DrawCrosshair(0, 8, 1, color_white);
 	}
+
+	// bool isVisible()
+	// {
+	// 	return !player.isMyPlayer();
+	// }
 
 	private void Movement()
 	{

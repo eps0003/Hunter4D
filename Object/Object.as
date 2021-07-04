@@ -305,6 +305,81 @@ class Object
 			if (!collisionZ) position.z += velocity.z;
 		}
 
+		// x collision again
+		if (collisionX)
+		{
+			Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
+
+			if (collideBlocks && collider.intersectsNewSolid(position, xPosition))
+			{
+				Vec3f min = (position + collider.min).floor();
+				Vec3f max = (position + collider.max).ceil();
+
+				if (velocity.x > 0)
+				{
+					position.x = max.x - collider.max.x - 0.0001f;
+				}
+				else
+				{
+					position.x = min.x - collider.min.x + 0.0001f;
+				}
+			}
+			else if (collideMapEdge && collider.intersectsMapEdge(xPosition))
+			{
+				if (velocity.x > 0)
+				{
+					position.x = map.dimensions.x - collider.max.x - 0.0001f;
+				}
+				else
+				{
+					position.x = -collider.min.x;
+				}
+			}
+			else
+			{
+				collisionX = false;
+				position.x += velocity.x;
+			}
+		}
+
+		// z collision again
+		if (collisionZ)
+		{
+			Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
+
+			if (collideBlocks && collider.intersectsNewSolid(position, zPosition))
+			{
+				Vec3f min = (position + collider.min).floor();
+				Vec3f max = (position + collider.max).ceil();
+
+				if (velocity.z > 0)
+				{
+					position.z = max.z - collider.max.z - 0.0001f;
+				}
+				else
+				{
+					position.z = min.z - collider.min.z + 0.0001f;
+				}
+			}
+			else if (collideMapEdge && collider.intersectsMapEdge(zPosition))
+			{
+				if (velocity.z > 0)
+				{
+					position.z = map.dimensions.z - collider.max.z - 0.0001f;
+				}
+				else
+				{
+					position.z = -collider.min.z;
+				}
+				collisionZ = true;
+			}
+			else
+			{
+				collisionZ = false;
+				position.z += velocity.z;
+			}
+		}
+
 		// y collision
 		if (velocity.y != 0)
 		{
@@ -333,8 +408,6 @@ class Object
 
 	void Render()
 	{
-		Interpolate();
-
 		float[] matrix;
 		Matrix::MakeIdentity(matrix);
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
@@ -394,6 +467,11 @@ class Object
 		interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		interPosition = interPosition.clamp(oldPosition, position);
 		interVelocity = oldVelocity.lerp(velocity, t);
+	}
+
+	bool isVisible()
+	{
+		return true;
 	}
 
 	void OnRemove()
