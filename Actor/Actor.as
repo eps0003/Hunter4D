@@ -7,7 +7,7 @@ class Actor : Object
 	CPlayer@ player;
 	float acceleration = 0.08;
 	float friction = 0.3f;
-	float jumpForce = 0.35f;
+	float jumpForce = 0.3f;
 
 	Actor(CPlayer@ player, Vec3f position)
 	{

@@ -131,9 +131,6 @@ class MapRenderer
 			if (synced && chunk.rebuild)
 			{
 				chunk.GenerateMesh(i);
-
-				Vec3f pos = chunkIndexToPos(i);
-				print("Rebuild chunk mesh: " + pos.toString());
 			}
 
 			chunk.Render();
