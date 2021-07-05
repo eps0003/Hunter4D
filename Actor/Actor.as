@@ -239,5 +239,6 @@ class Actor : Object
 	void OnRemove()
 	{
 		print("Removed actor: " + player.getUsername());
+		player.set("actor", null);
 	}
 }

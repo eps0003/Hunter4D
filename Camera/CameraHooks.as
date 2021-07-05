@@ -6,6 +6,11 @@ Camera@ camera;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	@camera = Camera::getCamera();
 }
 

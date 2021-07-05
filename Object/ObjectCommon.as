@@ -49,16 +49,13 @@ namespace Object
 
 	Object@[]@ getObjects()
 	{
-		CRules@ rules = getRules();
-
-		if (!rules.exists("objects"))
-		{
-			Object@[] objects;
-			rules.set("objects", @objects);
-		}
-
 		Object@[]@ objects;
-		rules.get("objects", @objects);
+		if (!getRules().get("objects", @objects))
+		{
+			Object@[] arr;
+			@objects = arr;
+			getRules().set("objects", @objects);
+		}
 		return objects;
 	}
 
@@ -69,6 +66,14 @@ namespace Object
 
 	void ClearObjects()
 	{
+		Object@[]@ objects = Object::getObjects();
+		for (uint i = 0; i < objects.size(); i++)
+		{
+			Object@ object = objects[i];
+			object.OnRemove();
+			object.HandleSerializeRemove();
+		}
+
 		getRules().clear("objects");
 	}
 }

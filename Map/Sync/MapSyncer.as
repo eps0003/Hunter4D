@@ -24,7 +24,7 @@ class MapSyncer
 
 	void AddRequestForEveryone()
 	{
-		mapRequests.clear();
+		mapRequests.empty();
 
 		for (uint i = 0; i < getPlayerCount(); i++)
 		{

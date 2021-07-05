@@ -11,6 +11,7 @@ void onInit(CRules@ this)
 {
 	@map = Map::getMap();
 	@renderer = Map::getRenderer();
+	index = 0;
 
 	this.set_string("loading message", "Initializing block faces...");
 }

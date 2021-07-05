@@ -6,6 +6,13 @@ void onInit(CRules@ this)
 {
 	@mapSyncer = Map::getSyncer();
 	this.set_string("loading message", "Deserializing map...");
+
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
+	mapSyncer.AddRequestForEveryone();
 }
 
 void onTick(CRules@ this)

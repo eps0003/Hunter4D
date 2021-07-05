@@ -1,8 +1,6 @@
 #include "Map.as"
 #include "Ray.as"
 #include "Camera.as"
-#include "Object.as"
-#include "Blob.as"
 
 void onInit(CRules@ this)
 {

@@ -7,7 +7,9 @@
 void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
-	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
+
+	int id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
+	this.set_s32("render script id", id);
 
 	CBitStream bs;
 	bs.write_netid(getLocalPlayer().getNetworkID());

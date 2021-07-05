@@ -6,6 +6,11 @@ float[] fpsArr;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	onTick(this);
 }
 

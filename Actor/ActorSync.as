@@ -7,19 +7,6 @@ void onInit(CRules@ this)
 	this.addCommandID("init actor");
 	this.addCommandID("sync actor");
 	this.addCommandID("spawn actor");
-
-	if (isServer())
-	{
-		for (uint i = 0; i < getPlayerCount(); i++)
-		{
-			CPlayer@ player = getPlayer(i);
-			if (player !is null)
-			{
-				Actor actor(player, SPAWN_POSITION);
-				Actor::AddActor(actor);
-			}
-		}
-	}
 }
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)

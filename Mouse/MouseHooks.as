@@ -6,6 +6,11 @@ Mouse@ mouse;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	@mouse = Mouse::getMouse();
 }
 

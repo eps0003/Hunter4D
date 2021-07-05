@@ -27,7 +27,6 @@ namespace Actor
 		if (actor !is null)
 		{
 			Object::RemoveObject(actor.id);
-			player.set("actor", null);
 		}
 	}
 
@@ -57,5 +56,13 @@ namespace Actor
 	uint getActorCount()
 	{
 		return Actor::getActors().size();
+	}
+
+	void ClearActors()
+	{
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			RemoveActor(getPlayer(i));
+		}
 	}
 }
