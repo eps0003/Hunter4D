@@ -301,14 +301,19 @@ class Object
 
 	void Collision()
 	{
-		if (collider is null) return;
+		if (collider !is null)
+		{
+			bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
+			bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
 
-		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
-		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
-
-		CollisionX(collideBlocks, collideMapEdge);
-		CollisionZ(collideBlocks, collideMapEdge);
-		CollisionY(collideBlocks);
+			CollisionX(collideBlocks, collideMapEdge);
+			CollisionZ(collideBlocks, collideMapEdge);
+			CollisionY(collideBlocks);
+		}
+		else
+		{
+			position += velocity;
+		}
 	}
 
 	void CollisionX(bool blocks, bool mapEdge)
