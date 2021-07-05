@@ -29,7 +29,7 @@ void onTick(CRules@ this)
 			{
 				if (left)
 				{
-					Vec3f position = raycast.hitPos + raycast.normal * 2;
+					Vec3f position = raycast.hitWorldPos + raycast.normal;
 
 					if (isServer())
 					{
@@ -81,28 +81,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void PlaceBlock(Vec3f position)
 {
-	Object::AddObject(Blob(position));
-
-	// Object@[]@ objects = Object::getObjects();
-	// for (uint i = 0; i < objects.size(); i++)
-	// {
-	// 	print("float!");
-	// 	objects[i].SetGravity(Vec3f());
-	// }
-
-	// Map@ map = Map::getMap();
-	// map.SetBlockSafe(position, SColor(255, 100, 100, 100));
+	Map@ map = Map::getMap();
+	map.SetBlockSafe(position, SColor(255, 100, 100, 100));
 }
 
 void DestroyBlock(Vec3f position)
 {
-	// Object@[]@ objects = Object::getObjects();
-	// for (uint i = 0; i < objects.size(); i++)
-	// {
-	// 	print("fall!");
-	// 	objects[i].SetGravity(Vec3f(0, -0.04f, 0));
-	// }
-
-	// Map@ map = Map::getMap();
-	// map.SetBlockSafe(position, 0);
+	Map@ map = Map::getMap();
+	map.SetBlockSafe(position, 0);
 }

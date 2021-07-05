@@ -61,16 +61,18 @@ class Map
 	{
 		blocks[index] = block;
 
+		CRules@ rules = getRules();
+
 		// Sync block to clients
-		if (!isClient() && !getRules().hasScript("GenerateMap.as"))
+		if (!isClient() && !rules.hasScript("GenerateMap.as"))
 		{
 			CBitStream bs;
 			bs.write_u32(index);
 			bs.write_u32(block.color);
-			getRules().SendCommand(getRules().getCommandID("sync block"), bs, true);
+			rules.SendCommand(rules.getCommandID("sync block"), bs, true);
 		}
 
-		if (isClient() && !getRules().hasScript("SyncMap.as"))
+		if (isClient() && !rules.hasScript("SyncMap.as"))
 		{
 			Map::getRenderer().GenerateMesh(indexToPos(index));
 		}

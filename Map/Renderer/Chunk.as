@@ -20,7 +20,6 @@ class Chunk
 		this.index = index;
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
-		GenerateMesh(index);
 	}
 
 	void Render()

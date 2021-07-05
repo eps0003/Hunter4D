@@ -43,10 +43,73 @@ class MapRenderer
 	void GenerateMesh(Vec3f position)
 	{
 		Vec3f chunkPos = worldPosToChunkPos(position);
-		Chunk@ chunk = getChunk(chunkPos);
+		Chunk@ chunk = getChunkSafe(chunkPos);
 		if (chunk !is null)
 		{
 			chunk.rebuild = true;
+
+			int x = position.x;
+			int y = position.y;
+			int z = position.z;
+
+			int cx = chunkPos.x;
+			int cy = chunkPos.y;
+			int cz = chunkPos.z;
+
+			int xMod = x % chunkDimension;
+			int yMod = y % chunkDimension;
+			int zMod = z % chunkDimension;
+
+			UpdateBlockFaces(x, y, z);
+
+			if (x > 0)
+				UpdateBlockFaces(x - 1, y, z);
+			if (x + 1 < map.dimensions.x)
+				UpdateBlockFaces(x + 1, y, z);
+			if (y > 0)
+				UpdateBlockFaces(x, y - 1, z);
+			if (y + 1 < map.dimensions.y)
+				UpdateBlockFaces(x, y + 1, z);
+			if (z > 0)
+				UpdateBlockFaces(x, y, z - 1);
+			if (y + 1 < map.dimensions.z)
+				UpdateBlockFaces(x, y, z + 1);
+
+			if (xMod == 0)
+			{
+				@chunk = getChunkSafe(cx - 1, cy, cz);
+				if (chunk !is null) chunk.rebuild = true;
+			}
+
+			if (xMod == chunkDimension - 1)
+			{
+				@chunk = getChunkSafe(cx + 1, cy, cz);
+				if (chunk !is null) chunk.rebuild = true;
+			}
+
+			if (yMod == 0)
+			{
+				@chunk = getChunkSafe(cx, cy - 1, cz);
+				if (chunk !is null) chunk.rebuild = true;
+			}
+
+			if (yMod == chunkDimension - 1)
+			{
+				@chunk = getChunkSafe(cx, cy + 1, cz);
+				if (chunk !is null) chunk.rebuild = true;
+			}
+
+			if (zMod == 0)
+			{
+				@chunk = getChunkSafe(cx, cy, cz - 1);
+				if (chunk !is null) chunk.rebuild = true;
+			}
+
+			if (zMod == chunkDimension - 1)
+			{
+				@chunk = getChunkSafe(cx, cy, cz + 1);
+				if (chunk !is null) chunk.rebuild = true;
+			}
 		}
 	}
 
@@ -129,12 +192,17 @@ class MapRenderer
 		faceFlags[index] = faces;
 	}
 
-	Chunk@ getChunk(Vec3f position)
+	Chunk@ getChunkSafe(Vec3f position)
 	{
-		return getChunk(chunkPosToChunkIndex(position));
+		return getChunkSafe(position.x, position.y, position.z);
 	}
 
-	Chunk@ getChunk(int index)
+	Chunk@ getChunkSafe(int x, int y, int z)
+	{
+		return getChunkSafe(chunkPosToChunkIndex(x, y, z));
+	}
+
+	Chunk@ getChunkSafe(int index)
 	{
 		if (isValidChunk(index))
 		{
