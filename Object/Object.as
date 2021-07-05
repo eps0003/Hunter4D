@@ -7,6 +7,7 @@
 class Object
 {
 	u16 id = 0;
+	bool hasSyncedInit = false;
 
 	Vec3f position;
 	Vec3f oldPosition;
@@ -38,7 +39,7 @@ class Object
 		{
 			_color = value;
 
-			if (!isClient())
+			if (!isClient() && hasSyncedInit)
 			{
 				CBitStream bs;
 				bs.write_u16(id);
@@ -78,6 +79,8 @@ class Object
 		bs.write_u8(collisionFlags);
 		bs.write_u32(color.color);
 		gravity.Serialize(bs);
+
+		hasSyncedInit = true;
 	}
 
 	void SerializeTick(CBitStream@ bs)
@@ -103,6 +106,8 @@ class Object
 		collisionFlags = bs.read_u8();
 		color = SColor(bs.read_u32());
 		gravity = Vec3f(bs);
+
+		hasSyncedInit = true;
 	}
 
 	void DeserializeTick(CBitStream@ bs)
@@ -244,9 +249,27 @@ class Object
 		return isServer();
 	}
 
+	void AddCollisionFlags(u8 flags)
+	{
+		SetCollisionFlags(collisionFlags | flags);
+	}
+
+	void RemoveCollisionFlags(u8 flags)
+	{
+		SetCollisionFlags(collisionFlags & ~flags);
+	}
+
 	void SetCollisionFlags(u8 flags)
 	{
 		collisionFlags = flags;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_u8(collisionFlags);
+			getRules().SendCommand(getRules().getCommandID("set object collision flags"), bs, true);
+		}
 	}
 
 	bool hasCollisionFlags(u8 flags)

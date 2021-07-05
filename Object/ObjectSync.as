@@ -6,6 +6,7 @@ void onInit(CRules@ this)
 	this.addCommandID("init object");
 	this.addCommandID("sync object");
 	this.addCommandID("remove object");
+	this.addCommandID("set object collision flags");
 	this.addCommandID("set object color");
 }
 
@@ -58,6 +59,14 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		Object object;
 		object.HandleDeserializeRemove(params);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
+	{
+		Object@ object = Object::getObject(params.read_u16());
+		if (object !is null)
+		{
+			object.SetCollisionFlags(params.read_u8());
+		}
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object color"))
 	{
