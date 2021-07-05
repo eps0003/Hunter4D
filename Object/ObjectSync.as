@@ -8,6 +8,7 @@ void onInit(CRules@ this)
 	this.addCommandID("remove object");
 	this.addCommandID("set object collision flags");
 	this.addCommandID("set object color");
+	this.addCommandID("set object gravity");
 }
 
 void onTick(CRules@ this)
@@ -74,6 +75,14 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (object !is null)
 		{
 			object.color = SColor(params.read_u32());
+		}
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object gravity"))
+	{
+		Object@ object = Object::getObject(params.read_u16());
+		if (object !is null)
+		{
+			object.SetGravity(Vec3f(params));
 		}
 	}
 }

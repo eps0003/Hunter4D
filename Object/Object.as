@@ -17,7 +17,7 @@ class Object
 	Vec3f oldVelocity;
 	Vec3f interVelocity;
 
-	Vec3f gravity;
+	private Vec3f gravity;
 
 	private SColor _color = color_white;
 
@@ -275,6 +275,19 @@ class Object
 	bool hasCollisionFlags(u8 flags)
 	{
 		return (collisionFlags & flags) == flags;
+	}
+
+	void SetGravity(Vec3f gravity)
+	{
+		this.gravity = gravity;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			gravity.Serialize(bs);
+			getRules().SendCommand(getRules().getCommandID("set object gravity"), bs, true);
+		}
 	}
 
 	void Collision()
