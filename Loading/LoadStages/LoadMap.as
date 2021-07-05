@@ -1,5 +1,6 @@
 #include "Map.as"
 #include "Ephtracy.as"
+#include "Utilities.as"
 
 Map@ map;
 uint sectionIndex = 0;
@@ -82,7 +83,7 @@ void onTick(CRules@ this)
 	{
 		print("Map generated!");
 		this.RemoveScript("LoadMap.as");
-		if (isClient() != isServer())
+		if (!isLocalHost())
 		{
 			this.AddScript("SyncMap.as");
 		}

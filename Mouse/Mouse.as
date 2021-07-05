@@ -14,12 +14,11 @@ class Mouse
 	void Update()
 	{
 		CalculateVelocity();
-		UpdateVisibility();
 	}
 
 	void Render()
 	{
-		Interpolate();
+		UpdateVisibility();
 	}
 
 	bool isInControl()
@@ -76,7 +75,7 @@ class Mouse
 		}
 	}
 
-	private void Interpolate()
+	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
 		interVelocity = Vec2f_lerp(_oldVelocity, velocity, t);

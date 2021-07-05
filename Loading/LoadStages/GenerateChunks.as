@@ -1,5 +1,5 @@
 #include "Map.as"
-#include "Interpolation.as"
+#include "Utilities.as"
 
 #define CLIENT_ONLY
 
@@ -17,7 +17,7 @@ void onInit(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint chunksThisTick = Interpolation::getFPS() * Maths::Pow(renderer.chunkDimension, -3) * 60;
+	uint chunksThisTick = getFPS() * Maths::Pow(renderer.chunkDimension, -3) * 60;
 
 	for (uint i = 0; i < chunksThisTick; i++)
 	{

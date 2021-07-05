@@ -9,9 +9,4 @@ namespace Interpolation
 	{
 		return getRules().get_f32("inter_frame_time");
 	}
-
-	int getFPS()
-	{
-		return getRules().get_u32("fps");
-	}
 }

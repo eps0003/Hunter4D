@@ -44,7 +44,10 @@ void Render(int id)
 	Render::SetBackfaceCull(true);
 	Render::ClearZ();
 
-	Camera::getCamera().Render();
+	Camera@ camera = Camera::getCamera();
+	camera.Interpolate();
+	camera.Render();
+
 	Map::getRenderer().Render();
 
 	Object@[]@ objects = Object::getObjects();

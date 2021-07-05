@@ -1,3 +1,5 @@
+#include "Utilities.as"
+
 #define CLIENT_ONLY
 
 float[] fpsArr;
@@ -28,9 +30,11 @@ void onTick(CRules@ this)
 
 void onRender(CRules@ this)
 {
+	if (isTickPaused()) return;
+
 	float correction = getRenderApproximateCorrectionFactor();
 	this.add_f32("inter_frame_time", correction);
 	this.add_f32("inter_game_time", correction);
 
-	fpsArr.push_back(getTicksASecond() / getRenderApproximateCorrectionFactor());
+	fpsArr.push_back(getTicksASecond() / correction);
 }

@@ -1,6 +1,8 @@
 #include "Map.as"
 #include "Ray.as"
 #include "Camera.as"
+#include "Object.as"
+#include "Blob.as"
 
 void onInit(CRules@ this)
 {
@@ -27,7 +29,7 @@ void onTick(CRules@ this)
 			{
 				if (left)
 				{
-					Vec3f position = raycast.hitWorldPos + raycast.normal;
+					Vec3f position = raycast.hitPos + raycast.normal * 2;
 
 					if (isServer())
 					{
@@ -79,12 +81,28 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void PlaceBlock(Vec3f position)
 {
-	Map@ map = Map::getMap();
-	map.SetBlockSafe(position, SColor(255, 100, 100, 100));
+	Object::AddObject(Blob(position));
+
+	// Object@[]@ objects = Object::getObjects();
+	// for (uint i = 0; i < objects.size(); i++)
+	// {
+	// 	print("float!");
+	// 	objects[i].SetGravity(Vec3f());
+	// }
+
+	// Map@ map = Map::getMap();
+	// map.SetBlockSafe(position, SColor(255, 100, 100, 100));
 }
 
 void DestroyBlock(Vec3f position)
 {
-	Map@ map = Map::getMap();
-	map.SetBlockSafe(position, 0);
+	// Object@[]@ objects = Object::getObjects();
+	// for (uint i = 0; i < objects.size(); i++)
+	// {
+	// 	print("fall!");
+	// 	objects[i].SetGravity(Vec3f(0, -0.04f, 0));
+	// }
+
+	// Map@ map = Map::getMap();
+	// map.SetBlockSafe(position, 0);
 }

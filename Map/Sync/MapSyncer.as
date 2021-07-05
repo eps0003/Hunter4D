@@ -1,5 +1,6 @@
 #include "MapRequest.as"
 #include "Map.as"
+#include "Utilities.as"
 
 class MapSyncer
 {
@@ -84,7 +85,7 @@ class MapSyncer
 
 	bool isSynced()
 	{
-		return synced || isClient() == isServer();
+		return synced || isLocalHost();
 	}
 
 	void ServerSync()

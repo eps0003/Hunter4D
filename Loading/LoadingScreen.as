@@ -1,9 +1,18 @@
 #define CLIENT_ONLY
 
+Driver@ driver;
+
+void onInit(CRules@ this)
+{
+	@driver = getDriver();
+}
+
 void onRender(CRules@ this)
 {
-	//background colour
-	Vec2f screenDim = getDriver().getScreenDimensions();
+	if (driver is null) return;
+
+	// Background colour
+	Vec2f screenDim = driver.getScreenDimensions();
 	SColor color(255, 165, 189, 200);
 	GUI::DrawRectangle(Vec2f_zero, screenDim, color);
 
@@ -12,7 +21,6 @@ void onRender(CRules@ this)
 
 void DrawLoadingBar(CRules@ this)
 {
-	Driver@ driver = getDriver();
 	Vec2f dim = driver.getScreenDimensions();
 	Vec2f center = driver.getScreenCenterPos();
 

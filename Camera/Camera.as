@@ -42,11 +42,10 @@ class Camera
 
 	void Render()
 	{
-		Interpolate();
 		Render::SetTransform(_modelMatrix, _viewMatrix, _projectionMatrix);
 	}
 
-	private void Interpolate()
+	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
 		interPosition = _oldPosition.lerp(position, t);

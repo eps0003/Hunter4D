@@ -3,6 +3,7 @@
 #include "Camera.as"
 #include "IBounds.as"
 #include "Map.as"
+#include "Utilities.as"
 
 class Object
 {
@@ -200,7 +201,7 @@ class Object
 
 	void PreUpdate()
 	{
-		if ((isClient() && isServer()) || getGameTime() > _lastUpdate + 1)
+		if (isLocalHost() || getGameTime() > _lastUpdate + 1)
 		{
 			oldPosition = position;
 			oldVelocity = velocity;
