@@ -89,4 +89,18 @@ class AABB : IBounds
 
 		return false;
 	}
+
+	bool intersectsVoxel(Vec3f worldPos, Vec3f voxelWorldPos)
+	{
+		for (int x = worldPos.x + min.x; x < worldPos.x + max.x; x++)
+		for (int y = worldPos.y + min.y; y < worldPos.y + max.y; y++)
+		for (int z = worldPos.z + min.z; z < worldPos.z + max.z; z++)
+		{
+			if (Vec3f(x, y, z) == voxelWorldPos)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

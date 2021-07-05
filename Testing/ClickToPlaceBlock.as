@@ -79,6 +79,17 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void PlaceBlock(Vec3f position)
 {
+	// Prevent placing blocks inside objects
+	Object@[]@ objects = Object::getObjects();
+	for (uint i = 0; i < objects.size(); i++)
+	{
+		Object@ object = objects[i];
+		if (object.collider !is null && object.collider.intersectsVoxel(object.position, position))
+		{
+			return;
+		}
+	}
+
 	Map::getMap().SetBlockSafe(position, SColor(255, 100, 100, 100));
 }
 
