@@ -10,11 +10,11 @@ class Object
 	bool hasSyncedInit = false;
 
 	Vec3f position;
-	Vec3f oldPosition;
+	private Vec3f oldPosition;
 	Vec3f interPosition;
 
 	Vec3f velocity;
-	Vec3f oldVelocity;
+	private Vec3f oldVelocity;
 	Vec3f interVelocity;
 
 	private Vec3f gravity;
@@ -28,6 +28,8 @@ class Object
 	private bool collisionX = false;
 	private bool collisionY = false;
 	private bool collisionZ = false;
+
+	private uint _lastUpdate = 0;
 
 	SColor color
 	{
@@ -52,6 +54,7 @@ class Object
 	Object(Vec3f position)
 	{
 		this.position = position;
+		oldPosition = position;
 		AssignUniqueID();
 	}
 
@@ -61,6 +64,8 @@ class Object
 		position = object.position;
 		oldVelocity = velocity;
 		velocity = object.velocity;
+
+		_lastUpdate = getGameTime();
 	}
 
 	void AssignUniqueID()
@@ -195,8 +200,11 @@ class Object
 
 	void PreUpdate()
 	{
-		oldPosition = position;
-		oldVelocity = velocity;
+		if ((isClient() && isServer()) || getGameTime() > _lastUpdate + 1)
+		{
+			oldPosition = position;
+			oldVelocity = velocity;
+		}
 
 		// Reset velocity from collision last tick
 		if (doPhysicsUpdate())
