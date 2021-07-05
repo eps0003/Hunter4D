@@ -2,7 +2,7 @@
 
 class Blob : Object
 {
-    float jumpInterval = 1.0f;
+	float jumpInterval = 1.0f;
 	float jumpForce = 0.4f;
 
 	Blob(Vec3f position)
@@ -19,9 +19,9 @@ class Blob : Object
 		if (doPhysicsUpdate())
 		{
 			if (getGameTime() % Maths::Round(getTicksASecond() * jumpInterval) == 0)
-            {
-                velocity.y = jumpForce;
-            }
+			{
+				velocity.y = jumpForce;
+			}
 		}
 	}
 }
