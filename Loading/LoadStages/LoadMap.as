@@ -1,10 +1,10 @@
 #include "Map.as"
-#include "Ephtracy.as"
+#include "Street.as"
 #include "Utilities.as"
 
 Map@ map;
 uint sectionIndex = 0;
-uint blocksPerSection = 100;
+uint blocksPerSection = 2000;
 uint sectionCount;
 
 uint size = mapData.size() / 6;

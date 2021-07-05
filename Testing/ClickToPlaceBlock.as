@@ -23,7 +23,7 @@ void onTick(CRules@ this)
 			Ray ray(camera.position, camera.rotation.dir());
 
 			RaycastInfo raycast;
-			if (ray.raycastBlock(100, false, raycast))
+			if (ray.raycastBlock(6, false, raycast))
 			{
 				if (left)
 				{
