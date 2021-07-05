@@ -1,6 +1,7 @@
 #include "Map.as"
 #include "Ray.as"
 #include "Camera.as"
+#include "Object.as"
 
 void onInit(CRules@ this)
 {
