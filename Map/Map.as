@@ -74,7 +74,7 @@ class Map
 
 		if (isClient() && !rules.hasScript("SyncMap.as"))
 		{
-			// Map::getRenderer().GenerateMesh(indexToPos(index));
+			Map::getRenderer().GenerateMesh(indexToPos(index));
 		}
 	}
 

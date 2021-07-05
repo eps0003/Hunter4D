@@ -17,6 +17,15 @@ void onPlayerLeave(CRules@ this, CPlayer@ player)
 	}
 }
 
+void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
+{
+	if (isServer())
+	{
+		Actor::RemoveActor(victim);
+		Actor::AddActor(Actor(victim, SPAWN_POSITION));
+	}
+}
+
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (cmd == this.getCommandID("init actor"))
@@ -34,8 +43,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		CPlayer@ player = getPlayerByNetworkId(params.read_netid());
 		if (player !is null)
 		{
-			Actor actor(player, SPAWN_POSITION);
-			Actor::AddActor(actor);
+			Actor::AddActor(Actor(player, SPAWN_POSITION));
 		}
 	}
 }

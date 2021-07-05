@@ -79,12 +79,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void PlaceBlock(Vec3f position)
 {
-	Map@ map = Map::getMap();
-	map.SetBlockSafe(position, SColor(255, 100, 100, 100));
+	Map::getMap().SetBlockSafe(position, SColor(255, 100, 100, 100));
 }
 
 void DestroyBlock(Vec3f position)
 {
-	Map@ map = Map::getMap();
-	map.SetBlockSafe(position, 0);
+	Map::getMap().SetBlockSafe(position, 0);
 }

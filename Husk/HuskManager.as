@@ -7,24 +7,41 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
-	for (uint i = 0; i < getPlayerCount(); i++)
+	if (isServer())
 	{
-		CPlayer@ player = getPlayer(i);
-		if (player !is null)
+		for (uint i = 0; i < getPlayerCount(); i++)
 		{
-			CreateHusk(player);
+			CPlayer@ player = getPlayer(i);
+			if (player !is null)
+			{
+				CreateHusk(player);
+			}
 		}
 	}
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	CreateHusk(player);
+	if (isServer())
+	{
+		CreateHusk(player);
+	}
 }
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	RemoveHusk(player);
+	if (isServer())
+	{
+		RemoveHusk(player);
+	}
+}
+
+void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
+{
+	if (isServer())
+	{
+		CreateHusk(victim);
+	}
 }
 
 void CreateHusk(CPlayer@ player)
