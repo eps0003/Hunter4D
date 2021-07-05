@@ -4,7 +4,7 @@
 class Mouse
 {
 	Vec2f velocity;
-	Vec2f oldVelocity;
+	private Vec2f _oldVelocity;
 	Vec2f interVelocity;
 
 	float sensitivity = 0.7f;
@@ -34,7 +34,7 @@ class Mouse
 
 	private void CalculateVelocity()
 	{
-		oldVelocity = velocity;
+		_oldVelocity = velocity;
 
 		Vec2f mousePos = getControls().getMouseScreenPos();
 		Vec2f center = getDriver().getScreenCenterPos();
@@ -79,6 +79,6 @@ class Mouse
 	private void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-		interVelocity = Vec2f_lerp(oldVelocity, velocity, t);
+		interVelocity = Vec2f_lerp(_oldVelocity, velocity, t);
 	}
 }
