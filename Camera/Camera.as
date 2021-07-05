@@ -5,27 +5,27 @@
 class Camera
 {
 	Vec3f position;
-	Vec3f oldPosition;
+	private Vec3f _oldPosition;
 	private Vec3f _interPosition;
 
 	Vec3f rotation;
-	Vec3f oldRotation;
+	private Vec3f _oldRotation;
 	private Vec3f _interRotation;
 
 	private float _fov = 70.0f;
 	private float _renderDistance = 150.0f;
 
-	private float[] modelMatrix;
-	private float[] viewMatrix;
-	private float[] projectionMatrix;
-	private float[] rotationMatrix;
+	private float[] _modelMatrix;
+	private float[] _viewMatrix;
+	private float[] _projectionMatrix;
+	private float[] _rotationMatrix;
 
 	Camera()
 	{
-		Matrix::MakeIdentity(modelMatrix);
-		Matrix::MakeIdentity(viewMatrix);
-		Matrix::MakeIdentity(projectionMatrix);
-		Matrix::MakeIdentity(rotationMatrix);
+		Matrix::MakeIdentity(_modelMatrix);
+		Matrix::MakeIdentity(_viewMatrix);
+		Matrix::MakeIdentity(_projectionMatrix);
+		Matrix::MakeIdentity(_rotationMatrix);
 
 		UpdateViewMatrix();
 		UpdateRotationMatrix();
@@ -36,21 +36,21 @@ class Camera
 
 	void Update()
 	{
-		oldPosition = position;
-		oldRotation = rotation;
+		_oldPosition = position;
+		_oldRotation = rotation;
 	}
 
 	void Render()
 	{
 		Interpolate();
-		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
+		Render::SetTransform(_modelMatrix, _viewMatrix, _projectionMatrix);
 	}
 
 	private void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-		interPosition = oldPosition.lerp(position, t);
-		interRotation = oldRotation.lerp(rotation, t);
+		interPosition = _oldPosition.lerp(position, t);
+		interRotation = _oldRotation.lerp(rotation, t);
 	}
 
 	Vec3f interPosition
@@ -110,7 +110,7 @@ class Camera
 		Vec2f screenDim = getDriver().getScreenDimensions();
 		float ratio = float(screenDim.x) / float(screenDim.y);
 
-		Matrix::MakePerspective(projectionMatrix,
+		Matrix::MakePerspective(_projectionMatrix,
 			fov * Maths::Pi / 180,
 			ratio,
 			0.01f, renderDistance
@@ -127,8 +127,8 @@ class Camera
 		// Matrix::MakeIdentity(thirdPerson);
 		// Matrix::SetTranslation(thirdPerson, 0, 0, 10);
 
-		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
-		// Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
+		Matrix::Multiply(_rotationMatrix, translation, _viewMatrix);
+		// Matrix::Multiply(thirdPerson, _viewMatrix, _viewMatrix);
 	}
 
 	private void UpdateRotationMatrix()
@@ -145,7 +145,7 @@ class Camera
 		Matrix::MakeIdentity(tempZ);
 		Matrix::SetRotationDegrees(tempZ, 0, 0, interRotation.z);
 
-		Matrix::Multiply(tempX, tempZ, rotationMatrix);
-		Matrix::Multiply(rotationMatrix, tempY, rotationMatrix);
+		Matrix::Multiply(tempX, tempZ, _rotationMatrix);
+		Matrix::Multiply(_rotationMatrix, tempY, _rotationMatrix);
 	}
 }
