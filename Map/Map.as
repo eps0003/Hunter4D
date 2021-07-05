@@ -64,7 +64,7 @@ class Map
 		CRules@ rules = getRules();
 
 		// Sync block to clients
-		if (!isClient() && !rules.hasScript("GenerateMap.as"))
+		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as"))
 		{
 			CBitStream bs;
 			bs.write_u32(index);
