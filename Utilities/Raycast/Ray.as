@@ -29,7 +29,7 @@ class Ray
 
 		Vec3f sideDist;
 		Vec3f step;
-		float dist;
+		float dist = 0;
 		Vec3f normal;
 
 		if (direction.x < 0)
