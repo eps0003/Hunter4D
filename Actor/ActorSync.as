@@ -24,7 +24,10 @@ void onInit(CRules@ this)
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	Actor::RemoveActor(player);
+	if (isServer())
+	{
+		Actor::RemoveActor(player);
+	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

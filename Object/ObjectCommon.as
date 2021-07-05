@@ -22,8 +22,7 @@ namespace Object
 		objects.push_back(object);
 		getRules().set("objects", @objects);
 
-		print("Added object: " + object.id);
-
+		object.OnInit();
 		object.HandleSerializeInit(null);
 	}
 
@@ -35,7 +34,9 @@ namespace Object
 			Object@ object = objects[i];
 			if (object.id == id)
 			{
+				object.OnRemove();
 				objects.removeAt(i);
+				object.HandleSerializeRemove();
 				return;
 			}
 		}

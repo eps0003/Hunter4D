@@ -19,7 +19,6 @@ namespace Actor
 	{
 		Object::AddObject(actor);
 		actor.player.set("actor", @actor);
-		print("Set actor: " + actor.player.getUsername());
 	}
 
 	void RemoveActor(CPlayer@ player)

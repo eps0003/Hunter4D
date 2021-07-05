@@ -5,6 +5,7 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("init object");
 	this.addCommandID("sync object");
+	this.addCommandID("remove object");
 	this.addCommandID("set object color");
 }
 
@@ -52,6 +53,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		Object object;
 		object.HandleDeserializeTick(params);
+	}
+	else if (cmd == this.getCommandID("remove object"))
+	{
+		Object object;
+		object.HandleDeserializeRemove(params);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object color"))
 	{

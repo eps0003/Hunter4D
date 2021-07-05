@@ -85,7 +85,11 @@ class Actor : Object
 		if (isServer()) return;
 
 		DeserializeInit(bs);
-		Actor::AddActor(this);
+
+		if (player !is null)
+		{
+			Actor::AddActor(this);
+		}
 	}
 
 	void HandleDeserializeTick(CBitStream@ bs)
@@ -93,7 +97,7 @@ class Actor : Object
 		DeserializeTick(bs);
 
 		// Don't update my own actor
-		if (player.isMyPlayer()) return;
+		if (player is null || player.isMyPlayer()) return;
 
 		// Update actor
 		Actor@ oldActor = Actor::getActor(player);
@@ -209,11 +213,6 @@ class Actor : Object
 		);
 	}
 
-	void OnRemove()
-	{
-		Actor::RemoveActor(player);
-	}
-
 	private void DrawCrosshair(int spacing, int length, int thickness, SColor color)
 	{
 		Vec2f center = getDriver().getScreenCenterPos();
@@ -230,5 +229,15 @@ class Actor : Object
 		//top/bottom
 		GUI::DrawRectangle(center - y1, center - y2, color);
 		GUI::DrawRectangle(center + y2, center + y1, color);
+	}
+
+	void OnInit()
+	{
+		print("Added actor: " + player.getUsername());
+	}
+
+	void OnRemove()
+	{
+		print("Removed actor: " + player.getUsername());
 	}
 }

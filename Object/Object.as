@@ -87,6 +87,11 @@ class Object
 		velocity.Serialize(bs);
 	}
 
+	void SerializeRemove(CBitStream@ bs)
+	{
+		bs.write_u16(id);
+	}
+
 	void DeserializeInit(CBitStream@ bs)
 	{
 		oldPosition = position;
@@ -108,6 +113,11 @@ class Object
 		id = bs.read_u16();
 		position = Vec3f(bs);
 		velocity = Vec3f(bs);
+	}
+
+	void DeserializeRemove(CBitStream@ bs)
+	{
+		id = bs.read_u16();
 	}
 
 	void HandleSerializeInit(CPlayer@ player)
@@ -138,6 +148,15 @@ class Object
 		getRules().SendCommand(getRules().getCommandID("sync object"), bs, true);
 	}
 
+	void HandleSerializeRemove()
+	{
+		if (isClient()) return;
+
+		CBitStream bs;
+		SerializeRemove(bs);
+		getRules().SendCommand(getRules().getCommandID("remove object"), bs, true);
+	}
+
 	void HandleDeserializeInit(CBitStream@ bs)
 	{
 		// Deserialize if client not localhost
@@ -159,6 +178,14 @@ class Object
 		{
 			oldObject = this;
 		}
+	}
+
+	void HandleDeserializeRemove(CBitStream@ bs)
+	{
+		if (isServer()) return;
+
+		DeserializeRemove(bs);
+		Object::RemoveObject(id);
 	}
 
 	void PreUpdate()
@@ -417,6 +444,11 @@ class Object
 	bool isVisible()
 	{
 		return true;
+	}
+
+	void OnInit()
+	{
+		print("Added object: " + id);
 	}
 
 	void OnRemove()
