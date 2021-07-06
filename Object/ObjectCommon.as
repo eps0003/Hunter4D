@@ -52,8 +52,7 @@ namespace Object
 		Object@[]@ objects;
 		if (!getRules().get("objects", @objects))
 		{
-			Object@[] arr;
-			@objects = arr;
+			@objects = array<Object@>();
 			getRules().set("objects", @objects);
 		}
 		return objects;

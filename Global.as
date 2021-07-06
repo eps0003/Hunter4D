@@ -15,8 +15,10 @@ void onRestart(CRules@ this)
 	this.set("map renderer", null);
 	this.set("objects", null);
 
-	this.RemoveScript("Client.as");
 	Render::RemoveScript(this.get_s32("render script id"));
+
+	this.RemoveScript("Client.as");
+	this.RemoveScript("SyncMap.as");
 
 	this.AddScript("LoadMap.as");
 	this.AddScript("LoadingScreen.as");

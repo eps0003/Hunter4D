@@ -12,14 +12,19 @@ uint yOffset = MAP_SIZE.y / 2;
 
 void onInit(CRules@ this)
 {
+	this.addCommandID("map generated");
+
 	if (isServer())
 	{
 		@map = Map::getMap();
 		map = Map(MAP_SIZE);
+		sectionIndex = 0;
 		sectionCount = Maths::Ceil(size / float(blocksPerSection));
+
+		this.set_bool("map generated", false);
+		this.Sync("map generated", true);
 	}
 
-	this.set_string("loading message", "Generating map...");
 	print("Begin generating map");
 }
 
@@ -71,11 +76,15 @@ void onTick(CRules@ this)
 			// Map generation complete
 			this.set_bool("map generated", true);
 			this.Sync("map generated", true);
+
+			CBitStream bs;
+			this.SendCommand(this.getCommandID("map generated"), bs, true);
 		}
 	}
 
 	if (isClient())
 	{
+		this.set_string("loading message", "Generating map...");
 		this.set_f32("loading progress", this.get_f32("map gen progress"));
 	}
 
@@ -91,5 +100,13 @@ void onTick(CRules@ this)
 		{
 			this.AddScript("InitBlockFaces.as");
 		}
+	}
+}
+
+void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
+{
+	if (cmd == this.getCommandID("map generated"))
+	{
+		this.set_bool("map generated", true);
 	}
 }

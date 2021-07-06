@@ -48,7 +48,7 @@ class Vec3f
 		}
 		else
 		{
-			print("Unable to parse serialized Vec3f string: " + serialized);
+			warn("Unable to parse serialized Vec3f string: " + serialized);
 		}
 	}
 
