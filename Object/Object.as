@@ -318,11 +318,9 @@ class Object
 
 	void CollisionX(bool blocks, bool mapEdge)
 	{
-		if (velocity.x == 0) return;
-
 		Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
 
-		if (blocks && collider.intersectsNewSolid(position, xPosition))
+		if (blocks && velocity.x != 0 && collider.intersectsNewSolid(position, xPosition))
 		{
 			Vec3f min = (position + collider.min).floor();
 			Vec3f max = (position + collider.max).ceil();
@@ -360,11 +358,9 @@ class Object
 
 	void CollisionZ(bool blocks, bool mapEdge)
 	{
-		if (velocity.z == 0) return;
-
 		Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
 
-		if (blocks && collider.intersectsNewSolid(position, zPosition))
+		if (blocks && velocity.z != 0 && collider.intersectsNewSolid(position, zPosition))
 		{
 			Vec3f min = (position + collider.min).floor();
 			Vec3f max = (position + collider.max).ceil();
@@ -402,11 +398,9 @@ class Object
 
 	void CollisionY(bool blocks)
 	{
-		if (velocity.y == 0) return;
-
 		Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
 
-		if (blocks && collider.intersectsNewSolid(position, yPosition))
+		if (blocks && velocity.y != 0 && collider.intersectsNewSolid(position, yPosition))
 		{
 			Vec3f min = (position + collider.min).floor();
 			Vec3f max = (position + collider.max).ceil();
