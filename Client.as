@@ -31,6 +31,16 @@ void onRender(CRules@ this)
 		actor.RenderHUD();
 	}
 
+	Actor@[] actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
+	{
+		Actor@ actor = actors[i];
+		if (actor.isNameplateVisible())
+		{
+			actor.RenderNameplate();
+		}
+	}
+
 	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
 	GUI::DrawText("Objects: " + Object::getObjectCount(), Vec2f(10, 50), color_black);
 }

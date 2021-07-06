@@ -1,4 +1,5 @@
 #include "Maths.as"
+#include "Camera.as"
 
 class Vec3f
 {
@@ -396,5 +397,41 @@ class Vec3f
 			x*m[1] + y*m[5] + z*m[9]  + m[13],
 			x*m[2] + y*m[6] + z*m[10] + m[14]
 		);
+	}
+
+	bool isInFrontOfCamera()
+	{
+		Camera@ camera = Camera::getCamera();
+		Vec3f posDir = this - camera.position;
+		Vec3f rotDir = camera.rotation.dir();
+		return posDir.dot(rotDir) >= 0;
+	}
+
+	bool isOnScreen()
+	{
+		if (isInFrontOfCamera())
+		{
+			Vec2f screenPos = projectToScreen();
+			return (
+				screenPos.x >= 0 &&
+				screenPos.x <= getScreenWidth() &&
+				screenPos.y >= 0 &&
+				screenPos.y <= getScreenHeight()
+			);
+		}
+		return false;
+	}
+
+	Vec2f projectToScreen()
+	{
+		Camera@ camera = Camera::getCamera();
+
+		Vec3f vec = multiply(camera.getViewMatrix());
+		vec = vec.multiply(camera.getProjectionMatrix());
+
+		int x = ((vec.x / vec.z + 1.0f) / 2.0f) * getScreenWidth() + 0.5f;
+		int y = ((1.0f - vec.y / vec.z) / 2.0f) * getScreenHeight() + 0.5f;
+
+		return Vec2f(x, y);
 	}
 }

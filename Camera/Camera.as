@@ -104,6 +104,26 @@ class Camera
 		}
 	}
 
+	float[] getModelMatrix()
+	{
+		return _modelMatrix;
+	}
+
+	float[] getViewMatrix()
+	{
+		return _viewMatrix;
+	}
+
+	float[] getProjectionMatrix()
+	{
+		return _projectionMatrix;
+	}
+
+	float[] getRotationMatrix()
+	{
+		return _rotationMatrix;
+	}
+
 	private void UpdateProjectionMatrix()
 	{
 		Vec2f screenDim = getDriver().getScreenDimensions();

@@ -163,9 +163,22 @@ class Actor : Object
 		DrawCrosshair(0, 8, 1, color_white);
 	}
 
+	void RenderNameplate()
+	{
+		Vec3f pos = interPosition + Vec3f(0, 2, 0);
+		if (!pos.isInFrontOfCamera()) return;
+		Vec2f screenPos = pos.projectToScreen();
+		GUI::DrawTextCentered(player.getCharacterName(), screenPos, color_white);
+	}
+
 	bool isVisible()
 	{
 		return !player.isMyPlayer();
+	}
+
+	bool isNameplateVisible()
+	{
+		return isVisible();
 	}
 
 	private void Movement()
