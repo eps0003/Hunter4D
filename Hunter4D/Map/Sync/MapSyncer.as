@@ -9,7 +9,7 @@ class MapSyncer
 	CBitStream@[] mapPackets;
 	private uint blocksPerPacket = 10000;
 	private bool synced = false;
-	private int index = 0;
+	private u16 index = 0;
 
 	MapSyncer()
 	{
@@ -142,21 +142,26 @@ class MapSyncer
 		CBitStream@ packet = getNextPacket();
 		if (packet is null) return;
 
-		index = packet.read_u16();
+		if (!packet.saferead_u16(index)) return;
+
 		uint firstBlock = index * blocksPerPacket;
 		uint lastBlock = firstBlock + blocksPerPacket;
 
 		if (index == 0)
 		{
-			map = Map(Vec3f(packet));
+			Vec3f dimensions;
+			if (!dimensions.deserialize(packet)) return;
+			map = Map(dimensions);
 		}
 
-		// Loop through these blocks and serialize
+		// Loop through these blocks and deserialize
 		for (uint i = firstBlock; i < lastBlock; i++)
 		{
 			if (i >= map.blockCount) break;
 
-			SColor block(packet.read_u32());
+			uint block;
+			if (!packet.saferead_u32(block)) return;
+
 			map.SetBlock(i, block);
 		}
 

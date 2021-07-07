@@ -17,8 +17,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		if (cmd == this.getCommandID("sync block"))
 		{
-			uint index = params.read_u32();
-			SColor block(params.read_u32());
+			uint index;
+			if (!params.saferead_u32(index)) return;
+
+			uint blockInt;
+			if (!params.saferead_u32(blockInt)) return;
+			SColor block(blockInt);
 
 			Map@ map = Map::getMap();
 			map.SetBlockSafe(index, block);

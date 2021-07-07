@@ -7,8 +7,6 @@ class Vec3f
 	float y = 0;
 	float z = 0;
 
-	Vec3f() {}
-
 	Vec3f(float x, float y, float z)
 	{
 		this.x = x;
@@ -26,31 +24,7 @@ class Vec3f
 
 	Vec3f(Vec3f vec)
 	{
-		x = vec.x;
-		y = vec.y;
-		z = vec.z;
-	}
-
-	Vec3f(CBitStream@ bs)
-	{
-		x = bs.read_f32();
-		y = bs.read_f32();
-		z = bs.read_f32();
-	}
-
-	Vec3f(string serialized)
-	{
-		string[] values = serialized.split(" ");
-		if (values.size() == 3)
-		{
-			x = parseFloat(values[0]);
-			y = parseFloat(values[1]);
-			z = parseFloat(values[2]);
-		}
-		else
-		{
-			warn("Unable to parse serialized Vec3f string: " + serialized);
-		}
+		opAssign(vec);
 	}
 
 	Vec3f(float[] arr)
@@ -382,6 +356,26 @@ class Vec3f
 	string serializeString()
 	{
 		return x + " " + y + " " + z;
+	}
+
+	bool deserialize(CBitStream@ bs)
+	{
+		return bs.saferead_f32(x) && bs.saferead_f32(y) && bs.saferead_f32(z);
+	}
+
+	bool deserializeString(string str)
+	{
+		string[] values = str.split(" ");
+		if (values.size() == 3)
+		{
+			x = parseFloat(values[0]);
+			y = parseFloat(values[1]);
+			z = parseFloat(values[2]);
+			return true;
+		}
+
+		warn("Unable to parse serialized Vec3f string: " + str);
+		return false;
 	}
 
 	float[] toArray()

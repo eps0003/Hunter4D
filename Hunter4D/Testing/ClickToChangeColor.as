@@ -31,8 +31,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		if (cmd == this.getCommandID("change color"))
 		{
-			CPlayer@ player = getPlayerByNetworkId(params.read_netid());
+			u16 playerId;
+			if (!params.saferead_netid(playerId)) return;
+
+			CPlayer@ player = getPlayerByNetworkId(playerId);
 			Actor@ actor = Actor::getActor(player);
+
 			ChangeColor(actor);
 		}
 	}

@@ -10,8 +10,6 @@ class Map
 	Vec3f dimensions;
 	uint blockCount = 0;
 
-	Map() {}
-
 	Map(Vec3f dimensions)
 	{
 		this.dimensions = dimensions;
@@ -132,7 +130,7 @@ class Map
 
 	bool isValidBlock(int index)
 	{
-		return index >= 0 && index < blocks.size();
+		return index >= 0 && index < blockCount;
 	}
 
 	//https://coderwall.com/p/fzni3g/bidirectional-translation-between-1d-and-3d-arrays

@@ -67,12 +67,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		if (cmd == this.getCommandID("place block"))
 		{
-			Vec3f position(params);
+			Vec3f position;
+			if (!position.deserialize(params)) return;
+
 			PlaceBlock(position);
 		}
 		else if (cmd == this.getCommandID("destroy block"))
 		{
-			Vec3f position(params);
+			Vec3f position;
+			if (!position.deserialize(params)) return;
+
 			DestroyBlock(position);
 		}
 	}

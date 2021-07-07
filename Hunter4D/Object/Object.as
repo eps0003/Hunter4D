@@ -101,34 +101,42 @@ class Object
 		bs.write_u16(id);
 	}
 
-	void DeserializeInit(CBitStream@ bs)
+	bool deserializeInit(CBitStream@ bs)
 	{
 		oldPosition = position;
 		oldVelocity = velocity;
 
-		id = bs.read_u16();
-		position = Vec3f(bs);
-		velocity = Vec3f(bs);
-		collisionFlags = bs.read_u8();
-		color = SColor(bs.read_u32());
-		gravity = Vec3f(bs);
+		if (!bs.saferead_u16(id)) return false;
+		if (!position.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
+		if (!bs.saferead_u8(collisionFlags)) return false;
+
+		u32 colorInt;
+		if (!bs.saferead_u32(colorInt)) return false;
+		color = SColor(colorInt);
+
+		if (!gravity.deserialize(bs)) return false;
 
 		hasSyncedInit = true;
+
+		return true;
 	}
 
-	void DeserializeTick(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
 		oldPosition = position;
 		oldVelocity = velocity;
 
-		id = bs.read_u16();
-		position = Vec3f(bs);
-		velocity = Vec3f(bs);
+		if (!bs.saferead_u16(id)) return false;
+		if (!position.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
+
+		return true;
 	}
 
-	void DeserializeRemove(CBitStream@ bs)
+	bool deserializeRemove(CBitStream@ bs)
 	{
-		id = bs.read_u16();
+		return bs.saferead_u16(id);
 	}
 
 	void HandleSerializeInit(CPlayer@ player)
@@ -168,21 +176,22 @@ class Object
 		getRules().SendCommand(getRules().getCommandID("remove object"), bs, true);
 	}
 
-	void HandleDeserializeInit(CBitStream@ bs)
+	void HandledeserializeInit(CBitStream@ bs)
 	{
-		// Deserialize if client not localhost
+		// deserialize if client not localhost
 		if (isServer()) return;
 
-		DeserializeInit(bs);
+		if (!deserializeInit(bs)) return
+;
 		Object::AddObject(this);
 	}
 
-	void HandleDeserializeTick(CBitStream@ bs)
+	void HandledeserializeTick(CBitStream@ bs)
 	{
-		// Deserialize if client not localhost
+		// deserialize if client not localhost
 		if (isServer()) return;
 
-		DeserializeTick(bs);
+		if (!deserializeTick(bs)) return;
 
 		Object@ oldObject = Object::getObject(id);
 		if (oldObject !is null)
@@ -191,11 +200,12 @@ class Object
 		}
 	}
 
-	void HandleDeserializeRemove(CBitStream@ bs)
+	void HandledeserializeRemove(CBitStream@ bs)
 	{
 		if (isServer()) return;
 
-		DeserializeRemove(bs);
+		if (!deserializeRemove(bs)) return;
+
 		Object::RemoveObject(id);
 	}
 

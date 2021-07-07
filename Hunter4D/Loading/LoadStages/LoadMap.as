@@ -56,7 +56,7 @@ void onTick(CRules@ this)
 
 		// Set loading progress
 		float progress = sectionIndex / Maths::Max(1, sectionCount - 2);
-		this.set_f32("map gen progress", sectionIndex / Maths::Max(1, sectionCount - 2));
+		this.set_f32("map gen progress", progress);
 		this.Sync("map gen progress", true);
 
 		if (sectionIndex < sectionCount - 1)

@@ -34,16 +34,30 @@ class Actor : Object
 		bs.write_netid(player.getNetworkID());
 	}
 
-	void DeserializeInit(CBitStream@ bs)
+	bool deserializeInit(CBitStream@ bs)
 	{
-		Object::DeserializeInit(bs);
-		@this.player = getPlayerByNetworkId(bs.read_netid());
+		if (!Object::deserializeInit(bs)) return false;
+
+		u16 playerId;
+		if (!bs.saferead_netid(playerId)) return false;
+
+		@player = getPlayerByNetworkId(playerId);
+		if (player is null) return false;
+
+		return true;
 	}
 
-	void DeserializeTick(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
-		Object::DeserializeTick(bs);
-		@this.player = getPlayerByNetworkId(bs.read_netid());
+		if (!Object::deserializeTick(bs)) return false;
+
+		u16 playerId;
+		if (!bs.saferead_netid(playerId)) return false;
+
+		@player = getPlayerByNetworkId(playerId);
+		if (player is null) return false;
+
+		return true;
 	}
 
 	void HandleSerializeInit(CPlayer@ player)
@@ -79,25 +93,22 @@ class Actor : Object
 		}
 	}
 
-	void HandleDeserializeInit(CBitStream@ bs)
+	void HandledeserializeInit(CBitStream@ bs)
 	{
-		// Deserialize if client not localhost
+		// deserialize if client not localhost
 		if (isServer()) return;
 
-		DeserializeInit(bs);
+		if (!deserializeInit(bs)) return;
 
-		if (player !is null)
-		{
-			Actor::AddActor(this);
-		}
+		Actor::AddActor(this);
 	}
 
-	void HandleDeserializeTick(CBitStream@ bs)
+	void HandledeserializeTick(CBitStream@ bs)
 	{
-		DeserializeTick(bs);
+		if (!deserializeTick(bs)) return;
 
 		// Don't update my own actor
-		if (player is null || player.isMyPlayer()) return;
+		if (player.isMyPlayer()) return;
 
 		// Update actor
 		Actor@ oldActor = Actor::getActor(player);

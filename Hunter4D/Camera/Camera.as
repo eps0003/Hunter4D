@@ -126,11 +126,10 @@ class Camera
 
 	private void UpdateProjectionMatrix()
 	{
-		Vec2f screenDim = getDriver().getScreenDimensions();
-		float ratio = float(screenDim.x) / float(screenDim.y);
+		float ratio = getScreenWidth() / float(getScreenHeight());
 
 		Matrix::MakePerspective(_projectionMatrix,
-			fov * Maths::Pi / 180,
+			fov * Maths::Pi / 180.0f,
 			ratio,
 			0.01f, renderDistance
 		);

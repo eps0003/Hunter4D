@@ -24,7 +24,7 @@ class MapRenderer
 		@map = Map::getMap();
 		@blocks = Blocks::getBlocks();
 
-		faceFlags.set_length(map.blocks.size());
+		faceFlags.set_length(map.blockCount);
 
 		chunkDimensions = (map.dimensions / chunkDimension).ceil();
 		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;

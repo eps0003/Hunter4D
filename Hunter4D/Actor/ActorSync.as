@@ -31,19 +31,21 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (cmd == this.getCommandID("init actor"))
 	{
 		Actor actor;
-		actor.HandleDeserializeInit(params);
+		actor.HandledeserializeInit(params);
 	}
 	else if (cmd == this.getCommandID("sync actor"))
 	{
 		Actor actor;
-		actor.HandleDeserializeTick(params);
+		actor.HandledeserializeTick(params);
 	}
 	else if (isServer() && cmd == this.getCommandID("spawn actor"))
 	{
-		CPlayer@ player = getPlayerByNetworkId(params.read_netid());
-		if (player !is null)
-		{
-			Actor::AddActor(Actor(player, SPAWN_POSITION));
-		}
+		u16 playerId;
+		if (!params.saferead_netid(playerId)) return;
+
+		CPlayer@ player = getPlayerByNetworkId(playerId);
+		if (player is null) return;
+
+		Actor::AddActor(Actor(player, SPAWN_POSITION));
 	}
 }

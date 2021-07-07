@@ -49,40 +49,55 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (cmd == this.getCommandID("init object"))
 	{
 		Object object;
-		object.HandleDeserializeInit(params);
+		object.HandledeserializeInit(params);
 	}
 	else if (cmd == this.getCommandID("sync object"))
 	{
 		Object object;
-		object.HandleDeserializeTick(params);
+		object.HandledeserializeTick(params);
 	}
 	else if (cmd == this.getCommandID("remove object"))
 	{
 		Object object;
-		object.HandleDeserializeRemove(params);
+		object.HandledeserializeRemove(params);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
-		Object@ object = Object::getObject(params.read_u16());
-		if (object !is null)
-		{
-			object.SetCollisionFlags(params.read_u8());
-		}
+		u16 id;
+		if (!params.saferead_u16(id)) return;
+
+		Object@ object = Object::getObject(id);
+		if (object is null) return;
+
+		u8 collisionFlags;
+		if (!params.saferead_u8(collisionFlags)) return;
+
+		object.SetCollisionFlags(collisionFlags);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object color"))
 	{
-		Object@ object = Object::getObject(params.read_u16());
-		if (object !is null)
-		{
-			object.color = SColor(params.read_u32());
-		}
+		u16 id;
+		if (!params.saferead_u16(id)) return;
+
+		Object@ object = Object::getObject(id);
+		if (object is null) return;
+
+		uint colorInt;
+		if (!params.saferead_u32(colorInt)) return;
+
+		object.color = SColor(colorInt);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object gravity"))
 	{
-		Object@ object = Object::getObject(params.read_u16());
-		if (object !is null)
-		{
-			object.SetGravity(Vec3f(params));
-		}
+		u16 id;
+		if (!params.saferead_u16(id)) return;
+
+		Object@ object = Object::getObject(id);
+		if (object is null) return;
+
+		Vec3f gravity;
+		if (!gravity.deserialize(params)) return;
+
+		object.SetGravity(gravity);
 	}
 }
