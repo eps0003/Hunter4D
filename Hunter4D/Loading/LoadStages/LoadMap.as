@@ -1,5 +1,5 @@
 #include "Map.as"
-#include "Ephtracy.as"
+#include "Street.as"
 #include "Utilities.as"
 
 Map@ map;
@@ -14,6 +14,11 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("map generated");
 
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	if (isServer())
 	{
 		@map = Map::getMap();

@@ -4,10 +4,10 @@
 class Mouse
 {
 	Vec2f velocity;
-	private Vec2f _oldVelocity;
+	private Vec2f oldVelocity;
 	Vec2f interVelocity;
 
-	float sensitivity = 0.7f;
+	private float sensitivity = 0.7f;
 
 	private bool wasInControl = false;
 
@@ -31,9 +31,19 @@ class Mouse
 		return Menu::getMainMenu() !is null || getHUD().hasMenus() || Engine::hasStandardGUIFocus();
 	}
 
+	float getSensitivity()
+	{
+		return sensitivity;
+	}
+
+	void SetSensitivity(float sens)
+	{
+		sensitivity = sens;
+	}
+
 	private void CalculateVelocity()
 	{
-		_oldVelocity = velocity;
+		oldVelocity = velocity;
 
 		Vec2f mousePos = getControls().getMouseScreenPos();
 		Vec2f center = getDriver().getScreenCenterPos();
@@ -78,6 +88,6 @@ class Mouse
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-		interVelocity = Vec2f_lerp(_oldVelocity, velocity, t);
+		interVelocity = Vec2f_lerp(oldVelocity, velocity, t);
 	}
 }

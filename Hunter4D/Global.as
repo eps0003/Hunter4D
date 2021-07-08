@@ -17,11 +17,6 @@ void onRestart(CRules@ this)
 	this.set("objects", null);
 	this.set("actors", null);
 
-	Render::RemoveScript(this.get_s32("render script id"));
-
-	this.RemoveScript("Client.as");
-	this.RemoveScript("SyncMap.as");
-
 	this.AddScript("LoadMap.as");
 	this.AddScript("LoadingScreen.as");
 }

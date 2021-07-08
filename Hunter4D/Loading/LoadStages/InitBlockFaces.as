@@ -16,6 +16,11 @@ void onInit(CRules@ this)
 	this.set_string("loading message", "Initializing block faces...");
 }
 
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("InitBlockFaces.as");
+}
+
 void onTick(CRules@ this)
 {
 	uint blocksThisTick = getFPS() * 30;

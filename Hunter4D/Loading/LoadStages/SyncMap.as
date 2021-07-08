@@ -6,15 +6,19 @@ void onInit(CRules@ this)
 {
 	@mapSyncer = Map::getSyncer();
 
-	onRestart(this);
-}
-
-void onRestart(CRules@ this)
-{
 	if (isServer())
 	{
 		mapSyncer.AddRequestForEveryone();
 	}
+}
+
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("SyncMap.as");
+}
+
+void onInitRestart(CRules@ this)
+{
 }
 
 void onTick(CRules@ this)

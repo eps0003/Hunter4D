@@ -5,51 +5,55 @@
 class Camera
 {
 	Vec3f position;
-	private Vec3f _oldPosition;
+	private Vec3f oldPosition;
 	private Vec3f _interPosition;
 
 	Vec3f rotation;
-	private Vec3f _oldRotation;
+	private Vec3f oldRotation;
 	private Vec3f _interRotation;
 
-	private float _fov = 70.0f;
-	private float _renderDistance = 150.0f;
+	private float fov = 70.0f;
+	private float renderDistance = 150.0f;
+	private SColor fogColor = SColor(255, 165, 189, 200);
 
-	private float[] _modelMatrix;
-	private float[] _viewMatrix;
-	private float[] _projectionMatrix;
-	private float[] _rotationMatrix;
+	private float[] modelMatrix;
+	private float[] viewMatrix;
+	private float[] projectionMatrix;
+	private float[] rotationMatrix;
 
 	Camera()
 	{
-		Matrix::MakeIdentity(_modelMatrix);
-		Matrix::MakeIdentity(_viewMatrix);
-		Matrix::MakeIdentity(_projectionMatrix);
-		Matrix::MakeIdentity(_rotationMatrix);
+		Matrix::MakeIdentity(modelMatrix);
+		Matrix::MakeIdentity(viewMatrix);
+		Matrix::MakeIdentity(projectionMatrix);
+		Matrix::MakeIdentity(rotationMatrix);
 
 		UpdateViewMatrix();
 		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
 
-		Render::SetFog(SColor(255, 165, 189, 200), SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
 	}
 
 	void Update()
 	{
-		_oldPosition = position;
-		_oldRotation = rotation;
+		oldPosition = position;
+		oldRotation = rotation;
 	}
 
 	void Render()
 	{
-		Render::SetTransform(_modelMatrix, _viewMatrix, _projectionMatrix);
+		// Vec2f screenDim = getDriver().getScreenDimensions();
+		// GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
+
+		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
 	}
 
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
-		interPosition = _oldPosition.lerp(position, t);
-		interRotation = _oldRotation.lerp(rotation, t);
+		interPosition = oldPosition.lerp(position, t);
+		interRotation = oldRotation.lerp(rotation, t);
 	}
 
 	Vec3f interPosition
@@ -78,57 +82,53 @@ class Camera
 		}
 	}
 
-	float fov
+	float getFOV()
 	{
-		get const
-		{
-			return _fov;
-		}
-		set
-		{
-			_fov = value;
-			UpdateProjectionMatrix();
-		}
+		return fov;
 	}
 
-	float renderDistance
+	void SetFOV(float fov)
 	{
-		get const
-		{
-			return _renderDistance;
-		}
-		set
-		{
-			_renderDistance = value;
-			UpdateProjectionMatrix();
-		}
+		this.fov = fov;
+		UpdateProjectionMatrix();
+	}
+
+	float getRenderDistance()
+	{
+		return renderDistance;
+	}
+
+	void SetRenderDistance(float distance)
+	{
+		renderDistance = distance;
+		UpdateProjectionMatrix();
 	}
 
 	float[] getModelMatrix()
 	{
-		return _modelMatrix;
+		return modelMatrix;
 	}
 
 	float[] getViewMatrix()
 	{
-		return _viewMatrix;
+		return viewMatrix;
 	}
 
 	float[] getProjectionMatrix()
 	{
-		return _projectionMatrix;
+		return projectionMatrix;
 	}
 
 	float[] getRotationMatrix()
 	{
-		return _rotationMatrix;
+		return rotationMatrix;
 	}
 
 	private void UpdateProjectionMatrix()
 	{
 		float ratio = getScreenWidth() / float(getScreenHeight());
 
-		Matrix::MakePerspective(_projectionMatrix,
+		Matrix::MakePerspective(projectionMatrix,
 			fov * Maths::Pi / 180.0f,
 			ratio,
 			0.01f, renderDistance
@@ -145,8 +145,8 @@ class Camera
 		// Matrix::MakeIdentity(thirdPerson);
 		// Matrix::SetTranslation(thirdPerson, 0, 0, 10);
 
-		Matrix::Multiply(_rotationMatrix, translation, _viewMatrix);
-		// Matrix::Multiply(thirdPerson, _viewMatrix, _viewMatrix);
+		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
+		// Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
 	}
 
 	private void UpdateRotationMatrix()
@@ -163,7 +163,7 @@ class Camera
 		Matrix::MakeIdentity(tempZ);
 		Matrix::SetRotationDegrees(tempZ, 0, 0, interRotation.z);
 
-		Matrix::Multiply(tempX, tempZ, _rotationMatrix);
-		Matrix::Multiply(_rotationMatrix, tempY, _rotationMatrix);
+		Matrix::Multiply(tempX, tempZ, rotationMatrix);
+		Matrix::Multiply(rotationMatrix, tempY, rotationMatrix);
 	}
 }

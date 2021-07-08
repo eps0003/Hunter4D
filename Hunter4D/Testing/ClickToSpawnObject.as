@@ -7,6 +7,11 @@ void onInit(CRules@ this)
 	this.addCommandID("spawn object");
 }
 
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("ClickToSpawnObject.as");
+}
+
 void onTick(CRules@ this)
 {
 	if (isClient() && getControls().isKeyJustPressed(KEY_LBUTTON))

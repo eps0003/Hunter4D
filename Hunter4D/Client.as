@@ -5,23 +5,25 @@
 
 #define CLIENT_ONLY
 
+int id;
+
 void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
 
-	int id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
-	this.set_s32("render script id", id);
+	id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 
 	CBitStream bs;
 	bs.write_netid(getLocalPlayer().getNetworkID());
 	this.SendCommand(this.getCommandID("spawn actor"), bs, false);
 
-	onRestart(this);
+	Texture::createFromFile("pixel", "Pixel.png");
 }
 
 void onRestart(CRules@ this)
 {
-	Texture::createFromFile("pixel", "Pixel.png");
+	Render::RemoveScript(id);
+	this.RemoveScript("Client.as");
 }
 
 void onRender(CRules@ this)
@@ -48,10 +50,6 @@ void onRender(CRules@ this)
 
 void Render(int id)
 {
-	// Background color
-	Vec2f screenDim = getDriver().getScreenDimensions();
-	GUI::DrawRectangle(Vec2f_zero, screenDim, SColor(255, 165, 189, 200));
-
 	Render::SetAlphaBlend(false);
 	Render::SetZBuffer(true, true);
 	Render::SetBackfaceCull(true);

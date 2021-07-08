@@ -11,6 +11,11 @@ void onInit(CRules@ this)
 	this.addCommandID("destroy block");
 }
 
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("ClickToPlaceBlock.as");
+}
+
 void onTick(CRules@ this)
 {
 	if (isClient())

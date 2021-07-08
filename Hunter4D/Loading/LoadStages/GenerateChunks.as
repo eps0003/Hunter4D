@@ -16,6 +16,11 @@ void onInit(CRules@ this)
 	this.set_string("loading message", "Generating chunks...");
 }
 
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("GenerateChunks.as");
+}
+
 void onTick(CRules@ this)
 {
 	uint chunksThisTick = getFPS() * Maths::Pow(renderer.chunkDimension, -3) * 60;

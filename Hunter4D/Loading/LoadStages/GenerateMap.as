@@ -10,6 +10,11 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("map generated");
 
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	if (isServer())
 	{
 		@map = Map::getMap();
@@ -22,6 +27,11 @@ void onInit(CRules@ this)
 	}
 
 	print("Begin generating map");
+}
+
+void onRestart(CRules@ this)
+{
+	this.RemoveScript("GenerateMap.as");
 }
 
 void onTick(CRules@ this)
