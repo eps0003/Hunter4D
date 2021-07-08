@@ -5,6 +5,7 @@ void onInit(CRules@ this)
 	onRestart(this);
 	InitDefaultMap();
 	Blocks::LoadBlocks();
+	CFileImage::silent_errors = true;
 }
 
 void onRestart(CRules@ this)
