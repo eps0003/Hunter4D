@@ -434,12 +434,10 @@ class Actor : ICollision
 	void OnInit()
 	{
 		print("Added actor: " + player.getUsername());
-		getRules().AddScript("ClickToPlaceBlock.as");
 	}
 
 	void OnRemove()
 	{
 		print("Removed actor: " + player.getUsername());
-		getRules().RemoveScript("ClickToPlaceBlock.as");
 	}
 }
