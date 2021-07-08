@@ -43,8 +43,8 @@ class Camera
 
 	void Render()
 	{
-		// Vec2f screenDim = getDriver().getScreenDimensions();
-		// GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
+		Vec2f screenDim = getDriver().getScreenDimensions();
+		GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
 
 		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
 	}
