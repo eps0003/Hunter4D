@@ -1,114 +1,196 @@
-#include "Object.as"
 #include "ActorCommon.as"
 #include "Mouse.as"
+#include "Collision.as"
 
-class Actor : Object
+class Actor : ICollision
 {
-	CPlayer@ player;
+	private CPlayer@ player;
+
+	bool hasSyncedInit = false;
+
+	private Vec3f gravity;
 	float acceleration = 0.08;
 	float friction = 0.3f;
 	float jumpForce = 0.3f;
 
+	Vec3f position;
+	private Vec3f oldPosition;
+	Vec3f interPosition;
+
+	Vec3f velocity;
+
+	private AABB@ collider;
+	private u8 collisionFlags = 0;
+
+	private uint lastUpdate = 0;
+
 	Actor(CPlayer@ player, Vec3f position)
 	{
-		super(position);
 		@this.player = player;
+		this.position = position;
+		oldPosition = position;
+
+		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
-		gravity = Vec3f(0, -0.04, 0);
+		SetGravity(Vec3f(0, -0.04f, 0));
 	}
 
 	void opAssign(Actor actor)
 	{
-		opAssign(cast<Object>(actor));
+		oldPosition = position;
+
+		position = actor.position;
+		velocity = actor.velocity;
+
+		lastUpdate = getGameTime();
 	}
 
-	void SerializeInit(CBitStream@ bs)
+	CPlayer@ getPlayer()
 	{
-		Object::SerializeInit(bs);
-		bs.write_netid(player.getNetworkID());
+		return player;
 	}
 
-	void SerializeTick(CBitStream@ bs)
+	AABB@ getCollider()
 	{
-		Object::SerializeTick(bs);
-		bs.write_netid(player.getNetworkID());
+		return collider;
 	}
 
-	bool deserializeInit(CBitStream@ bs)
+	void SetCollider(AABB@ collider)
 	{
-		if (!Object::deserializeInit(bs)) return false;
-
-		u16 playerId;
-		if (!bs.saferead_netid(playerId)) return false;
-
-		@player = getPlayerByNetworkId(playerId);
-		if (player is null) return false;
-
-		return true;
+		@this.collider = collider;
 	}
 
-	bool deserializeTick(CBitStream@ bs)
+	bool hasCollider()
 	{
-		if (!Object::deserializeTick(bs)) return false;
-
-		u16 playerId;
-		if (!bs.saferead_netid(playerId)) return false;
-
-		@player = getPlayerByNetworkId(playerId);
-		if (player is null) return false;
-
-		return true;
+		return collider !is null;
 	}
 
-	void HandleSerializeInit(CPlayer@ player)
+	void AddCollisionFlags(u8 flags)
 	{
-		// Sync to player if server not localhost
-		if (isClient()) return;
+		SetCollisionFlags(collisionFlags | flags);
+	}
 
-		CBitStream bs;
-		SerializeInit(bs);
+	void RemoveCollisionFlags(u8 flags)
+	{
+		SetCollisionFlags(collisionFlags & ~flags);
+	}
+
+	void SetCollisionFlags(u8 flags)
+	{
+		collisionFlags = flags;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_netid(player.getNetworkID());
+			bs.write_u8(collisionFlags);
+			getRules().SendCommand(getRules().getCommandID("set actor collision flags"), bs, true);
+		}
+	}
+
+	bool hasCollisionFlags(u8 flags)
+	{
+		return (collisionFlags & flags) == flags;
+	}
+
+	Vec3f getGravity()
+	{
+		return gravity;
+	}
+
+	void SetGravity(Vec3f gravity)
+	{
+		this.gravity = gravity;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_netid(player.getNetworkID());
+			gravity.Serialize(bs);
+			getRules().SendCommand(getRules().getCommandID("set actor gravity"), bs, true);
+		}
+	}
+
+	void SerializeInit(CPlayer@ player, CBitStream@ bs = CBitStream(), string commandName = "init actor")
+	{
+		bs.write_netid(this.player.getNetworkID());
+		position.Serialize(bs);
+		velocity.Serialize(bs);
+		gravity.Serialize(bs);
+		bs.write_u8(collisionFlags);
+
+		bs.write_bool(hasCollider());
+		if (hasCollider())
+		{
+			collider.Serialize(bs);
+		}
+
+		hasSyncedInit = true;
 
 		if (player !is null)
 		{
-			getRules().SendCommand(getRules().getCommandID("init actor"), bs, player);
+			getRules().SendCommand(getRules().getCommandID(commandName), bs, player);
 		}
 		else
 		{
-			getRules().SendCommand(getRules().getCommandID("init actor"), bs, true);
+			getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
 		}
 	}
 
-	void HandleSerializeTick()
+	void SerializeTick(CBitStream@ bs = CBitStream(), string commandName = "sync actor")
 	{
-		// Sync to server if client not localhost
-		if (isServer()) return;
+		bs.write_netid(player.getNetworkID());
+		position.Serialize(bs);
+		velocity.Serialize(bs);
 
-		// Sync my actor
-		Actor@ actor = Actor::getMyActor();
-		if (actor !is null)
+		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+	}
+
+	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove actor")
+	{
+		bs.write_netid(player.getNetworkID());
+
+		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+	}
+
+	void DeserializeInit(CBitStream@ bs)
+	{
+		u16 playerId;
+		if (!bs.saferead_netid(playerId)) return;
+
+		@player = getPlayerByNetworkId(playerId);
+		if (player is null) return;
+
+		if (!position.deserialize(bs)) return;
+		if (!velocity.deserialize(bs)) return;
+		if (!gravity.deserialize(bs)) return;
+		if (!bs.saferead_u8(collisionFlags)) return;
+
+		bool hasCollider;
+		if (!bs.saferead_bool(hasCollider)) return;
+
+		if (hasCollider)
 		{
-			CBitStream bs;
-			SerializeTick(bs);
-			getRules().SendCommand(getRules().getCommandID("sync actor"), bs, true);
+			@collider = AABB();
+			if (!collider.deserialize(bs)) return;
 		}
-	}
 
-	void HandledeserializeInit(CBitStream@ bs)
-	{
-		// deserialize if client not localhost
-		if (isServer()) return;
-
-		if (!deserializeInit(bs)) return;
+		hasSyncedInit = true;
 
 		Actor::AddActor(this);
 	}
 
-	void HandledeserializeTick(CBitStream@ bs)
+	void DeserializeTick(CBitStream@ bs)
 	{
-		if (!deserializeTick(bs)) return;
+		u16 playerId;
+		if (!bs.saferead_netid(playerId)) return;
 
 		// Don't update my own actor
-		if (player.isMyPlayer()) return;
+		@player = getPlayerByNetworkId(playerId);
+		if (player is null || player.isMyPlayer()) return;
+
+		if (!position.deserialize(bs)) return;
+		if (!velocity.deserialize(bs)) return;
 
 		// Update actor
 		Actor@ oldActor = Actor::getActor(player);
@@ -118,23 +200,38 @@ class Actor : Object
 		}
 	}
 
-	u8 teamNum
+	void DeserializeRemove(CBitStream@ bs)
 	{
-		get const
+		u16 playerId;
+		if (!bs.saferead_netid(playerId)) return;
+
+		@player = getPlayerByNetworkId(playerId);
+		if (player is null) return;
+
+		Actor::RemoveActor(player);
+	}
+
+	u8 getTeamNum()
+	{
+		return player.getTeamNum();
+	}
+
+	void SetTeamNum(u8 team)
+	{
+		player.server_setTeamNum(team);
+	}
+
+	void PreUpdate()
+	{
+		if (player.isMyPlayer() || getGameTime() > lastUpdate + 1)
 		{
-			return player.getTeamNum();
-		}
-		set
-		{
-			player.server_setTeamNum(value);
+			oldPosition = position;
 		}
 	}
 
 	void Update()
 	{
-		Object::Update();
-
-		if (doPhysicsUpdate())
+		if (player.isMyPlayer())
 		{
 			Movement();
 		}
@@ -142,36 +239,100 @@ class Actor : Object
 
 	void PostUpdate()
 	{
-		Object::PostUpdate();
-
 		if (player.isMyPlayer())
 		{
+			velocity.y = Maths::Clamp(velocity.y, -1, 1);
+
+			//set velocity to zero if low enough
+			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
+			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
+			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
+
+			Collision();
 			UpdateCamera();
 		}
 	}
 
-	bool doPhysicsUpdate()
-	{
-		return player.isMyPlayer();
-	}
-
 	void Collision()
 	{
-		if (collider is null) return;
+		if (!hasCollider()) return;
 
-		bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
-		bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
+		// Move along x axis if no collision occurred
+		Vec3f posTemp = position;
+		Vec3f velTemp = velocity;
+		bool collisionX = CollisionX(this, posTemp, velTemp);
+		if (!collisionX)
+		{
+			position = posTemp;
+			velocity = velTemp;
+		}
 
-		CollisionX(collideBlocks, collideMapEdge);
-		CollisionZ(collideBlocks, collideMapEdge);
-		if (collisionX) CollisionX(collideBlocks, collideMapEdge);
-		CollisionY(collideBlocks);
+		CollisionZ(this, position, velocity);
+
+		// Check x collision again if a collision occurred initially
+		if (collisionX)
+		{
+			CollisionX(this, position, velocity);
+		}
+
+		CollisionY(this, position, velocity);
+	}
+
+	void Render()
+	{
+		float[] matrix;
+		Matrix::MakeIdentity(matrix);
+		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
+		Render::SetModelTransform(matrix);
+
+		Vec3f min = collider.min;
+		Vec3f max = collider.max;
+		SColor color = color_white;
+
+		Vertex[] vertices = {
+			// Left
+			Vertex(min.x, max.y, max.z, 0, 0, color),
+			Vertex(min.x, max.y, min.z, 1, 0, color),
+			Vertex(min.x, min.y, min.z, 1, 1, color),
+			Vertex(min.x, min.y, max.z, 0, 1, color),
+			// Right
+			Vertex(max.x, max.y, min.z, 0, 0, color),
+			Vertex(max.x, max.y, max.z, 1, 0, color),
+			Vertex(max.x, min.y, max.z, 1, 1, color),
+			Vertex(max.x, min.y, min.z, 0, 1, color),
+			// Front
+			Vertex(min.x, max.y, min.z, 0, 0, color),
+			Vertex(max.x, max.y, min.z, 1, 0, color),
+			Vertex(max.x, min.y, min.z, 1, 1, color),
+			Vertex(min.x, min.y, min.z, 0, 1, color),
+			// Back
+			Vertex(max.x, max.y, max.z, 0, 0, color),
+			Vertex(min.x, max.y, max.z, 1, 0, color),
+			Vertex(min.x, min.y, max.z, 1, 1, color),
+			Vertex(max.x, min.y, max.z, 0, 1, color),
+			// Down
+			Vertex(max.x, min.y, max.z, 0, 0, color),
+			Vertex(min.x, min.y, max.z, 1, 0, color),
+			Vertex(min.x, min.y, min.z, 1, 1, color),
+			Vertex(max.x, min.y, min.z, 0, 1, color),
+			// Up
+			Vertex(min.x, max.y, max.z, 0, 0, color),
+			Vertex(max.x, max.y, max.z, 1, 0, color),
+			Vertex(max.x, max.y, min.z, 1, 1, color),
+			Vertex(min.x, max.y, min.z, 0, 1, color)
+		};
+
+		Render::SetBackfaceCull(false);
+		Render::SetAlphaBlend(true);
+		Render::RawQuads("pixel", vertices);
+		Render::SetAlphaBlend(false);
+		Render::SetBackfaceCull(true);
 	}
 
 	void RenderHUD()
 	{
-		Object::RenderHUD();
 		DrawCrosshair(0, 8, 1, color_white);
+		GUI::DrawText("Position: " + interPosition.toString(), Vec2f(10, 10), color_black);
 	}
 
 	void RenderNameplate()
@@ -182,14 +343,27 @@ class Actor : Object
 		GUI::DrawTextCentered(player.getCharacterName(), screenPos, color_white);
 	}
 
+	void Interpolate()
+	{
+		float t = Interpolation::getFrameTime();
+		interPosition = oldPosition.lerp(position, t);
+		// interPosition = oldPosition.lerp(oldPosition + velocity, t);
+		// interPosition = interPosition.clamp(oldPosition, position);
+	}
+
 	bool isVisible()
 	{
-		return !player.isMyPlayer();
+		return !player.isMyPlayer() && hasCollider();
 	}
 
 	bool isNameplateVisible()
 	{
 		return isVisible();
+	}
+
+	bool isOnGround()
+	{
+		return hasCollider() && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0));
 	}
 
 	private void Movement()
@@ -212,7 +386,9 @@ class Actor : Object
 			dir = dir.RotateBy(camera.rotation.y);
 		}
 
-		if (controls.isKeyPressed(KEY_SPACE) && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0)))
+		velocity += gravity;
+
+		if (controls.isKeyPressed(KEY_SPACE) && isOnGround())
 		{
 			velocity.y = jumpForce;
 		}
@@ -263,6 +439,5 @@ class Actor : Object
 	void OnRemove()
 	{
 		print("Removed actor: " + player.getUsername());
-		player.set("actor", null);
 	}
 }

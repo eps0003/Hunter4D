@@ -2,6 +2,8 @@
 #include "Ray.as"
 #include "Camera.as"
 #include "Object.as"
+#include "Actor.as"
+#include "Collision.as"
 
 void onInit(CRules@ this)
 {
@@ -89,7 +91,28 @@ void PlaceBlock(Vec3f position)
 	for (uint i = 0; i < objects.size(); i++)
 	{
 		Object@ object = objects[i];
-		if (object.collider !is null && object.collider.intersectsVoxel(object.position, position))
+
+		bool hasCollider = object.hasCollider();
+		bool collidesWithBlocks = object.hasCollisionFlags(CollisionFlag::Blocks);
+		bool intersectsVoxel = object.getCollider().intersectsVoxel(object.position, position);
+
+		if (hasCollider && collidesWithBlocks && intersectsVoxel)
+		{
+			return;
+		}
+	}
+
+	// Prevent placing blocks inside actors
+	Actor@[]@ actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
+	{
+		Actor@ actor = actors[i];
+
+		bool hasCollider = actor.hasCollider();
+		bool collidesWithBlocks = actor.hasCollisionFlags(CollisionFlag::Blocks);
+		bool intersectsVoxel = actor.getCollider().intersectsVoxel(actor.position, position);
+
+		if (hasCollider && collidesWithBlocks && intersectsVoxel)
 		{
 			return;
 		}

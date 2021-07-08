@@ -1,3 +1,4 @@
+#include "Object.as"
 #include "Actor.as"
 #include "Camera.as"
 #include "MapRenderer.as"
@@ -31,7 +32,7 @@ void onRender(CRules@ this)
 		actor.RenderHUD();
 	}
 
-	Actor@[] actors = Actor::getActors();
+	Actor@[]@ actors = Actor::getActors();
 	for (uint i = 0; i < actors.size(); i++)
 	{
 		Actor@ actor = actors[i];
@@ -61,6 +62,17 @@ void Render(int id)
 	camera.Render();
 
 	Map::getRenderer().Render();
+
+	Actor@[]@ actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
+	{
+		Actor@ actor = actors[i];
+		actor.Interpolate();
+		if (actor.isVisible())
+		{
+			actor.Render();
+		}
+	}
 
 	Object@[]@ objects = Object::getObjects();
 	for (uint i = 0; i < objects.size(); i++)

@@ -3,16 +3,14 @@ namespace Object
 	Object@ getObject(u16 id)
 	{
 		Object@[]@ objects = Object::getObjects();
-
 		for (uint i = 0; i < objects.size(); i++)
 		{
 			Object@ object = objects[i];
-			if (object.id == id)
+			if (object.getID() == id)
 			{
 				return object;
 			}
 		}
-
 		return null;
 	}
 
@@ -23,7 +21,11 @@ namespace Object
 		getRules().set("objects", @objects);
 
 		object.OnInit();
-		object.HandleSerializeInit(null);
+
+		if (!isClient())
+		{
+			object.SerializeInit(null);
+		}
 	}
 
 	void RemoveObject(u16 id)
@@ -32,11 +34,16 @@ namespace Object
 		for (uint i = 0; i < objects.size(); i++)
 		{
 			Object@ object = objects[i];
-			if (object.id == id)
+			if (object.getID() == id)
 			{
 				object.OnRemove();
 				objects.removeAt(i);
-				object.HandleSerializeRemove();
+
+				if (!isClient())
+				{
+					object.SerializeRemove();
+				}
+
 				return;
 			}
 		}
@@ -70,9 +77,8 @@ namespace Object
 		{
 			Object@ object = objects[i];
 			object.OnRemove();
-			object.HandleSerializeRemove();
+			object.SerializeRemove();
 		}
-
 		getRules().clear("objects");
 	}
 }

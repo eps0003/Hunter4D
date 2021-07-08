@@ -7,9 +7,10 @@ void onInit(CRules@ this)
 	this.addCommandID("sync object");
 	this.addCommandID("remove object");
 	this.addCommandID("set object collision flags");
-	this.addCommandID("set object color");
 	this.addCommandID("set object gravity");
+	this.addCommandID("set object friction");
 }
+
 
 void onTick(CRules@ this)
 {
@@ -29,7 +30,11 @@ void onTick(CRules@ this)
 	{
 		Object@ object = objects[i];
 		object.PostUpdate();
-		object.HandleSerializeTick();
+
+		if (!isClient())
+		{
+			object.SerializeTick();
+		}
 	}
 }
 
@@ -37,29 +42,28 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
 	// Sync all objects
 	Object@[]@ objects = Object::getObjects();
-
 	for (uint i = 0; i < objects.size(); i++)
 	{
-		objects[i].HandleSerializeInit(player);
+		objects[i].SerializeInit(player);
 	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (cmd == this.getCommandID("init object"))
+	if (!isServer() && cmd == this.getCommandID("init object"))
 	{
 		Object object;
-		object.HandledeserializeInit(params);
+		object.DeserializeInit(params);
 	}
 	else if (cmd == this.getCommandID("sync object"))
 	{
 		Object object;
-		object.HandledeserializeTick(params);
+		object.DeserializeTick(params);
 	}
-	else if (cmd == this.getCommandID("remove object"))
+	else if (!isServer() && cmd == this.getCommandID("remove object"))
 	{
 		Object object;
-		object.HandledeserializeRemove(params);
+		object.DeserializeRemove(params);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
@@ -74,19 +78,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		object.SetCollisionFlags(collisionFlags);
 	}
-	else if (!isServer() && cmd == this.getCommandID("set object color"))
-	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Object@ object = Object::getObject(id);
-		if (object is null) return;
-
-		uint colorInt;
-		if (!params.saferead_u32(colorInt)) return;
-
-		object.color = SColor(colorInt);
-	}
 	else if (!isServer() && cmd == this.getCommandID("set object gravity"))
 	{
 		u16 id;
@@ -99,5 +90,18 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!gravity.deserialize(params)) return;
 
 		object.SetGravity(gravity);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object friction"))
+	{
+		u16 id;
+		if (!params.saferead_u16(id)) return;
+
+		Object@ object = Object::getObject(id);
+		if (object is null) return;
+
+		float friction;
+		if (!params.saferead_f32(friction)) return;
+
+		object.SetFriction(friction);
 	}
 }

@@ -1,26 +1,45 @@
 #include "Object.as"
+#include "Actor.as"
 
 class Blob : Object
 {
 	float jumpInterval = 1.0f;
-	float jumpForce = 0.4f;
+	float jumpForce = 0.3f;
+	float forwardForce = 0.2f;
+	private uint spawnTime;
 
 	Blob(Vec3f position)
 	{
 		super(position);
+
+		SetCollider(AABB(Vec3f(-0.3f), Vec3f(0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
 		SetGravity(Vec3f(0, -0.04f, 0));
+		SetFriction(0.5f);
+
+		spawnTime = getGameTime();
 	}
 
 	void Update()
 	{
 		Object::Update();
 
-		if (doPhysicsUpdate())
+		if (isServer())
 		{
-			if (getGameTime() % Maths::Round(getTicksASecond() * jumpInterval) == 0)
+			Actor@[]@ actors = Actor::getActors();
+			if (actors.size() > 0)
 			{
-				velocity.y = jumpForce;
+				Actor@ actor = actors[0];
+
+				if ((getGameTime() - spawnTime) % Maths::Round(getTicksASecond() * jumpInterval) == 0)
+				{
+					Vec3f dir = actor.position - position;
+					dir.y = 0;
+					dir.SetMag(forwardForce);
+					dir.y = jumpForce;
+
+					velocity = dir;
+				}
 			}
 		}
 	}

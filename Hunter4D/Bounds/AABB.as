@@ -1,3 +1,5 @@
+#include "IBounds.as"
+
 class AABB : IBounds
 {
 	Vec3f min;
@@ -102,5 +104,16 @@ class AABB : IBounds
 			}
 		}
 		return false;
+	}
+
+	void Serialize(CBitStream@ bs)
+	{
+		min.Serialize(bs);
+		max.Serialize(bs);
+	}
+
+	bool deserialize(CBitStream@ bs)
+	{
+		return min.deserialize(bs) && max.deserialize(bs);
 	}
 }

@@ -15,6 +15,7 @@ void onRestart(CRules@ this)
 	this.set("map syncer", null);
 	this.set("map renderer", null);
 	this.set("objects", null);
+	this.set("actors", null);
 
 	Render::RemoveScript(this.get_s32("render script id"));
 

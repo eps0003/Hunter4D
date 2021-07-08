@@ -2,12 +2,16 @@ namespace Actor
 {
 	Actor@ getActor(CPlayer@ player)
 	{
-		Actor@ actor;
-		if (player !is null)
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
 		{
-			player.get("actor", @actor);
+			Actor@ actor = actors[i];
+			if (actor.getPlayer() is player)
+			{
+				return actor;
+			}
 		}
-		return actor;
+		return null;
 	}
 
 	Actor@ getMyActor()
@@ -17,39 +21,52 @@ namespace Actor
 
 	void AddActor(Actor@ actor)
 	{
-		Object::AddObject(actor);
-		actor.player.set("actor", @actor);
+		Actor@[]@ actors = Actor::getActors();
+		actors.push_back(actor);
+		getRules().set("actors", @actors);
+
+		actor.OnInit();
+
+		if (!isClient())
+		{
+			actor.SerializeInit(null);
+		}
 	}
 
 	void RemoveActor(CPlayer@ player)
 	{
-		Actor@ actor = Actor::getActor(player);
-		if (actor !is null)
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
 		{
-			Object::RemoveObject(actor.id);
+			Actor@ actor = actors[i];
+			if (actor.getPlayer() is player)
+			{
+				actor.OnRemove();
+				actors.removeAt(i);
+
+				if (!isClient())
+				{
+					actor.SerializeRemove();
+				}
+
+				return;
+			}
 		}
 	}
 
-	bool hasActor(CPlayer@ player)
+	bool actorExists(CPlayer@ player)
 	{
 		return Actor::getActor(player) !is null;
 	}
 
-	Actor@[] getActors()
+	Actor@[]@ getActors()
 	{
-		Actor@[] actors;
-
-		for (uint i = 0; i < getPlayerCount(); i++)
+		Actor@[]@ actors;
+		if (!getRules().get("actors", @actors))
 		{
-			CPlayer@ player = getPlayer(i);
-			Actor@ actor = Actor::getActor(player);
-
-			if (actor !is null)
-			{
-				actors.push_back(actor);
-			}
+			@actors = array<Actor@>();
+			getRules().set("actors", @actors);
 		}
-
 		return actors;
 	}
 
@@ -60,9 +77,13 @@ namespace Actor
 
 	void ClearActors()
 	{
-		for (uint i = 0; i < getPlayerCount(); i++)
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
 		{
-			RemoveActor(getPlayer(i));
+			Actor@ actor = actors[i];
+			actor.OnRemove();
+			actor.SerializeRemove();
 		}
+		getRules().clear("actors");
 	}
 }

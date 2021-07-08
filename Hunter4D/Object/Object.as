@@ -1,56 +1,25 @@
 #include "ObjectCommon.as"
-#include "Vec3f.as"
-#include "Camera.as"
-#include "IBounds.as"
-#include "Map.as"
-#include "Utilities.as"
+#include "Collision.as"
 
-class Object
+class Object : ICollision
 {
-	u16 id = 0;
+	private u16 id = 0;
+
 	bool hasSyncedInit = false;
+
+	private Vec3f gravity;
+	private float friction = 1.0f;
 
 	Vec3f position;
 	private Vec3f oldPosition;
 	Vec3f interPosition;
 
 	Vec3f velocity;
-	private Vec3f oldVelocity;
-	Vec3f interVelocity;
 
-	private Vec3f gravity;
-
-	private SColor _color = color_white;
-
-	AABB@ collider = AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f));
+	private AABB@ collider;
 	private u8 collisionFlags = 0;
-	private Map@ map = Map::getMap();
 
-	private bool collisionX = false;
-	private bool collisionY = false;
-	private bool collisionZ = false;
-
-	private uint _lastUpdate = 0;
-
-	SColor color
-	{
-		get const
-		{
-			return _color;
-		}
-		set
-		{
-			_color = value;
-
-			if (!isClient() && hasSyncedInit)
-			{
-				CBitStream bs;
-				bs.write_u16(id);
-				bs.write_u32(value.color);
-				getRules().SendCommand(getRules().getCommandID("set object color"), bs, true);
-			}
-		}
-	}
+	private uint lastUpdate = 0;
 
 	Object(Vec3f position)
 	{
@@ -62,11 +31,11 @@ class Object
 	void opAssign(Object object)
 	{
 		oldPosition = position;
+
 		position = object.position;
-		oldVelocity = velocity;
 		velocity = object.velocity;
 
-		_lastUpdate = getGameTime();
+		lastUpdate = getGameTime();
 	}
 
 	void AssignUniqueID()
@@ -77,195 +46,24 @@ class Object
 		}
 	}
 
-	void SerializeInit(CBitStream@ bs)
+	u16 getID()
 	{
-		bs.write_u16(id);
-		position.Serialize(bs);
-		velocity.Serialize(bs);
-		bs.write_u8(collisionFlags);
-		bs.write_u32(color.color);
-		gravity.Serialize(bs);
-
-		hasSyncedInit = true;
+		return id;
 	}
 
-	void SerializeTick(CBitStream@ bs)
+	AABB@ getCollider()
 	{
-		bs.write_u16(id);
-		position.Serialize(bs);
-		velocity.Serialize(bs);
+		return collider;
 	}
 
-	void SerializeRemove(CBitStream@ bs)
+	void SetCollider(AABB@ collider)
 	{
-		bs.write_u16(id);
+		@this.collider = collider;
 	}
 
-	bool deserializeInit(CBitStream@ bs)
+	bool hasCollider()
 	{
-		oldPosition = position;
-		oldVelocity = velocity;
-
-		if (!bs.saferead_u16(id)) return false;
-		if (!position.deserialize(bs)) return false;
-		if (!velocity.deserialize(bs)) return false;
-		if (!bs.saferead_u8(collisionFlags)) return false;
-
-		u32 colorInt;
-		if (!bs.saferead_u32(colorInt)) return false;
-		color = SColor(colorInt);
-
-		if (!gravity.deserialize(bs)) return false;
-
-		hasSyncedInit = true;
-
-		return true;
-	}
-
-	bool deserializeTick(CBitStream@ bs)
-	{
-		oldPosition = position;
-		oldVelocity = velocity;
-
-		if (!bs.saferead_u16(id)) return false;
-		if (!position.deserialize(bs)) return false;
-		if (!velocity.deserialize(bs)) return false;
-
-		return true;
-	}
-
-	bool deserializeRemove(CBitStream@ bs)
-	{
-		return bs.saferead_u16(id);
-	}
-
-	void HandleSerializeInit(CPlayer@ player)
-	{
-		// Sync to player if server not localhost
-		if (isClient()) return;
-
-		CBitStream bs;
-		SerializeInit(bs);
-
-		if (player !is null)
-		{
-			getRules().SendCommand(getRules().getCommandID("init object"), bs, player);
-		}
-		else
-		{
-			getRules().SendCommand(getRules().getCommandID("init object"), bs, true);
-		}
-	}
-
-	void HandleSerializeTick()
-	{
-		// Sync to players if server not localhost
-		if (isClient()) return;
-
-		CBitStream bs;
-		SerializeTick(bs);
-		getRules().SendCommand(getRules().getCommandID("sync object"), bs, true);
-	}
-
-	void HandleSerializeRemove()
-	{
-		if (isClient()) return;
-
-		CBitStream bs;
-		SerializeRemove(bs);
-		getRules().SendCommand(getRules().getCommandID("remove object"), bs, true);
-	}
-
-	void HandledeserializeInit(CBitStream@ bs)
-	{
-		// deserialize if client not localhost
-		if (isServer()) return;
-
-		if (!deserializeInit(bs)) return
-;
-		Object::AddObject(this);
-	}
-
-	void HandledeserializeTick(CBitStream@ bs)
-	{
-		// deserialize if client not localhost
-		if (isServer()) return;
-
-		if (!deserializeTick(bs)) return;
-
-		Object@ oldObject = Object::getObject(id);
-		if (oldObject !is null)
-		{
-			oldObject = this;
-		}
-	}
-
-	void HandledeserializeRemove(CBitStream@ bs)
-	{
-		if (isServer()) return;
-
-		if (!deserializeRemove(bs)) return;
-
-		Object::RemoveObject(id);
-	}
-
-	void PreUpdate()
-	{
-		if (isLocalHost() || getGameTime() > _lastUpdate + 1)
-		{
-			oldPosition = position;
-			oldVelocity = velocity;
-		}
-
-		// Reset velocity from collision last tick
-		if (doPhysicsUpdate())
-		{
-			if (collisionX)
-			{
-				velocity.x = 0;
-				collisionX = false;
-			}
-
-			if (collisionY)
-			{
-				velocity.y = 0;
-				collisionY = false;
-			}
-
-			if (collisionZ)
-			{
-				velocity.z = 0;
-				collisionZ = false;
-			}
-		}
-	}
-
-	void Update()
-	{
-		if (doPhysicsUpdate())
-		{
-			velocity += gravity;
-		}
-	}
-
-	void PostUpdate()
-	{
-		if (doPhysicsUpdate())
-		{
-			velocity.y = Maths::Clamp(velocity.y, -1, 1);
-
-			//set velocity to zero if low enough
-			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
-			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
-			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
-
-			Collision();
-		}
-	}
-
-	bool doPhysicsUpdate()
-	{
-		return isServer();
+		return collider !is null;
 	}
 
 	void AddCollisionFlags(u8 flags)
@@ -296,6 +94,11 @@ class Object
 		return (collisionFlags & flags) == flags;
 	}
 
+	Vec3f getGravity()
+	{
+		return gravity;
+	}
+
 	void SetGravity(Vec3f gravity)
 	{
 		this.gravity = gravity;
@@ -309,127 +112,153 @@ class Object
 		}
 	}
 
+	float getFriction()
+	{
+		return friction;
+	}
+
+	void SetFriction(float friction)
+	{
+		this.friction = friction;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_f32(friction);
+			getRules().SendCommand(getRules().getCommandID("set object friction"), bs, true);
+		}
+	}
+
+	void SerializeInit(CPlayer@ player, CBitStream@ bs = CBitStream(), string commandName = "init object")
+	{
+		bs.write_u16(id);
+		position.Serialize(bs);
+		velocity.Serialize(bs);
+		gravity.Serialize(bs);
+		bs.write_u8(collisionFlags);
+
+		bs.write_bool(hasCollider());
+		if (hasCollider())
+		{
+			collider.Serialize(bs);
+		}
+
+		hasSyncedInit = true;
+
+		if (player !is null)
+		{
+			getRules().SendCommand(getRules().getCommandID(commandName), bs, player);
+		}
+		else
+		{
+			getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+		}
+	}
+
+	void SerializeTick(CBitStream@ bs = CBitStream(), string commandName = "sync object")
+	{
+		bs.write_u16(id);
+		position.Serialize(bs);
+		velocity.Serialize(bs);
+
+		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+	}
+
+	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove object")
+	{
+		bs.write_u16(id);
+
+		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+	}
+
+	void DeserializeInit(CBitStream@ bs)
+	{
+		if (!bs.saferead_u16(id)) return;
+		if (!position.deserialize(bs)) return;
+		if (!velocity.deserialize(bs)) return;
+		if (!gravity.deserialize(bs)) return;
+		if (!bs.saferead_u8(collisionFlags)) return;
+
+		bool hasCollider;
+		if (!bs.saferead_bool(hasCollider)) return;
+
+		if (hasCollider)
+		{
+			@collider = AABB();
+			if (!collider.deserialize(bs)) return;
+		}
+
+		hasSyncedInit = true;
+
+		Object::AddObject(this);
+	}
+
+	void DeserializeTick(CBitStream@ bs)
+	{
+		if (!bs.saferead_u16(id)) return;
+		if (!position.deserialize(bs)) return;
+		if (!velocity.deserialize(bs)) return;
+
+		// Update object
+		Object@ oldObject = Object::getObject(id);
+		if (oldObject !is null)
+		{
+			oldObject = this;
+		}
+	}
+
+	void DeserializeRemove(CBitStream@ bs)
+	{
+		if (!bs.saferead_u16(id)) return;
+
+		Object::RemoveObject(id);
+	}
+
+	void PreUpdate()
+	{
+		if (isServer() || getGameTime() > lastUpdate + 1)
+		{
+			oldPosition = position;
+		}
+	}
+
+	void Update()
+	{
+		if (isServer())
+		{
+			velocity += gravity;
+		}
+	}
+
+	void PostUpdate()
+	{
+		if (isServer())
+		{
+			if (isOnGround())
+			{
+				velocity.x *= friction;
+				velocity.z *= friction;
+			}
+
+			velocity.y = Maths::Clamp(velocity.y, -1, 1);
+
+			//set velocity to zero if low enough
+			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
+			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
+			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
+
+			Collision();
+		}
+	}
+
 	void Collision()
 	{
-		if (collider !is null)
-		{
-			bool collideBlocks = hasCollisionFlags(CollisionFlag::Blocks);
-			bool collideMapEdge = hasCollisionFlags(CollisionFlag::MapEdge);
+		if (!hasCollider()) return;
 
-			CollisionX(collideBlocks, collideMapEdge);
-			CollisionZ(collideBlocks, collideMapEdge);
-			CollisionY(collideBlocks);
-		}
-		else
-		{
-			position += velocity;
-		}
-	}
-
-	void CollisionX(bool blocks, bool mapEdge)
-	{
-		Vec3f xPosition = position + Vec3f(velocity.x, 0, 0);
-
-		if (blocks && velocity.x != 0 && collider.intersectsNewSolid(position, xPosition))
-		{
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
-			if (velocity.x > 0)
-			{
-				position.x = max.x - collider.max.x - 0.0001f;
-			}
-			else
-			{
-				position.x = min.x - collider.min.x + 0.0001f;
-			}
-
-			collisionX = true;
-		}
-		else if (mapEdge && collider.intersectsMapEdge(xPosition))
-		{
-			if (velocity.x > 0)
-			{
-				position.x = map.dimensions.x - collider.max.x - 0.0001f;
-			}
-			else
-			{
-				position.x = -collider.min.x;
-			}
-
-			collisionX = true;
-		}
-		else
-		{
-			collisionX = false;
-			position.x += velocity.x;
-		}
-	}
-
-	void CollisionZ(bool blocks, bool mapEdge)
-	{
-		Vec3f zPosition = position + Vec3f(0, 0, velocity.z);
-
-		if (blocks && velocity.z != 0 && collider.intersectsNewSolid(position, zPosition))
-		{
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
-			if (velocity.z > 0)
-			{
-				position.z = max.z - collider.max.z - 0.0001f;
-			}
-			else
-			{
-				position.z = min.z - collider.min.z + 0.0001f;
-			}
-
-			collisionZ = true;
-		}
-		else if (mapEdge && collider.intersectsMapEdge(zPosition))
-		{
-			if (velocity.z > 0)
-			{
-				position.z = map.dimensions.z - collider.max.z - 0.0001f;
-			}
-			else
-			{
-				position.z = -collider.min.z;
-			}
-
-			collisionZ = true;
-		}
-		else
-		{
-			collisionZ = false;
-			position.z += velocity.z;
-		}
-	}
-
-	void CollisionY(bool blocks)
-	{
-		Vec3f yPosition = position + Vec3f(0, velocity.y, 0);
-
-		if (blocks && velocity.y != 0 && collider.intersectsNewSolid(position, yPosition))
-		{
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
-			if (velocity.y > 0)
-			{
-				position.y = max.y - collider.max.y - 0.0001f;
-			}
-			else
-			{
-				position.y = min.y - collider.min.y + 0.0001f;
-			}
-
-			collisionY = true;
-		}
-		else
-		{
-			position.y += velocity.y;
-		}
+		CollisionX(this, position, velocity);
+		CollisionZ(this, position, velocity);
+		CollisionY(this, position, velocity);
 	}
 
 	void Render()
@@ -441,6 +270,7 @@ class Object
 
 		Vec3f min = collider.min;
 		Vec3f max = collider.max;
+		SColor color = color_white;
 
 		Vertex[] vertices = {
 			// Left
@@ -482,22 +312,22 @@ class Object
 		Render::SetBackfaceCull(true);
 	}
 
-	void RenderHUD()
-	{
-		GUI::DrawText("Position: " + position.toString(), Vec2f(10, 10), color_black);
-	}
-
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
 		interPosition = oldPosition.lerp(position, t);
+		// interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		// interPosition = interPosition.clamp(oldPosition, position);
-		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 
 	bool isVisible()
 	{
-		return true;
+		return hasCollider();
+	}
+
+	bool isOnGround()
+	{
+		return hasCollider() && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0));
 	}
 
 	void OnInit()

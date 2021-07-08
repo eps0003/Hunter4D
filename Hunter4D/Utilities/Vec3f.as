@@ -14,6 +14,13 @@ class Vec3f
 		this.z = z;
 	}
 
+	Vec3f(float x)
+	{
+		this.x = x;
+		this.y = x;
+		this.z = x;
+	}
+
 	Vec3f(Vec3f vec, float mag)
 	{
 		vec = vec.normalized();
@@ -189,6 +196,24 @@ class Vec3f
 		return this / mag();
 	}
 
+	void Normalize()
+	{
+		float lengthSq = magSquared();
+		if (lengthSq == 0)
+		{
+			x = 0;
+			y = 0;
+			z = 0;
+		}
+		else if (lengthSq != 1)
+		{
+			float len = mag();
+			x /= len;
+			y /= len;
+			z /= len;
+		}
+	}
+
 	float mag()
 	{
 		return Maths::Sqrt(x*x + y*y + z*z);
@@ -197,6 +222,14 @@ class Vec3f
 	float magSquared()
 	{
 		return x*x + y*y + z*z;
+	}
+
+	void SetMag(float mag)
+	{
+		Normalize();
+		x *= mag;
+		y *= mag;
+		z *= mag;
 	}
 
 	Vec3f dir()
