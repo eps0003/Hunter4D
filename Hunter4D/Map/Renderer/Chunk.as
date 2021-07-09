@@ -2,7 +2,6 @@ class Chunk
 {
 	Map@ map;
 	MapRenderer@ renderer;
-	private Blocks@ blocks;
 
 	uint index;
 
@@ -16,7 +15,6 @@ class Chunk
 	{
 		@this.renderer = renderer;
 		@map = renderer.map;
-		@blocks = Blocks::getBlocks();
 		this.index = index;
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
@@ -148,7 +146,7 @@ class Chunk
 					AddIndices();
 				}
 
-				// if (blocks.isTransparent(block))
+				// if (Blocks::isTransparent(block))
 				// {
 				// 	float o = 0.005f;
 

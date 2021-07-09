@@ -1,10 +1,7 @@
-#include "Blocks.as"
-
 void onInit(CRules@ this)
 {
 	onRestart(this);
 	InitDefaultMap();
-	Blocks::LoadBlocks();
 	CFileImage::silent_errors = true;
 }
 

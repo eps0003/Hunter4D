@@ -190,7 +190,7 @@ class Map
 
 	bool canSetBlock(CPlayer@ player, int index, SColor block)
 	{
-		if (Blocks::getBlocks().isSolid(block))
+		if (Blocks::isSolid(block))
 		{
 			Vec3f position = indexToPos(index);
 

@@ -17,7 +17,6 @@ class Ray
 	bool raycastBlock(float distance, bool solidOnly, RaycastInfo &out raycastInfo)
 	{
 		Map@ map = Map::getMap();
-		Blocks@ blocks = Blocks::getBlocks();
 
 		Vec3f worldPos = position.floor();
 
@@ -70,7 +69,7 @@ class Ray
 			SColor block = map.getBlockSafe(worldPos);
 
 			//hit a block
-			bool hit = solidOnly ? blocks.isSolid(block) : blocks.isVisible(block);
+			bool hit = solidOnly ? Blocks::isSolid(block) : Blocks::isVisible(block);
 			if (hit)
 			{
 				dist = Maths::Max(0, dist);
