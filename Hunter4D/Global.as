@@ -43,8 +43,3 @@ void InitDefaultMap()
 
 	map.MakeMiniMap();
 }
-
-void CalculateMinimapColour(CMap@ this, u32 offset, TileType tile, SColor &out col)
-{
-	col = color_black;
-}
