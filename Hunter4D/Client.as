@@ -19,7 +19,7 @@ void onInit(CRules@ this)
 
 	CBitStream bs;
 	bs.write_netid(getLocalPlayer().getNetworkID());
-	this.SendCommand(this.getCommandID("spawn actor"), bs, false);
+	this.SendCommand(this.getCommandID("player loaded"), bs, false);
 
 	Texture::createFromFile("pixel", "Pixel.png");
 

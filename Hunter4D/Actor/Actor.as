@@ -294,7 +294,9 @@ class Actor : ICollision
 
 		Vec3f min = collider.min;
 		Vec3f max = collider.max;
-		SColor color = color_white;
+
+		CTeam@ team = getRules().getTeam(getTeamNum());
+		SColor color = team !is null ? team.color : color_white;
 
 		Vertex[] vertices = {
 			// Left
@@ -365,7 +367,11 @@ class Actor : ICollision
 
 	bool isNameplateVisible()
 	{
-		return isVisible();
+		u8 localTeam = getLocalPlayer().getTeamNum();
+		return (
+			isVisible() &&
+			(getTeamNum() == localTeam || localTeam == getRules().getSpectatorTeamNum())
+		);
 	}
 
 	bool isOnGround()
