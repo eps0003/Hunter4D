@@ -24,7 +24,7 @@ namespace Object
 
 		if (!isClient())
 		{
-			object.SerializeInit(null);
+			object.SerializeInit();
 		}
 	}
 

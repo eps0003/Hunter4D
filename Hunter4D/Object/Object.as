@@ -130,7 +130,7 @@ class Object : ICollision
 		}
 	}
 
-	void SerializeInit(CPlayer@ player, CBitStream@ bs = CBitStream(), string commandName = "init object")
+	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init object")
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);

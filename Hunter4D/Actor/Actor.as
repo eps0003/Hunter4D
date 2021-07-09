@@ -111,7 +111,7 @@ class Actor : ICollision
 		}
 	}
 
-	void SerializeInit(CPlayer@ player, CBitStream@ bs = CBitStream(), string commandName = "init actor")
+	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init actor")
 	{
 		bs.write_netid(this.player.getNetworkID());
 		position.Serialize(bs);

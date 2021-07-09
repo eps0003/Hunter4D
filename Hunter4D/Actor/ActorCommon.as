@@ -29,7 +29,7 @@ namespace Actor
 
 		if (!isClient())
 		{
-			actor.SerializeInit(null);
+			actor.SerializeInit();
 		}
 	}
 
