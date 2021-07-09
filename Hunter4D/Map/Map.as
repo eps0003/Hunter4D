@@ -90,6 +90,8 @@ class Map
 	void SetBlock(int index, SColor block)
 	{
 		SColor oldBlock = blocks[index];
+		if (oldBlock == block) return;
+
 		blocks[index] = block;
 
 		CRules@ rules = getRules();
@@ -103,7 +105,7 @@ class Map
 			rules.SendCommand(rules.getCommandID("sync block"), bs, true);
 		}
 
-		if (isClient() && oldBlock != block && !rules.hasScript("SyncMap.as"))
+		if (isClient() && !rules.hasScript("SyncMap.as"))
 		{
 			Map::getRenderer().GenerateMesh(indexToPos(index));
 		}
