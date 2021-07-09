@@ -7,6 +7,7 @@ class Blob : Object
 	float jumpForce = 0.3f;
 	float forwardForce = 0.2f;
 	private uint spawnTime;
+	private bool midJump = false;
 
 	Blob(Vec3f position)
 	{
@@ -38,8 +39,32 @@ class Blob : Object
 					dir.SetMag(forwardForce);
 					dir.y = jumpForce;
 
-					velocity = dir;
+					velocity.y = jumpForce;
+					midJump = true;
 				}
+
+				if (midJump)
+				{
+					Vec3f dir = actor.position - position;
+					dir.y = 0;
+					dir.SetMag(forwardForce);
+
+					velocity.x = dir.x;
+					velocity.z = dir.z;
+				}
+			}
+		}
+	}
+
+	void PostUpdate()
+	{
+		Object::PostUpdate();
+
+		if (isServer())
+		{
+			if (isOnGround())
+			{
+				midJump = false;
 			}
 		}
 	}
