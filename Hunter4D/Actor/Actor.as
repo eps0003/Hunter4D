@@ -4,6 +4,7 @@
 
 class Actor : ICollision
 {
+	private u16 id = 0;
 	private CPlayer@ player;
 
 	bool hasSyncedInit = false;
@@ -29,6 +30,7 @@ class Actor : ICollision
 		@this.player = player;
 		this.position = position;
 		oldPosition = position;
+		id = getRules().add_u32("id", 1);
 
 		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
@@ -43,6 +45,11 @@ class Actor : ICollision
 		velocity = actor.velocity;
 
 		lastUpdate = getGameTime();
+	}
+
+	u16 getID()
+	{
+		return id;
 	}
 
 	CPlayer@ getPlayer()
@@ -82,7 +89,7 @@ class Actor : ICollision
 		if (!isClient() && hasSyncedInit)
 		{
 			CBitStream bs;
-			bs.write_netid(player.getNetworkID());
+			bs.write_u16(id);
 			bs.write_u8(collisionFlags);
 			getRules().SendCommand(getRules().getCommandID("set actor collision flags"), bs, true);
 		}
@@ -105,7 +112,7 @@ class Actor : ICollision
 		if (!isClient() && hasSyncedInit)
 		{
 			CBitStream bs;
-			bs.write_netid(player.getNetworkID());
+			bs.write_u16(id);
 			gravity.Serialize(bs);
 			getRules().SendCommand(getRules().getCommandID("set actor gravity"), bs, true);
 		}
@@ -114,6 +121,7 @@ class Actor : ICollision
 	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init actor")
 	{
 		bs.write_netid(this.player.getNetworkID());
+		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 		gravity.Serialize(bs);
@@ -139,7 +147,7 @@ class Actor : ICollision
 
 	void SerializeTick(CBitStream@ bs = CBitStream(), string commandName = "sync actor")
 	{
-		bs.write_netid(player.getNetworkID());
+		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 
@@ -148,7 +156,7 @@ class Actor : ICollision
 
 	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove actor")
 	{
-		bs.write_netid(player.getNetworkID());
+		bs.write_u16(id);
 
 		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
 	}
@@ -161,6 +169,7 @@ class Actor : ICollision
 		@player = getPlayerByNetworkId(playerId);
 		if (player is null) return;
 
+		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 		if (!gravity.deserialize(bs)) return;
@@ -182,19 +191,13 @@ class Actor : ICollision
 
 	void DeserializeTick(CBitStream@ bs)
 	{
-		u16 playerId;
-		if (!bs.saferead_netid(playerId)) return;
-
-		// Don't update my own actor
-		@player = getPlayerByNetworkId(playerId);
-		if (player is null || player.isMyPlayer()) return;
-
+		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 
 		// Update actor
-		Actor@ oldActor = Actor::getActor(player);
-		if (oldActor !is null)
+		Actor@ oldActor = Actor::getActor(id);
+		if (oldActor !is null && !oldActor.getPlayer().isMyPlayer())
 		{
 			oldActor = this;
 		}
@@ -202,13 +205,9 @@ class Actor : ICollision
 
 	void DeserializeRemove(CBitStream@ bs)
 	{
-		u16 playerId;
-		if (!bs.saferead_netid(playerId)) return;
+		if (!bs.saferead_u16(id)) return;
 
-		@player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
-
-		Actor::RemoveActor(player);
+		Actor::RemoveActor(id);
 	}
 
 	u8 getTeamNum()
@@ -250,6 +249,14 @@ class Actor : ICollision
 
 			Collision();
 			UpdateCamera();
+		}
+
+		if (isServer())
+		{
+			if (position.y <= -10)
+			{
+				Kill();
+			}
 		}
 	}
 
@@ -439,5 +446,10 @@ class Actor : ICollision
 	void OnRemove()
 	{
 		print("Removed actor: " + player.getUsername());
+	}
+
+	void Kill()
+	{
+		player.getBlob().server_Die();
 	}
 }

@@ -14,6 +14,20 @@ namespace Actor
 		return null;
 	}
 
+	Actor@ getActor(u16 id)
+	{
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
+		{
+			Actor@ actor = actors[i];
+			if (actor.getID() == id)
+			{
+				return actor;
+			}
+		}
+		return null;
+	}
+
 	Actor@ getMyActor()
 	{
 		return Actor::getActor(getLocalPlayer());
@@ -40,6 +54,27 @@ namespace Actor
 		{
 			Actor@ actor = actors[i];
 			if (actor.getPlayer() is player)
+			{
+				actor.OnRemove();
+				actors.removeAt(i);
+
+				if (!isClient())
+				{
+					actor.SerializeRemove();
+				}
+
+				return;
+			}
+		}
+	}
+
+	void RemoveActor(u16 id)
+	{
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
+		{
+			Actor@ actor = actors[i];
+			if (actor.getID() == id)
 			{
 				actor.OnRemove();
 				actors.removeAt(i);

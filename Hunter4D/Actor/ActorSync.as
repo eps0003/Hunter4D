@@ -1,6 +1,6 @@
 #include "Actor.as"
 
-Vec3f SPAWN_POSITION = Vec3f(50, 3, 50);
+Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
 
 void onInit(CRules@ this)
 {
@@ -91,13 +91,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
+		u16 id;
+		if (!params.saferead_u16(id)) return;
 
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
-
-		Actor@ actor = Actor::getActor(player);
+		Actor@ actor = Actor::getActor(id);
 		if (actor is null) return;
 
 		u8 collisionFlags;
@@ -107,13 +104,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set actor gravity"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
+		u16 id;
+		if (!params.saferead_u16(id)) return;
 
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
-
-		Actor@ actor = Actor::getActor(player);
+		Actor@ actor = Actor::getActor(id);
 		if (actor is null) return;
 
 		Vec3f gravity;

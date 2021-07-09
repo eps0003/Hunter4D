@@ -25,7 +25,7 @@ class Object : ICollision
 	{
 		this.position = position;
 		oldPosition = position;
-		AssignUniqueID();
+		id = getRules().add_u32("id", 1);
 	}
 
 	void opAssign(Object object)
@@ -36,14 +36,6 @@ class Object : ICollision
 		velocity = object.velocity;
 
 		lastUpdate = getGameTime();
-	}
-
-	void AssignUniqueID()
-	{
-		if (isServer())
-		{
-			id = getRules().add_u32("object id", 1);
-		}
 	}
 
 	u16 getID()
