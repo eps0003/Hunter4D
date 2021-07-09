@@ -25,6 +25,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	if (isServer())
 	{
 		CreateHusk(player);
+		player.server_setTeamNum(0);
 	}
 }
 
@@ -60,4 +61,24 @@ void RemoveHusk(CPlayer@ player)
 	{
 		blob.server_Die();
 	}
+}
+
+void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
+{
+	u8 currentTeam = player.getTeamNum();
+
+	if (currentTeam != newTeam)
+	{
+		player.server_setTeamNum(newTeam);
+
+		if (currentTeam != this.getSpectatorTeamNum())
+		{
+			player.getBlob().server_Die();
+		}
+	}
+}
+
+void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldteam, u8 newTeam)
+{
+	player.getBlob().server_setTeamNum(newTeam);
 }
