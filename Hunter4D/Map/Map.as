@@ -6,7 +6,7 @@
 
 class Map
 {
-	SColor[] blocks;
+	private SColor[] blocks;
 	Vec3f dimensions;
 	uint blockCount = 0;
 
@@ -22,6 +22,28 @@ class Map
 		blocks = map.blocks;
 		dimensions = map.dimensions;
 		blockCount = map.blockCount;
+	}
+
+	void SetTemporaryBlock(Vec3f position, SColor block, CPlayer@ player)
+	{
+		SetTemporaryBlock(position.x, position.y, position.z, block, player);
+	}
+
+	void SetTemporaryBlock(int x, int y, int z, SColor block, CPlayer@ player)
+	{
+		SetTemporaryBlock(posToIndex(x, y, z), block, player);
+	}
+
+	void SetTemporaryBlock(int index, SColor block, CPlayer@ player)
+	{
+		SetBlockSafe(index, block);
+
+		// Tell server to place block
+		CBitStream bs;
+		bs.write_netid(player.getNetworkID());
+		bs.write_u32(index);
+		bs.write_u32(block.color);
+		getRules().SendCommand(getRules().getCommandID("place block"), bs, false);
 	}
 
 	void SetBlockSafe(Vec3f position, SColor block)
@@ -57,6 +79,7 @@ class Map
 
 	void SetBlock(int index, SColor block)
 	{
+		SColor oldBlock = blocks[index];
 		blocks[index] = block;
 
 		CRules@ rules = getRules();
@@ -70,7 +93,7 @@ class Map
 			rules.SendCommand(rules.getCommandID("sync block"), bs, true);
 		}
 
-		if (isClient() && !rules.hasScript("SyncMap.as"))
+		if (isClient() && oldBlock != block && !rules.hasScript("SyncMap.as"))
 		{
 			Map::getRenderer().GenerateMesh(indexToPos(index));
 		}

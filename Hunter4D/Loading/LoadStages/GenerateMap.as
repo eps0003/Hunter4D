@@ -73,8 +73,7 @@ void onTick(CRules@ this)
 			this.set_bool("map generated", true);
 			this.Sync("map generated", true);
 
-			CBitStream bs;
-			this.SendCommand(this.getCommandID("map generated"), bs, true);
+			this.SendCommand(this.getCommandID("map generated"), CBitStream(), true);
 		}
 	}
 

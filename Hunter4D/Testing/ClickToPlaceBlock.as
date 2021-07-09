@@ -38,9 +38,7 @@ void onTick(CRules@ this)
 					}
 					else
 					{
-						CBitStream bs;
-						position.Serialize(bs);
-						this.SendCommand(this.getCommandID("place block"), bs, false);
+						Map::getMap().SetTemporaryBlock(position, SColor(255, 100, 100, 100), getLocalPlayer());
 					}
 				}
 				else if (right)
@@ -53,9 +51,7 @@ void onTick(CRules@ this)
 					}
 					else
 					{
-						CBitStream bs;
-						position.Serialize(bs);
-						this.SendCommand(this.getCommandID("destroy block"), bs, false);
+						Map::getMap().SetTemporaryBlock(position, 0, getLocalPlayer());
 					}
 				}
 			}
