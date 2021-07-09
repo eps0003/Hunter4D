@@ -2,6 +2,7 @@
 #include "Camera.as"
 #include "Blob.as"
 
+Mouse@ mouse;
 Camera@ camera;
 CControls@ controls;
 
@@ -14,13 +15,19 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
-	@camera = Camera::getCamera();
-	@controls = getControls();
+	if (isClient())
+	{
+		@mouse = Mouse::getMouse();
+		@camera = Camera::getCamera();
+		@controls = getControls();
+	}
 }
 
 void onTick(CRules@ this)
 {
-	if (isClient() && controls.isKeyJustPressed(KEY_LBUTTON))
+	if (!isClient() || !mouse.isInControl()) return;
+
+	if (controls.isKeyJustPressed(KEY_LBUTTON))
 	{
 		Ray ray(camera.position, camera.rotation.dir());
 

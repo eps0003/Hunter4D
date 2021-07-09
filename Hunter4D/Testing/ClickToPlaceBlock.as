@@ -4,9 +4,11 @@
 #include "Object.as"
 #include "Actor.as"
 #include "Collision.as"
+#include "Mouse.as"
 
 #define CLIENT_ONLY
 
+Mouse@ mouse;
 Camera@ camera;
 Map@ map;
 CControls@ controls;
@@ -18,6 +20,7 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
+	@mouse = Mouse::getMouse();
 	@camera = Camera::getCamera();
 	@map = Map::getMap();
 	@controls = getControls();
@@ -25,7 +28,7 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	if (this.hasScript("LoadingScreen.as")) return;
+	if (!mouse.isInControl()) return;
 
 	bool left = controls.isKeyJustPressed(KEY_LBUTTON);
 	bool right = controls.isKeyJustPressed(KEY_RBUTTON);
