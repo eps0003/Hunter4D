@@ -1,6 +1,6 @@
 #include "Actor.as"
 
-Vec3f SPAWN_POSITION = Vec3f(50, 10, 50);
+Vec3f SPAWN_POSITION = Vec3f(50, 3, 50);
 
 void onInit(CRules@ this)
 {

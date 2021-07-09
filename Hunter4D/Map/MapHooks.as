@@ -1,16 +1,27 @@
 #include "Map.as"
 
+Map@ map;
+MapSyncer@ mapSyncer;
+
 void onInit(CRules@ this)
 {
 	this.addCommandID("sync block");
 	this.addCommandID("place block");
 	this.addCommandID("place block fail");
 	this.addCommandID("sync map");
+
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
+	@map = Map::getMap();
+	@mapSyncer = Map::getSyncer();
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	Map::getSyncer().AddRequest(player);
+	mapSyncer.AddRequest(player);
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -24,8 +35,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!params.saferead_u32(blockInt)) return;
 		SColor block(blockInt);
 
-		Map@ map = Map::getMap();
-		if (map.isValidBlock(index) && map.getBlock(index) == block)
+		if (map.isValidBlock(index))
 		{
 			map.SetBlock(index, block);
 		}
@@ -45,10 +55,9 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!params.saferead_u32(blockInt)) return;
 		SColor block(blockInt);
 
-		Map@ map = Map::getMap();
 		if (map.isValidBlock(index))
 		{
-			if (true) // if (canPlaceBlock(index, player))
+			if (map.canSetBlock(player, index, block))
 			{
 				map.SetBlock(index, block);
 			}
@@ -70,12 +79,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!params.saferead_u32(blockInt)) return;
 		SColor block(blockInt);
 
-		Map::getMap().SetBlockSafe(index, block);
+		map.SetBlockSafe(index, block);
 	}
 	else if (!isServer() && cmd == this.getCommandID("sync map"))
 	{
 		CBitStream bs = params;
 		bs.SetBitIndex(params.getBitIndex());
-		Map::getSyncer().AddPacket(bs);
+		mapSyncer.AddPacket(bs);
 	}
 }

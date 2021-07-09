@@ -3,6 +3,8 @@
 #include "MapRenderer.as"
 #include "Vec3f.as"
 #include "MapSyncer.as"
+#include "Object.as"
+#include "Actor.as"
 
 class Map
 {
@@ -24,26 +26,34 @@ class Map
 		blockCount = map.blockCount;
 	}
 
-	void SetTemporaryBlock(Vec3f position, SColor block, CPlayer@ player)
+	void ClientSetBlockSafe(Vec3f position, SColor block)
 	{
-		SetTemporaryBlock(position.x, position.y, position.z, block, player);
+		ClientSetBlockSafe(position.x, position.y, position.z, block);
 	}
 
-	void SetTemporaryBlock(int x, int y, int z, SColor block, CPlayer@ player)
+	void ClientSetBlockSafe(int x, int y, int z, SColor block)
 	{
-		SetTemporaryBlock(posToIndex(x, y, z), block, player);
+		ClientSetBlockSafe(posToIndex(x, y, z), block);
 	}
 
-	void SetTemporaryBlock(int index, SColor block, CPlayer@ player)
+	void ClientSetBlockSafe(int index, SColor block)
 	{
-		SetBlockSafe(index, block);
+		CPlayer@ player = getLocalPlayer();
 
-		// Tell server to place block
-		CBitStream bs;
-		bs.write_netid(player.getNetworkID());
-		bs.write_u32(index);
-		bs.write_u32(block.color);
-		getRules().SendCommand(getRules().getCommandID("place block"), bs, false);
+		if (canSetBlock(player, index, block))
+		{
+			SetBlockSafe(index, block);
+
+			if (!isLocalHost())
+			{
+				// Tell server to place block
+				CBitStream bs;
+				bs.write_netid(player.getNetworkID());
+				bs.write_u32(index);
+				bs.write_u32(block.color);
+				getRules().SendCommand(getRules().getCommandID("place block"), bs, false);
+			}
+		}
 	}
 
 	void SetBlockSafe(Vec3f position, SColor block)
@@ -174,5 +184,43 @@ class Map
 		vec.z = Maths::Floor(index / dimensions.x) % dimensions.z;
 		vec.y = Maths::Floor(index / (dimensions.x * dimensions.z));
 		return vec;
+	}
+
+	bool canSetBlock(CPlayer@ player, int index, SColor block)
+	{
+		if (Blocks::getBlocks().isSolid(block))
+		{
+			Vec3f position = indexToPos(index);
+
+			// Prevent placing blocks inside objects
+			Object@[]@ objects = Object::getObjects();
+			for (uint i = 0; i < objects.size(); i++)
+			{
+				Object@ object = objects[i];
+
+				if (object.hasCollider() &&
+					object.hasCollisionFlags(CollisionFlag::Blocks) &&
+					object.getCollider().intersectsVoxel(object.position, position))
+				{
+					return false;
+				}
+			}
+
+			// Prevent placing blocks inside actors
+			Actor@[]@ actors = Actor::getActors();
+			for (uint i = 0; i < actors.size(); i++)
+			{
+				Actor@ actor = actors[i];
+
+				if (actor.hasCollider() &&
+					actor.hasCollisionFlags(CollisionFlag::Blocks) &&
+					actor.getCollider().intersectsVoxel(actor.position, position))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
