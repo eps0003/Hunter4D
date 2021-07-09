@@ -13,9 +13,6 @@ CControls@ controls;
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("place block");
-	this.addCommandID("destroy block");
-
 	onRestart(this);
 }
 
@@ -48,7 +45,7 @@ void onTick(CRules@ this)
 			else
 			{
 				Vec3f position = raycast.hitWorldPos;
-				Map::getMap().ClientSetBlockSafe(position, 0);
+				map.ClientSetBlockSafe(position, 0);
 			}
 		}
 	}

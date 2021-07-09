@@ -2,21 +2,26 @@
 #include "Camera.as"
 #include "Blob.as"
 
+Camera@ camera;
+CControls@ controls;
+
 void onInit(CRules@ this)
 {
 	this.addCommandID("spawn object");
+
+	onRestart(this);
 }
 
 void onRestart(CRules@ this)
 {
-	this.RemoveScript("ClickToSpawnObject.as");
+	@camera = Camera::getCamera();
+	@controls = getControls();
 }
 
 void onTick(CRules@ this)
 {
-	if (isClient() && getControls().isKeyJustPressed(KEY_LBUTTON))
+	if (isClient() && controls.isKeyJustPressed(KEY_LBUTTON))
 	{
-		Camera@ camera = Camera::getCamera();
 		Ray ray(camera.position, camera.rotation.dir());
 
 		RaycastInfo raycast;
@@ -40,7 +45,7 @@ void onTick(CRules@ this)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isServer() && cmd == this.getCommandID("spawn object"))
+	if (!isClient() && cmd == this.getCommandID("spawn object"))
 	{
 		Vec3f position;
 		if (!position.deserialize(params)) return;
