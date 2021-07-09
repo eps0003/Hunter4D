@@ -6,6 +6,10 @@
 #define CLIENT_ONLY
 
 int id;
+Actor@[]@ actors;
+Object@[]@ objects;
+Camera@ camera;
+MapRenderer@ mapRenderer;
 
 void onInit(CRules@ this)
 {
@@ -18,6 +22,9 @@ void onInit(CRules@ this)
 	this.SendCommand(this.getCommandID("spawn actor"), bs, false);
 
 	Texture::createFromFile("pixel", "Pixel.png");
+
+	@camera = Camera::getCamera();
+	@mapRenderer = Map::getRenderer();
 }
 
 void onRestart(CRules@ this)
@@ -26,26 +33,31 @@ void onRestart(CRules@ this)
 	this.RemoveScript("Client.as");
 }
 
+void onTick(CRules@ this)
+{
+	@actors = Actor::getActors();
+	@objects = Object::getObjects();
+}
+
 void onRender(CRules@ this)
 {
-	Actor@ actor = Actor::getMyActor();
-	if (actor !is null)
-	{
-		actor.RenderHUD();
-	}
-
-	Actor@[]@ actors = Actor::getActors();
 	for (uint i = 0; i < actors.size(); i++)
 	{
 		Actor@ actor = actors[i];
+
+		if (actor.getPlayer().isMyPlayer())
+		{
+			actor.RenderHUD();
+		}
+
 		if (actor.isNameplateVisible())
 		{
 			actor.RenderNameplate();
 		}
 	}
 
-	GUI::DrawText("Actors: " + Actor::getActorCount(), Vec2f(10, 30), color_black);
-	GUI::DrawText("Objects: " + Object::getObjectCount(), Vec2f(10, 50), color_black);
+	GUI::DrawText("Actors: " + actors.size(), Vec2f(10, 30), color_black);
+	GUI::DrawText("Objects: " + objects.size(), Vec2f(10, 50), color_black);
 }
 
 void Render(int id)
@@ -55,13 +67,11 @@ void Render(int id)
 	Render::SetBackfaceCull(true);
 	Render::ClearZ();
 
-	Camera@ camera = Camera::getCamera();
 	camera.Interpolate();
 	camera.Render();
 
-	Map::getRenderer().Render();
+	mapRenderer.Render();
 
-	Actor@[]@ actors = Actor::getActors();
 	for (uint i = 0; i < actors.size(); i++)
 	{
 		Actor@ actor = actors[i];
@@ -72,7 +82,6 @@ void Render(int id)
 		}
 	}
 
-	Object@[]@ objects = Object::getObjects();
 	for (uint i = 0; i < objects.size(); i++)
 	{
 		Object@ object = objects[i];
