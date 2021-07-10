@@ -8,7 +8,7 @@ uint blocksPerSection = 2000;
 uint sectionCount;
 
 uint size = mapData.size() / 6;
-uint yOffset = MAP_SIZE.y / 2;
+uint yOffset = MAP_SIZE.y * 0.5f;
 
 void onInit(CRules@ this)
 {

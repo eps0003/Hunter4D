@@ -22,8 +22,7 @@ void onRender(CRules@ this)
 void DrawLoadingBar(CRules@ this)
 {
 	Vec2f center = driver.getScreenCenterPos();
-
-	uint halfWidth = (getScreenWidth() * 0.8f) / 2.0f;
+	uint halfWidth = getScreenWidth() * 0.4f;
 
 	string text = this.get_string("loading message");
 	float progress = Maths::Clamp01(this.get_f32("loading progress"));

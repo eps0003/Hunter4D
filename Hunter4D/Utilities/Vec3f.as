@@ -234,8 +234,8 @@ class Vec3f
 
 	Vec3f dir()
 	{
-		float yRadians = y * Maths::Pi / 180;
-		float xRadians = x * Maths::Pi / 180;
+		float yRadians = y * Maths::Pi / 180.0f;
+		float xRadians = x * Maths::Pi / 180.0f;
 		return Vec3f(
 			Maths::Sin(-yRadians) * Maths::Cos(-xRadians),
 			Maths::Sin(xRadians),
@@ -245,8 +245,8 @@ class Vec3f
 
 	Vec3f fastDir()
 	{
-		float yRadians = y * Maths::Pi / 180;
-		float xRadians = x * Maths::Pi / 180;
+		float yRadians = y * Maths::Pi / 180.0f;
+		float xRadians = x * Maths::Pi / 180.0f;
 		return Vec3f(
 			Maths::FastSin(-yRadians) * Maths::FastCos(-xRadians),
 			Maths::FastSin(xRadians),
@@ -456,8 +456,8 @@ class Vec3f
 		Vec3f vec = multiply(camera.getViewMatrix());
 		vec = vec.multiply(camera.getProjectionMatrix());
 
-		int x = ((vec.x / vec.z + 1.0f) / 2.0f) * getScreenWidth() + 0.5f;
-		int y = ((1.0f - vec.y / vec.z) / 2.0f) * getScreenHeight() + 0.5f;
+		int x = ((vec.x / vec.z + 1.0f) * 0.5f) * getScreenWidth() + 0.5f;
+		int y = ((1.0f - vec.y / vec.z) * 0.5f) * getScreenHeight() + 0.5f;
 
 		return Vec2f(x, y);
 	}
