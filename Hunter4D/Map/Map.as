@@ -56,38 +56,38 @@ class Map
 		}
 	}
 
-	void SetBlockSafe(Vec3f position, SColor block)
+	void SetBlockSafe(Vec3f position, SColor block, CPlayer@ player = null)
 	{
-		SetBlockSafe(position.x, position.y, position.z, block);
+		SetBlockSafe(position.x, position.y, position.z, block, player);
 	}
 
-	void SetBlockSafe(int x, int y, int z, SColor block)
+	void SetBlockSafe(int x, int y, int z, SColor block, CPlayer@ player = null)
 	{
 		if (isValidBlock(x, y, z))
 		{
-			SetBlock(x, y, z, block);
+			SetBlock(x, y, z, block, player);
 		}
 	}
 
-	void SetBlockSafe(int index, SColor block)
+	void SetBlockSafe(int index, SColor block, CPlayer@ player = null)
 	{
 		if (isValidBlock(index))
 		{
-			SetBlock(index, block);
+			SetBlock(index, block, player);
 		}
 	}
 
-	void SetBlock(Vec3f position, SColor block)
+	void SetBlock(Vec3f position, SColor block, CPlayer@ player = null)
 	{
-		SetBlock(position.x, position.y, position.z, block);
+		SetBlock(position.x, position.y, position.z, block, player);
 	}
 
-	void SetBlock(int x, int y, int z, SColor block)
+	void SetBlock(int x, int y, int z, SColor block, CPlayer@ player = null)
 	{
-		SetBlock(posToIndex(x, y, z), block);
+		SetBlock(posToIndex(x, y, z), block, player);
 	}
 
-	void SetBlock(int index, SColor block)
+	void SetBlock(int index, SColor block, CPlayer@ player = null)
 	{
 		SColor oldBlock = blocks[index];
 		if (oldBlock == block) return;
@@ -100,6 +100,11 @@ class Map
 		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as"))
 		{
 			CBitStream bs;
+			bs.write_bool(player !is null);
+			if (player !is null)
+			{
+				bs.write_netid(player.getNetworkID());
+			}
 			bs.write_u32(index);
 			bs.write_u32(block.color);
 			rules.SendCommand(rules.getCommandID("sync block"), bs, true);
