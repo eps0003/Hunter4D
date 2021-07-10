@@ -33,16 +33,37 @@ class Map
 
 	void ClientSetBlockSafe(int x, int y, int z, SColor block)
 	{
-		ClientSetBlockSafe(posToIndex(x, y, z), block);
+		if (isValidBlock(x, y, z))
+		{
+			ClientSetBlock(x, y, z, block);
+		}
 	}
 
 	void ClientSetBlockSafe(int index, SColor block)
+	{
+		if (isValidBlock(index))
+		{
+			ClientSetBlock(index, block);
+		}
+	}
+
+	void ClientSetBlock(Vec3f position, SColor block)
+	{
+		ClientSetBlock(position.x, position.y, position.z, block);
+	}
+
+	void ClientSetBlock(int x, int y, int z, SColor block)
+	{
+		ClientSetBlock(posToIndex(x, y, z), block);
+	}
+
+	void ClientSetBlock(int index, SColor block)
 	{
 		CPlayer@ player = getLocalPlayer();
 
 		if (canSetBlock(player, index, block))
 		{
-			SetBlockSafe(index, block);
+			SetBlock(index, block);
 
 			if (!isLocalHost())
 			{
