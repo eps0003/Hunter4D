@@ -27,7 +27,7 @@ void onTick(CRules@ this)
 {
 	if (!isClient() || !mouse.isInControl()) return;
 
-	if (controls.isKeyJustPressed(KEY_LBUTTON))
+	if (controls.isKeyJustPressed(controls.getActionKeyKey(AK_ACTION1)))
 	{
 		Ray ray(camera.position, camera.rotation.dir());
 

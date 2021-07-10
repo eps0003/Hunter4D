@@ -30,8 +30,8 @@ void onTick(CRules@ this)
 {
 	if (!mouse.isInControl()) return;
 
-	bool left = controls.isKeyJustPressed(KEY_LBUTTON);
-	bool right = controls.isKeyJustPressed(KEY_RBUTTON);
+	bool left = controls.isKeyJustPressed(controls.getActionKeyKey(AK_ACTION1));
+	bool right = controls.isKeyJustPressed(controls.getActionKeyKey(AK_ACTION2));
 
 	if (left || right)
 	{

@@ -387,10 +387,10 @@ class Actor : ICollision
 		Vec2f dir;
 		s8 verticalDir = 0;
 
-		if (controls.isKeyPressed(KEY_KEY_W)) dir.y++;
-		if (controls.isKeyPressed(KEY_KEY_S)) dir.y--;
-		if (controls.isKeyPressed(KEY_KEY_D)) dir.x++;
-		if (controls.isKeyPressed(KEY_KEY_A)) dir.x--;
+		if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
+		if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
+		if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
+		if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
 
 		float len = dir.Length();
 		if (len > 0)
@@ -401,7 +401,7 @@ class Actor : ICollision
 
 		velocity += gravity;
 
-		if (controls.isKeyPressed(KEY_SPACE) && isOnGround())
+		if (controls.ActionKeyPressed(AK_ACTION3) && isOnGround())
 		{
 			velocity.y = jumpForce;
 		}
