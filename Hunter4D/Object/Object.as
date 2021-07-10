@@ -246,11 +246,16 @@ class Object : ICollision
 
 	void Collision()
 	{
-		if (!hasCollider()) return;
-
-		CollisionX(this, position, velocity);
-		CollisionZ(this, position, velocity);
-		CollisionY(this, position, velocity);
+		if (hasCollider())
+		{
+			CollisionX(this, position, velocity);
+			CollisionZ(this, position, velocity);
+			CollisionY(this, position, velocity);
+		}
+		else
+		{
+			position += velocity;
+		}
 	}
 
 	void Render()

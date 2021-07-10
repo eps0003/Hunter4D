@@ -262,27 +262,32 @@ class Actor : ICollision
 
 	void Collision()
 	{
-		if (!hasCollider()) return;
-
-		// Move along x axis if no collision occurred
-		Vec3f posTemp = position;
-		Vec3f velTemp = velocity;
-		bool collisionX = CollisionX(this, posTemp, velTemp);
-		if (!collisionX)
+		if (hasCollider())
 		{
-			position = posTemp;
-			velocity = velTemp;
+			// Move along x axis if no collision occurred
+			Vec3f posTemp = position;
+			Vec3f velTemp = velocity;
+			bool collisionX = CollisionX(this, posTemp, velTemp);
+			if (!collisionX)
+			{
+				position = posTemp;
+				velocity = velTemp;
+			}
+
+			CollisionZ(this, position, velocity);
+
+			// Check x collision again if a collision occurred initially
+			if (collisionX)
+			{
+				CollisionX(this, position, velocity);
+			}
+
+			CollisionY(this, position, velocity);
 		}
-
-		CollisionZ(this, position, velocity);
-
-		// Check x collision again if a collision occurred initially
-		if (collisionX)
+		else
 		{
-			CollisionX(this, position, velocity);
+			position += velocity;
 		}
-
-		CollisionY(this, position, velocity);
 	}
 
 	void Render()
