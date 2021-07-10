@@ -12,6 +12,7 @@ void onRestart(CRules@ this)
 	this.set("map", null);
 	this.set("map syncer", null);
 	this.set("map renderer", null);
+	this.set("particle manager", null);
 	this.set("objects", null);
 	this.set("actors", null);
 

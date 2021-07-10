@@ -5,12 +5,15 @@
 #include "MapSyncer.as"
 #include "Object.as"
 #include "Actor.as"
+#include "Particle.as"
 
 class Map
 {
 	private SColor[] blocks;
 	Vec3f dimensions;
 	uint blockCount = 0;
+
+	private CRules@ rules = getRules();
 
 	Map(Vec3f dimensions)
 	{
@@ -72,7 +75,7 @@ class Map
 				bs.write_netid(player.getNetworkID());
 				bs.write_u32(index);
 				bs.write_u32(block.color);
-				getRules().SendCommand(getRules().getCommandID("place block"), bs, false);
+				rules.SendCommand(rules.getCommandID("place block"), bs, false);
 			}
 		}
 	}
@@ -115,8 +118,6 @@ class Map
 
 		blocks[index] = block;
 
-		CRules@ rules = getRules();
-
 		// Sync block to clients
 		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as"))
 		{
@@ -131,9 +132,46 @@ class Map
 			rules.SendCommand(rules.getCommandID("sync block"), bs, true);
 		}
 
-		if (isClient() && !rules.hasScript("SyncMap.as"))
+		if (isClient())
 		{
-			Map::getRenderer().GenerateMesh(indexToPos(index));
+			if (!rules.hasScript("SyncMap.as"))
+			{
+				Map::getRenderer().GenerateMesh(indexToPos(index));
+			}
+
+			if (rules.get_bool("loaded") && !Blocks::isVisible(block))
+			{
+				ParticleManager@ particleManager = Particles::getManager();
+				particleManager.CheckStaticParticles();
+
+				Vec3f position = indexToPos(index);
+				AABB bounds(position, position + 1);
+				Random random(getGameTime());
+
+				for (uint i = 0; i < 20; i++)
+				{
+					Vec3f pos = bounds.getRandomPoint();
+
+					Vec3f dir = pos - (position + 0.5f);
+					Vec3f vel(dir, random.NextFloat() * 0.2f);
+					vel.y = Maths::Max(0, vel.y);
+					vel.x *= 0.5f;
+					vel.z *= 0.5f;
+
+					Particle particle;
+					particle.position = pos;
+					particle.velocity = vel;
+					particle.timeToLive = 40 + random.NextRanged(60);
+					particle.color.setRed(oldBlock.getRed() * 0.8f);
+					particle.color.setGreen(oldBlock.getGreen() * 0.8f);
+					particle.color.setBlue(oldBlock.getBlue() * 0.8f);
+					particle.gravity = -0.03f;
+					particle.elasticity = 0.5f;
+					particle.friction = 0.6f;
+
+					particleManager.AddParticle(particle);
+				}
+			}
 		}
 	}
 

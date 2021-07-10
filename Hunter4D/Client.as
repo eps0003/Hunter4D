@@ -2,6 +2,7 @@
 #include "Actor.as"
 #include "Camera.as"
 #include "MapRenderer.as"
+#include "Particle.as"
 
 #define CLIENT_ONLY
 
@@ -10,10 +11,12 @@ Actor@[]@ actors;
 Object@[]@ objects;
 Camera@ camera;
 MapRenderer@ mapRenderer;
+ParticleManager@ particleManager;
 
 void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
+	this.set_bool("loaded", true);
 
 	id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 
@@ -37,6 +40,7 @@ void onTick(CRules@ this)
 {
 	@actors = Actor::getActors();
 	@objects = Object::getObjects();
+	@particleManager = Particles::getManager();
 }
 
 void onRender(CRules@ this)
@@ -60,6 +64,7 @@ void onRender(CRules@ this)
 
 	GUI::DrawText("Actors: " + actors.size(), Vec2f(10, 30), color_black);
 	GUI::DrawText("Objects: " + objects.size(), Vec2f(10, 50), color_black);
+	GUI::DrawText("Particles: " + particleManager.getParticleCount(), Vec2f(10, 70), color_black);
 }
 
 void Render(int id)
@@ -73,6 +78,8 @@ void Render(int id)
 	camera.Render();
 
 	mapRenderer.Render();
+
+	particleManager.Render();
 
 	for (uint i = 0; i < actors.size(); i++)
 	{

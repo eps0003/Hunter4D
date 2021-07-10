@@ -6,6 +6,8 @@ class AABB : IBounds
 	Vec3f max;
 	Vec3f dim;
 
+	private Random random(getGameTime());
+
 	AABB(Vec3f min, Vec3f max)
 	{
 		this.min = min;
@@ -50,11 +52,10 @@ class AABB : IBounds
 
 	Vec3f getRandomPoint()
 	{
-		Random random();
 		return Vec3f(
-			min.x + random.Next() * dim.x,
-			min.y + random.Next() * dim.y,
-			min.z + random.Next() * dim.z
+			min.x + random.NextFloat() * dim.x,
+			min.y + random.NextFloat() * dim.y,
+			min.z + random.NextFloat() * dim.z
 		);
 	}
 
