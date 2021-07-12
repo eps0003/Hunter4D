@@ -41,16 +41,12 @@ class ParticleManager
 
 	private float[] matrix;
 
-	private CRules@ rules;
-	private Map@ map;
-	private Camera@ camera;
+	private CRules@ rules = getRules();
+	private Map@ map = Map::getMap();
+	private Camera@ camera = Camera::getCamera();
 
 	ParticleManager()
 	{
-		@rules = getRules();
-		@map = Map::getMap();
-		@camera = Camera::getCamera();
-
 		Matrix::MakeIdentity(matrix);
 	}
 

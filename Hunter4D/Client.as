@@ -3,6 +3,7 @@
 #include "Camera.as"
 #include "MapRenderer.as"
 #include "Particle.as"
+#include "Loading.as"
 
 #define CLIENT_ONLY
 
@@ -16,13 +17,9 @@ ParticleManager@ particleManager;
 void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
-	this.set_bool("loaded", true);
+	Loading::getLoading().SetMyPlayerLoaded(true);
 
 	id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
-
-	CBitStream bs;
-	bs.write_netid(getLocalPlayer().getNetworkID());
-	this.SendCommand(this.getCommandID("player loaded"), bs, false);
 
 	Texture::createFromFile("pixel", "Pixel.png");
 

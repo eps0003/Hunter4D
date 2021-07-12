@@ -6,6 +6,7 @@
 #include "Object.as"
 #include "Actor.as"
 #include "Particle.as"
+#include "Loading.as"
 
 class Map
 {
@@ -14,6 +15,7 @@ class Map
 	uint blockCount = 0;
 
 	private CRules@ rules = getRules();
+	private Loading@ loading = Loading::getLoading();
 
 	Map(Vec3f dimensions)
 	{
@@ -139,7 +141,7 @@ class Map
 				Map::getRenderer().GenerateMesh(indexToPos(index));
 			}
 
-			if (rules.get_bool("loaded") && !Blocks::isVisible(block))
+			if (!Blocks::isVisible(block) && loading.isMyPlayerLoaded())
 			{
 				ParticleManager@ particleManager = Particles::getManager();
 				particleManager.CheckStaticParticles();

@@ -4,7 +4,6 @@ Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("player loaded");
 	this.addCommandID("init actor");
 	this.addCommandID("sync actor");
 	this.addCommandID("remove actor");

@@ -4,17 +4,12 @@
 
 class MapSyncer
 {
-	private Map@ map;
+	private Map@ map = Map::getMap();
 	private MapRequest@[] mapRequests;
 	CBitStream@[] mapPackets;
 	private uint blocksPerPacket = 10000;
 	private bool synced = false;
 	private u16 index = 0;
-
-	MapSyncer()
-	{
-		@map = Map::getMap();
-	}
 
 	void AddRequest(CPlayer@ player, uint packet = 0)
 	{
