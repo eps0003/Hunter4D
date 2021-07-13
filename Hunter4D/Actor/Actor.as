@@ -14,9 +14,6 @@ class Actor : ICollision
 	bool hasSyncedInit = false;
 
 	private Vec3f gravity;
-	float acceleration = 0.08;
-	float friction = 0.3f;
-	float jumpForce = 0.3f;
 
 	Vec3f position;
 	private Vec3f oldPosition;
@@ -39,10 +36,6 @@ class Actor : ICollision
 		this.position = position;
 		oldPosition = position;
 		id = rules.add_u32("id", 1);
-
-		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f)));
-		SetCollisionFlags(CollisionFlag::All);
-		SetGravity(Vec3f(0, -0.04f, 0));
 	}
 
 	void opAssign(Actor actor)
@@ -253,10 +246,7 @@ class Actor : ICollision
 
 	void Update()
 	{
-		if (player.isMyPlayer())
-		{
-			Movement();
-		}
+
 	}
 
 	void PostUpdate()
@@ -366,7 +356,11 @@ class Actor : ICollision
 
 	void RenderHUD()
 	{
-		DrawCrosshair(0, 8, 1, color_white);
+		if (isCrosshairVisible())
+		{
+			DrawCrosshair(0, 8, 1, color_white);
+		}
+
 		GUI::DrawText("Position: " + interPosition.toString(), Vec2f(10, 10), color_black);
 	}
 
@@ -400,41 +394,14 @@ class Actor : ICollision
 		);
 	}
 
+	bool isCrosshairVisible()
+	{
+		return true;
+	}
+
 	bool isOnGround()
 	{
 		return hasCollider() && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0));
-	}
-
-	private void Movement()
-	{
-		CControls@ controls = getControls();
-		Camera@ camera = Camera::getCamera();
-
-		Vec2f dir;
-		s8 verticalDir = 0;
-
-		if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
-		if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
-		if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
-		if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
-
-		float len = dir.Length();
-		if (len > 0)
-		{
-			dir /= len; // Normalize
-			dir = dir.RotateBy(camera.rotation.y);
-		}
-
-		velocity += gravity;
-
-		if (controls.ActionKeyPressed(AK_ACTION3) && isOnGround())
-		{
-			velocity.y = jumpForce;
-		}
-
-		// Move actor
-		velocity.x += dir.x * acceleration - friction * velocity.x;
-		velocity.z += dir.y * acceleration - friction * velocity.z;
 	}
 
 	private void UpdateCamera()
