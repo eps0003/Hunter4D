@@ -5,6 +5,10 @@ class Object : ICollision
 {
 	private u16 id = 0;
 
+	private string initCommand = "init object";
+	private string syncCommand = "sync object";
+	private string removeCommand = "remove object";
+
 	bool hasSyncedInit = false;
 
 	private Vec3f gravity;
@@ -24,11 +28,6 @@ class Object : ICollision
 	private float[] matrix;
 
 	private CRules@ rules = getRules();
-
-	Object()
-	{
-		Matrix::MakeIdentity(matrix);
-	}
 
 	Object(Vec3f position)
 	{
@@ -50,6 +49,21 @@ class Object : ICollision
 	u16 getID()
 	{
 		return id;
+	}
+
+	void SetInitCommand(string cmd)
+	{
+		initCommand = cmd;
+	}
+
+	void SetSyncCommand(string cmd)
+	{
+		syncCommand = cmd;
+	}
+
+	void SetRemoveCommand(string cmd)
+	{
+		removeCommand = cmd;
 	}
 
 	AABB@ getCollider()
@@ -337,6 +351,11 @@ class Object : ICollision
 	void OnInit()
 	{
 		print("Added object: " + id);
+
+		if (isClient())
+		{
+			Matrix::MakeIdentity(matrix);
+		}
 	}
 
 	void OnRemove()

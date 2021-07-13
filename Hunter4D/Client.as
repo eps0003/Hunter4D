@@ -1,5 +1,4 @@
 #include "Object.as"
-#include "Actor.as"
 #include "Camera.as"
 #include "MapRenderer.as"
 #include "Particle.as"
@@ -23,6 +22,7 @@ void onInit(CRules@ this)
 
 	Texture::createFromFile("pixel", "Pixel.png");
 
+	@particleManager = Particles::getManager();
 	@camera = Camera::getCamera();
 	@mapRenderer = Map::getRenderer();
 }
@@ -37,7 +37,6 @@ void onTick(CRules@ this)
 {
 	@actors = Actor::getActors();
 	@objects = Object::getObjects();
-	@particleManager = Particles::getManager();
 }
 
 void onRender(CRules@ this)

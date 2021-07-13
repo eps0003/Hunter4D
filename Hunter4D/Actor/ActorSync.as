@@ -1,7 +1,5 @@
 #include "Actor.as"
 
-Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
-
 void onInit(CRules@ this)
 {
 	this.addCommandID("init actor");
@@ -57,7 +55,6 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 	if (isServer())
 	{
 		Actor::RemoveActor(victim);
-		Actor::AddActor(Actor(victim, SPAWN_POSITION));
 	}
 }
 
@@ -77,16 +74,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		Actor actor;
 		actor.DeserializeRemove(params);
-	}
-	else if (isServer() && cmd == this.getCommandID("player loaded"))
-	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
-
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
-
-		Actor::AddActor(Actor(player, SPAWN_POSITION));
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{

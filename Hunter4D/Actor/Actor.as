@@ -7,6 +7,10 @@ class Actor : ICollision
 	private u16 id = 0;
 	private CPlayer@ player;
 
+	private string initCommand = "init actor";
+	private string syncCommand = "sync actor";
+	private string removeCommand = "remove actor";
+
 	bool hasSyncedInit = false;
 
 	private Vec3f gravity;
@@ -28,11 +32,6 @@ class Actor : ICollision
 	private float[] matrix;
 
 	private CRules@ rules = getRules();
-
-	Actor()
-	{
-		Matrix::MakeIdentity(matrix);
-	}
 
 	Actor(CPlayer@ player, Vec3f position)
 	{
@@ -64,6 +63,21 @@ class Actor : ICollision
 	CPlayer@ getPlayer()
 	{
 		return player;
+	}
+
+	void SetInitCommand(string cmd)
+	{
+		initCommand = cmd;
+	}
+
+	void SetSyncCommand(string cmd)
+	{
+		syncCommand = cmd;
+	}
+
+	void SetRemoveCommand(string cmd)
+	{
+		removeCommand = cmd;
 	}
 
 	AABB@ getCollider()
@@ -127,7 +141,7 @@ class Actor : ICollision
 		}
 	}
 
-	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init actor")
+	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream())
 	{
 		bs.write_netid(this.player.getNetworkID());
 		bs.write_u16(id);
@@ -146,28 +160,28 @@ class Actor : ICollision
 
 		if (player !is null)
 		{
-			rules.SendCommand(rules.getCommandID(commandName), bs, player);
+			rules.SendCommand(rules.getCommandID(initCommand), bs, player);
 		}
 		else
 		{
-			rules.SendCommand(rules.getCommandID(commandName), bs, true);
+			rules.SendCommand(rules.getCommandID(initCommand), bs, true);
 		}
 	}
 
-	void SerializeTick(CBitStream@ bs = CBitStream(), string commandName = "sync actor")
+	void SerializeTick(CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 
-		rules.SendCommand(rules.getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(syncCommand), bs, true);
 	}
 
-	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove actor")
+	void SerializeRemove(CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
 
-		rules.SendCommand(rules.getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(removeCommand), bs, true);
 	}
 
 	void DeserializeInit(CBitStream@ bs)
@@ -459,6 +473,11 @@ class Actor : ICollision
 	void OnInit()
 	{
 		print("Added actor: " + player.getUsername());
+
+		if (isClient())
+		{
+			Matrix::MakeIdentity(matrix);
+		}
 	}
 
 	void OnRemove()
