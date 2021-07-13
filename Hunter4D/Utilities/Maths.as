@@ -31,4 +31,14 @@ namespace Maths
 	{
 		return a1 + AngleDifference(a1, a2) * t;
 	}
+
+	float toRadians(float degrees)
+	{
+		return degrees * Maths::Pi / 180.0f;
+	}
+
+	float toDegrees(float radians)
+	{
+		return radians * 180.0f / Maths::Pi;
+	}
 }

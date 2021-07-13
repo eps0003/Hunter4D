@@ -10,9 +10,9 @@ class Particle
 	Vec3f position;
 	Vec3f velocity;
 	SColor color = color_white;
-	u16 timeToLive = 60;
+	u16 timeToLive = 2 * getTicksASecond();
 	bool dieOnCollide = false;
-	float gravity = 0;
+	float gravity = 0.0f;
 	float elasticity = 0.0f;
 	float friction = 1.0f;
 }
@@ -38,6 +38,8 @@ class ParticleManager
 	private float[] gravity;
 	private float[] elasticity;
 	private float[] friction;
+
+	private float maxScale = 0.0625f;
 
 	private float[] matrix;
 
@@ -230,10 +232,8 @@ class ParticleManager
 		float t = Interpolation::getFrameTime();
 		float gt = Interpolation::getGameTime();
 
-		float yRotationRadians = camera.interRotation.y * Maths::Pi / 180.0f;
+		float yRotationRadians = Maths::toRadians(camera.interRotation.y);
 		Vec3f vec(Maths::FastCos(yRotationRadians), 1, Maths::FastSin(yRotationRadians));
-
-		float maxScale = 0.0625f;
 
 		Vertex[] vertices = array<Vertex>(count * 4);
 
@@ -254,7 +254,7 @@ class ParticleManager
 		}
 
 		Render::RawQuads("pixel", vertices);
-}
+	}
 
 	void CheckStaticParticles()
 	{

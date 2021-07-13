@@ -11,6 +11,8 @@ class Mouse
 
 	private bool wasInControl = false;
 
+	private CRules@ rules = getRules();
+
 	void Update()
 	{
 		CalculateVelocity();
@@ -23,7 +25,7 @@ class Mouse
 
 	bool isInControl()
 	{
-		return isWindowFocused() && !isVisible() && !getRules().hasScript("LoadingScreen.as");
+		return isWindowFocused() && !isVisible() && !rules.hasScript("LoadingScreen.as");
 	}
 
 	bool isVisible()

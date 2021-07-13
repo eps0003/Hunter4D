@@ -11,6 +11,8 @@ class MapSyncer
 	private bool synced = false;
 	private u16 index = 0;
 
+	private CRules@ rules = getRules();
+
 	void AddRequest(CPlayer@ player, uint packet = 0)
 	{
 		MapRequest request(player, packet);
@@ -122,7 +124,7 @@ class MapSyncer
 		}
 
 		// Send to requesting player
-		getRules().SendCommand(getRules().getCommandID("sync map"), bs, player);
+		rules.SendCommand(rules.getCommandID("sync map"), bs, player);
 
 		// Request next packet
 		index++;

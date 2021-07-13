@@ -6,7 +6,7 @@ class Loading
 
 	bool isPlayerLoaded(CPlayer@ player)
 	{
-		return rules.get_bool(player.getUsername() + "loaded");
+		return rules.get_bool(getToken(player));
 	}
 
 	bool isMyPlayerLoaded()
@@ -18,7 +18,7 @@ class Loading
 	{
 		if (loaded == isPlayerLoaded(player)) return;
 
-		string token = player.getUsername() + "loaded";
+		string token = getToken(player);
 		rules.set_bool(token, loaded);
 		rules.Sync(token, true);
 
@@ -58,5 +58,10 @@ class Loading
 				SetPlayerLoaded(player, loaded);
 			}
 		}
+	}
+
+	private string getToken(CPlayer@ player)
+	{
+		return player.getUsername() + "loaded";
 	}
 }

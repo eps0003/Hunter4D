@@ -45,6 +45,24 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 	}
 }
 
+void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
+{
+	u8 currentTeam = player.getTeamNum();
+	if (currentTeam != newTeam)
+	{
+		player.server_setTeamNum(newTeam);
+	}
+}
+
+void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
+{
+	CBlob@ blob = player.getBlob();
+	if (blob !is null)
+	{
+		blob.server_setTeamNum(newTeam);
+	}
+}
+
 void CreateHusk(CPlayer@ player)
 {
 	CBlob@ blob = server_CreateBlob("husk");
@@ -61,18 +79,4 @@ void RemoveHusk(CPlayer@ player)
 	{
 		blob.server_Die();
 	}
-}
-
-void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
-{
-	u8 currentTeam = player.getTeamNum();
-	if (currentTeam != newTeam)
-	{
-		player.server_setTeamNum(newTeam);
-	}
-}
-
-void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
-{
-	player.getBlob().server_setTeamNum(newTeam);
 }

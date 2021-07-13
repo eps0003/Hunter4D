@@ -129,7 +129,7 @@ class Camera
 		float ratio = getScreenWidth() / float(getScreenHeight());
 
 		Matrix::MakePerspective(projectionMatrix,
-			fov * Maths::Pi / 180.0f,
+			Maths::toRadians(fov),
 			ratio,
 			0.01f, renderDistance
 		);

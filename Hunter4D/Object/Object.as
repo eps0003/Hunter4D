@@ -21,11 +21,20 @@ class Object : ICollision
 
 	private uint lastUpdate = 0;
 
+	private float[] matrix;
+
+	private CRules@ rules = getRules();
+
+	Object()
+	{
+		Matrix::MakeIdentity(matrix);
+	}
+
 	Object(Vec3f position)
 	{
 		this.position = position;
 		oldPosition = position;
-		id = getRules().add_u32("id", 1);
+		id = rules.add_u32("id", 1);
 	}
 
 	void opAssign(Object object)
@@ -77,7 +86,7 @@ class Object : ICollision
 			CBitStream bs;
 			bs.write_u16(id);
 			bs.write_u8(collisionFlags);
-			getRules().SendCommand(getRules().getCommandID("set object collision flags"), bs, true);
+			rules.SendCommand(rules.getCommandID("set object collision flags"), bs, true);
 		}
 	}
 
@@ -100,7 +109,7 @@ class Object : ICollision
 			CBitStream bs;
 			bs.write_u16(id);
 			gravity.Serialize(bs);
-			getRules().SendCommand(getRules().getCommandID("set object gravity"), bs, true);
+			rules.SendCommand(rules.getCommandID("set object gravity"), bs, true);
 		}
 	}
 
@@ -118,7 +127,7 @@ class Object : ICollision
 			CBitStream bs;
 			bs.write_u16(id);
 			bs.write_f32(friction);
-			getRules().SendCommand(getRules().getCommandID("set object friction"), bs, true);
+			rules.SendCommand(rules.getCommandID("set object friction"), bs, true);
 		}
 	}
 
@@ -140,11 +149,11 @@ class Object : ICollision
 
 		if (player !is null)
 		{
-			getRules().SendCommand(getRules().getCommandID(commandName), bs, player);
+			rules.SendCommand(rules.getCommandID(commandName), bs, player);
 		}
 		else
 		{
-			getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+			rules.SendCommand(rules.getCommandID(commandName), bs, true);
 		}
 	}
 
@@ -154,14 +163,14 @@ class Object : ICollision
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 
-		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(commandName), bs, true);
 	}
 
 	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove object")
 	{
 		bs.write_u16(id);
 
-		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(commandName), bs, true);
 	}
 
 	void DeserializeInit(CBitStream@ bs)
@@ -260,8 +269,6 @@ class Object : ICollision
 
 	void Render()
 	{
-		float[] matrix;
-		Matrix::MakeIdentity(matrix);
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
 		Render::SetModelTransform(matrix);
 

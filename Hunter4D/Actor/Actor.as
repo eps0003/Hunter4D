@@ -25,12 +25,21 @@ class Actor : ICollision
 
 	private uint lastUpdate = 0;
 
+	private float[] matrix;
+
+	private CRules@ rules = getRules();
+
+	Actor()
+	{
+		Matrix::MakeIdentity(matrix);
+	}
+
 	Actor(CPlayer@ player, Vec3f position)
 	{
 		@this.player = player;
 		this.position = position;
 		oldPosition = position;
-		id = getRules().add_u32("id", 1);
+		id = rules.add_u32("id", 1);
 
 		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
@@ -91,7 +100,7 @@ class Actor : ICollision
 			CBitStream bs;
 			bs.write_u16(id);
 			bs.write_u8(collisionFlags);
-			getRules().SendCommand(getRules().getCommandID("set actor collision flags"), bs, true);
+			rules.SendCommand(rules.getCommandID("set actor collision flags"), bs, true);
 		}
 	}
 
@@ -114,7 +123,7 @@ class Actor : ICollision
 			CBitStream bs;
 			bs.write_u16(id);
 			gravity.Serialize(bs);
-			getRules().SendCommand(getRules().getCommandID("set actor gravity"), bs, true);
+			rules.SendCommand(rules.getCommandID("set actor gravity"), bs, true);
 		}
 	}
 
@@ -137,11 +146,11 @@ class Actor : ICollision
 
 		if (player !is null)
 		{
-			getRules().SendCommand(getRules().getCommandID(commandName), bs, player);
+			rules.SendCommand(rules.getCommandID(commandName), bs, player);
 		}
 		else
 		{
-			getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+			rules.SendCommand(rules.getCommandID(commandName), bs, true);
 		}
 	}
 
@@ -151,14 +160,14 @@ class Actor : ICollision
 		position.Serialize(bs);
 		velocity.Serialize(bs);
 
-		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(commandName), bs, true);
 	}
 
 	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove actor")
 	{
 		bs.write_u16(id);
 
-		getRules().SendCommand(getRules().getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(commandName), bs, true);
 	}
 
 	void DeserializeInit(CBitStream@ bs)
@@ -292,15 +301,13 @@ class Actor : ICollision
 
 	void Render()
 	{
-		float[] matrix;
-		Matrix::MakeIdentity(matrix);
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
 		Render::SetModelTransform(matrix);
 
 		Vec3f min = collider.min;
 		Vec3f max = collider.max;
 
-		CTeam@ team = getRules().getTeam(getTeamNum());
+		CTeam@ team = rules.getTeam(getTeamNum());
 		SColor color = team !is null ? team.color : color_white;
 
 		Vertex[] vertices = {
@@ -375,7 +382,7 @@ class Actor : ICollision
 		u8 localTeam = getLocalPlayer().getTeamNum();
 		return (
 			isVisible() &&
-			(getTeamNum() == localTeam || localTeam == getRules().getSpectatorTeamNum())
+			(getTeamNum() == localTeam || localTeam == rules.getSpectatorTeamNum())
 		);
 	}
 

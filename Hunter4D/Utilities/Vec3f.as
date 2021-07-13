@@ -234,8 +234,8 @@ class Vec3f
 
 	Vec3f dir()
 	{
-		float yRadians = y * Maths::Pi / 180.0f;
-		float xRadians = x * Maths::Pi / 180.0f;
+		float xRadians = Maths::toRadians(x);
+		float yRadians = Maths::toRadians(y);
 		return Vec3f(
 			Maths::Sin(-yRadians) * Maths::Cos(-xRadians),
 			Maths::Sin(xRadians),
@@ -245,8 +245,8 @@ class Vec3f
 
 	Vec3f fastDir()
 	{
-		float yRadians = y * Maths::Pi / 180.0f;
-		float xRadians = x * Maths::Pi / 180.0f;
+		float xRadians = Maths::toRadians(x);
+		float yRadians = Maths::toRadians(y);
 		return Vec3f(
 			Maths::FastSin(-yRadians) * Maths::FastCos(-xRadians),
 			Maths::FastSin(xRadians),
