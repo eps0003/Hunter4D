@@ -1,12 +1,8 @@
-#include "LoadingCommon.as"
-
-class Loading
+namespace Loading
 {
-	private CRules@ rules = getRules();
-
 	bool isPlayerLoaded(CPlayer@ player)
 	{
-		return rules.get_bool(getToken(player));
+		return getRules().get_bool(player.getUsername() + "loaded");
 	}
 
 	bool isMyPlayerLoaded()
@@ -18,15 +14,15 @@ class Loading
 	{
 		if (loaded == isPlayerLoaded(player)) return;
 
-		string token = getToken(player);
-		rules.set_bool(token, loaded);
-		rules.Sync(token, true);
+		string token = player.getUsername() + "loaded";
+		getRules().set_bool(token, loaded);
+		getRules().Sync(token, true);
 
 		if (loaded && player.isMyPlayer())
 		{
 			CBitStream bs;
 			bs.write_netid(player.getNetworkID());
-			rules.SendCommand(rules.getCommandID("player loaded"), bs, false);
+			getRules().SendCommand(getRules().getCommandID("player loaded"), bs, false);
 		}
 	}
 
@@ -58,10 +54,5 @@ class Loading
 				SetPlayerLoaded(player, loaded);
 			}
 		}
-	}
-
-	private string getToken(CPlayer@ player)
-	{
-		return player.getUsername() + "loaded";
 	}
 }

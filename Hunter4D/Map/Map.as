@@ -15,7 +15,6 @@ class Map
 	uint blockCount = 0;
 
 	private CRules@ rules = getRules();
-	private Loading@ loading = Loading::getLoading();
 
 	Map(Vec3f dimensions)
 	{
@@ -141,7 +140,7 @@ class Map
 				Map::getRenderer().GenerateMesh(indexToPos(index));
 			}
 
-			if (!Blocks::isVisible(block) && loading.isMyPlayerLoaded())
+			if (!Blocks::isVisible(block) && Loading::isMyPlayerLoaded())
 			{
 				ParticleManager@ particleManager = Particles::getManager();
 				particleManager.CheckStaticParticles();

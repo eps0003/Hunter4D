@@ -4,7 +4,6 @@
 
 #define SERVER_ONLY
 
-Loading@ loading;
 Map@ map;
 
 uint countdownDuration = 5 * getTicksASecond();
@@ -17,7 +16,6 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
-	@loading = Loading::getLoading();
 	@map = Map::getMap();
 
 	this.SetCurrentState(WARMUP);
@@ -59,7 +57,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		Vec3f spawnPos = map.dimensions * Vec3f(0.5f, 1.0f, 0.5f) + Vec3f(0, 2, 0);
 		Actor::AddActor(SpleefActor(player, spawnPos));
 
-		if (loading.areAllPlayersLoaded())
+		if (Loading::areAllPlayersLoaded())
 		{
 			timeToStart = getGameTime() + countdownDuration + 1;
 		}
