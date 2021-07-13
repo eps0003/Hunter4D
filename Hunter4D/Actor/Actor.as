@@ -246,7 +246,10 @@ class Actor : ICollision
 
 	void Update()
 	{
-
+		if (player.isMyPlayer())
+		{
+			velocity += gravity;
+		}
 	}
 
 	void PostUpdate()
