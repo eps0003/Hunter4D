@@ -71,7 +71,8 @@ class SandboxActor : Actor
 		int spacing = 10;
 		int selectedBorder = 4;
 		int size = 50;
-		int y = getScreenHeight() - 20 - size;
+		int numOffset = 12;
+		int y = 20;
 
 		for (int i = 0; i < n; i++)
 		{
@@ -90,7 +91,11 @@ class SandboxActor : Actor
 			}
 
 			GUI::DrawRectangle(Vec2f(x, y), Vec2f(x + size, y + size), color);
-			GUI::DrawTextCentered("" + (i + 1), Vec2f(x + size - 12, y + size - 12), color_white);
+			GUI::DrawTextCentered(
+				"" + (i + 1),
+				Vec2f(x + size - numOffset, y + size - numOffset),
+				color_white
+			);
 		}
 	}
 

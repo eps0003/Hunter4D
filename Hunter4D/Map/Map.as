@@ -15,12 +15,18 @@ class Map
 	uint blockCount = 0;
 
 	private CRules@ rules = getRules();
+	private ParticleManager@ particleManager;
 
 	Map(Vec3f dimensions)
 	{
 		this.dimensions = dimensions;
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
 		blocks = array<SColor>(blockCount, 0);
+
+		if (isClient())
+		{
+			@particleManager = Particles::getManager();
+		}
 	}
 
 	void opAssign(Map map)
@@ -67,6 +73,11 @@ class Map
 
 		if (canSetBlock(player, index, block))
 		{
+			if (!Blocks::isVisible(block))
+			{
+				Particles::EmitBlockBreakParticles(index, blocks[index]);
+			}
+
 			SetBlock(index, block);
 
 			if (!isLocalHost())
@@ -144,34 +155,6 @@ class Map
 			{
 				ParticleManager@ particleManager = Particles::getManager();
 				particleManager.CheckStaticParticles();
-
-				Vec3f position = indexToPos(index);
-				AABB bounds(position, position + 1);
-				Random random(getGameTime());
-
-				for (uint i = 0; i < 20; i++)
-				{
-					Vec3f pos = bounds.getRandomPoint();
-
-					Vec3f dir = pos - (position + 0.5f);
-					Vec3f vel(dir, random.NextFloat() * 0.2f);
-					vel.y = Maths::Max(0, vel.y);
-					vel.x *= 0.5f;
-					vel.z *= 0.5f;
-
-					Particle particle;
-					particle.position = pos;
-					particle.velocity = vel;
-					particle.timeToLive = 40 + random.NextRanged(60);
-					particle.color.setRed(oldBlock.getRed() * 0.8f);
-					particle.color.setGreen(oldBlock.getGreen() * 0.8f);
-					particle.color.setBlue(oldBlock.getBlue() * 0.8f);
-					particle.gravity = -0.03f;
-					particle.elasticity = 0.5f;
-					particle.friction = 0.6f;
-
-					particleManager.AddParticle(particle);
-				}
 			}
 		}
 	}

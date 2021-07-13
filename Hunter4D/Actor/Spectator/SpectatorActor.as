@@ -54,10 +54,10 @@ class SpectatorActor : Actor
 		}
 	}
 
-    bool isVisible()
-    {
-        return false;
-    }
+	bool isVisible()
+	{
+		return false;
+	}
 
 	bool isCrosshairVisible()
 	{

@@ -42,12 +42,18 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		uint index;
 		if (!params.saferead_u32(index)) return;
+		if (!map.isValidBlock(index)) return;
 
 		uint blockInt;
 		if (!params.saferead_u32(blockInt)) return;
 		SColor block(blockInt);
 
-		map.SetBlockSafe(index, block);
+		if (!Blocks::isVisible(block))
+		{
+			Particles::EmitBlockBreakParticles(index, map.getBlock(index));
+		}
+
+		map.SetBlock(index, block);
 	}
 	else if (!isClient() && cmd == this.getCommandID("place block"))
 	{
