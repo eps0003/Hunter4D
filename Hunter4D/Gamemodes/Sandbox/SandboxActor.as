@@ -4,8 +4,6 @@
 class SandboxActor : Actor
 {
 	private CControls@ controls;
-	private Mouse@ mouse;
-	private Camera@ camera;
 	private Map@ map;
 	private Driver@ driver;
 
@@ -31,7 +29,7 @@ class SandboxActor : Actor
 		super(player, position);
 
 		SetInitCommand("init sandbox actor");
-		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 0.1f, 0.3f)));
+		SetCollider(AABB(Vec3f(-0.3f, 0.0f, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
 		SetGravity(Vec3f(0, -0.04f, 0));
 	}
@@ -43,8 +41,6 @@ class SandboxActor : Actor
 		if (player.isMyPlayer())
 		{
 			@controls = getControls();
-			@mouse = Mouse::getMouse();
-			@camera = Camera::getCamera();
 			@map = Map::getMap();
 			@driver = getDriver();
 		}

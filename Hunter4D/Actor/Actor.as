@@ -1,6 +1,7 @@
 #include "ActorCommon.as"
 #include "Mouse.as"
 #include "Collision.as"
+#include "ModelSegment.as"
 
 class Actor : ICollision
 {
@@ -20,15 +21,32 @@ class Actor : ICollision
 	Vec3f interPosition;
 
 	Vec3f velocity;
+	private Vec3f oldVelocity;
+	Vec3f interVelocity;
 
 	private AABB@ collider;
 	private u8 collisionFlags = 0;
 
 	private uint lastUpdate = 0;
 
+	private float cameraHeight = 1.6f;
+
+	private ModelSegment@ head;
+	private ModelSegment@ body;
+	private ModelSegment@ upperLeftArm;
+	private ModelSegment@ lowerLeftArm;
+	private ModelSegment@ upperRightArm;
+	private ModelSegment@ lowerRightArm;
+	private ModelSegment@ upperLeftLeg;
+	private ModelSegment@ lowerLeftLeg;
+	private ModelSegment@ upperRightLeg;
+	private ModelSegment@ lowerRightLeg;
+
 	private float[] matrix;
 
 	private CRules@ rules = getRules();
+	private Camera@ camera;
+	private Mouse@ mouse;
 
 	Actor(CPlayer@ player, Vec3f position)
 	{
@@ -41,6 +59,7 @@ class Actor : ICollision
 	void opAssign(Actor actor)
 	{
 		oldPosition = position;
+		oldVelocity = velocity;
 
 		position = actor.position;
 		velocity = actor.velocity;
@@ -241,6 +260,7 @@ class Actor : ICollision
 		if (player.isMyPlayer() || getGameTime() > lastUpdate + 1)
 		{
 			oldPosition = position;
+			oldVelocity = velocity;
 		}
 	}
 
@@ -292,8 +312,8 @@ class Actor : ICollision
 
 			CollisionZ(this, position, velocity);
 
-			// Check x collision again if a collision occurred initially
 			if (collisionX)
+			// Check x collision again if a collision occurred initially
 			{
 				CollisionX(this, position, velocity);
 			}
@@ -308,51 +328,64 @@ class Actor : ICollision
 
 	void Render()
 	{
+		float gt = Interpolation::getGameTime() * 0.4f;
+		float vel = interVelocity.toXZ().Length() * 4.0f;
+
+		float sin = Maths::Sin(gt) * vel;
+		float cos = Maths::Cos(gt) * vel;
+
+		float limbSin = sin * 40.0f;
+		float limbCos = cos * 40.0f;
+
+		head.position = Vec3f(0, 0.75f, 0);
+		head.rotation = Vec3f(camera.interRotation.x, 0, 0);
+
+		body.position = Vec3f(0, 0.75f + Maths::Abs(cos * 0.1f), 0);
+		body.rotation = Vec3f(Maths::Sin(gt * 2.0f) * vel * -4.0f, 0, 0);
+
+		// Left arm
+
+		upperLeftArm.position = Vec3f(-0.25f, 0.75f, 0);
+		upperLeftArm.rotation = Vec3f(-limbCos, 0, 0);
+
+		lowerLeftArm.position = Vec3f(-0.125f, -0.375f, -0.125f);
+		lowerLeftArm.rotation = Vec3f(Maths::Max(0, -limbCos), 0, 0);
+
+		// Right arm
+
+		upperRightArm.position = Vec3f(0.25f, 0.75f, 0);
+		upperRightArm.rotation = Vec3f(limbCos, 0, 0);
+
+		lowerRightArm.position = Vec3f(0.125f, -0.375f, -0.125f);
+		lowerRightArm.rotation = Vec3f(Maths::Max(0, limbCos), 0, 0);
+
+		// Left leg
+
+		upperLeftLeg.rotation = Vec3f(limbCos, 0, 0);
+
+		lowerLeftLeg.position = Vec3f(-0.125f, -0.375f, 0.125f);
+		lowerLeftLeg.rotation = Vec3f(Maths::Min(0, limbSin), 0, 0);
+
+		// Right leg
+
+		upperRightLeg.rotation = Vec3f(-limbCos, 0, 0);
+
+		lowerRightLeg.position = Vec3f(0.125f, -0.375f, 0.125f);
+		lowerRightLeg.rotation = Vec3f(Maths::Min(0, -limbSin), 0, 0);
+
+		// Render
+
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
-		Render::SetModelTransform(matrix);
+		Matrix::SetRotationDegrees(matrix, 0, -camera.interRotation.y, 0);
 
-		Vec3f min = collider.min;
-		Vec3f max = collider.max;
-
-		CTeam@ team = rules.getTeam(getTeamNum());
-		SColor color = team !is null ? team.color : color_white;
-
-		Vertex[] vertices = {
-			// Left
-			Vertex(min.x, max.y, max.z, 0, 0, color),
-			Vertex(min.x, max.y, min.z, 1, 0, color),
-			Vertex(min.x, min.y, min.z, 1, 1, color),
-			Vertex(min.x, min.y, max.z, 0, 1, color),
-			// Right
-			Vertex(max.x, max.y, min.z, 0, 0, color),
-			Vertex(max.x, max.y, max.z, 1, 0, color),
-			Vertex(max.x, min.y, max.z, 1, 1, color),
-			Vertex(max.x, min.y, min.z, 0, 1, color),
-			// Front
-			Vertex(min.x, max.y, min.z, 0, 0, color),
-			Vertex(max.x, max.y, min.z, 1, 0, color),
-			Vertex(max.x, min.y, min.z, 1, 1, color),
-			Vertex(min.x, min.y, min.z, 0, 1, color),
-			// Back
-			Vertex(max.x, max.y, max.z, 0, 0, color),
-			Vertex(min.x, max.y, max.z, 1, 0, color),
-			Vertex(min.x, min.y, max.z, 1, 1, color),
-			Vertex(max.x, min.y, max.z, 0, 1, color),
-			// Down
-			Vertex(max.x, min.y, max.z, 0, 0, color),
-			Vertex(min.x, min.y, max.z, 1, 0, color),
-			Vertex(min.x, min.y, min.z, 1, 1, color),
-			Vertex(max.x, min.y, min.z, 0, 1, color),
-			// Up
-			Vertex(min.x, max.y, max.z, 0, 0, color),
-			Vertex(max.x, max.y, max.z, 1, 0, color),
-			Vertex(max.x, max.y, min.z, 1, 1, color),
-			Vertex(min.x, max.y, min.z, 0, 1, color)
-		};
+		float[] scaleMatrix;
+		Matrix::MakeIdentity(scaleMatrix);
+		Matrix::SetScale(scaleMatrix, 0.9f, 0.9f, 0.9f);
+		Matrix::MultiplyImmediate(matrix, scaleMatrix);
 
 		Render::SetBackfaceCull(false);
 		Render::SetAlphaBlend(true);
-		Render::RawQuads("pixel", vertices);
+		body.Render(matrix);
 		Render::SetAlphaBlend(false);
 		Render::SetBackfaceCull(true);
 	}
@@ -381,15 +414,17 @@ class Actor : ICollision
 		interPosition = oldPosition.lerp(position, t);
 		// interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		// interPosition = interPosition.clamp(oldPosition, position);
+		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 
 	bool isVisible()
 	{
-		return !player.isMyPlayer() && hasCollider();
+		return true; //!player.isMyPlayer() && hasCollider();
 	}
 
 	bool isNameplateVisible()
 	{
+		return false;
 		u8 localTeam = getLocalPlayer().getTeamNum();
 		return (
 			isVisible() &&
@@ -409,11 +444,8 @@ class Actor : ICollision
 
 	private void UpdateCamera()
 	{
-		Camera@ camera = Camera::getCamera();
-		Mouse@ mouse = Mouse::getMouse();
-
 		// Move and rotate camera
-		camera.position = position;
+		camera.position = position + Vec3f(0, cameraHeight, 0);
 		camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
 		camera.rotation = Vec3f(
 			Maths::Clamp(camera.rotation.x, -90, 90),
@@ -447,6 +479,50 @@ class Actor : ICollision
 		if (isClient())
 		{
 			Matrix::MakeIdentity(matrix);
+
+			@head = ModelSegment("ActorHead.obj");
+			@body = ModelSegment("ActorBody.obj");
+			@upperLeftArm = ModelSegment("ActorUpperLeftArm.obj");
+			@lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj");
+			@upperRightArm = ModelSegment("ActorUpperRightArm.obj");
+			@lowerRightArm= ModelSegment("ActorLowerRightArm.obj");
+			@upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj");
+			@lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj");
+			@upperRightLeg = ModelSegment("ActorUpperRightLeg.obj");
+			@lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj");
+
+			SMaterial@ material = head.mesh.GetMaterial();
+			material.AddTexture("KnightSkin.png");
+			material.SetFlag(SMaterial::LIGHTING, false);
+			material.SetFlag(SMaterial::BILINEAR_FILTER, false);
+
+			head.mesh.SetMaterial(material);
+			body.mesh.SetMaterial(material);
+			upperLeftArm.mesh.SetMaterial(material);
+			lowerLeftArm.mesh.SetMaterial(material);
+			upperRightArm.mesh.SetMaterial(material);
+			lowerRightArm.mesh.SetMaterial(material);
+			upperLeftLeg.mesh.SetMaterial(material);
+			lowerLeftLeg.mesh.SetMaterial(material);
+			upperRightLeg.mesh.SetMaterial(material);
+			lowerRightLeg.mesh.SetMaterial(material);
+
+			body.AddChild(head);
+			body.AddChild(upperLeftArm);
+			body.AddChild(upperRightArm);
+			body.AddChild(upperLeftLeg);
+			body.AddChild(upperRightLeg);
+
+			upperLeftArm.AddChild(lowerLeftArm);
+			upperRightArm.AddChild(lowerRightArm);
+			upperLeftLeg.AddChild(lowerLeftLeg);
+			upperRightLeg.AddChild(lowerRightLeg);
+		}
+
+		if (player.isMyPlayer())
+		{
+			@camera = Camera::getCamera();
+			@mouse = Mouse::getMouse();
 		}
 	}
 

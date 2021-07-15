@@ -4,7 +4,6 @@
 class SpectatorActor : Actor
 {
 	private CControls@ controls;
-	private Camera@ camera;
 
 	float acceleration = 0.2f;
 	float friction = 0.4f;
@@ -22,7 +21,6 @@ class SpectatorActor : Actor
 		if (player.isMyPlayer())
 		{
 			@controls = getControls();
-			@camera = Camera::getCamera();
 		}
 	}
 

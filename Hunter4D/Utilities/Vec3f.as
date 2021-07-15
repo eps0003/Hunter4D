@@ -379,6 +379,11 @@ class Vec3f
 		);
 	}
 
+	Vec2f toXZ()
+	{
+		return Vec2f(x, z);
+	}
+
 	void Serialize(CBitStream@ bs)
 	{
 		bs.write_f32(x);
