@@ -3,7 +3,6 @@
 
 class SandboxActor : Actor
 {
-	private CControls@ controls;
 	private Map@ map;
 	private Driver@ driver;
 
@@ -24,11 +23,18 @@ class SandboxActor : Actor
 		SColor(255, 24, 20, 37)		// Dark purple
 	};
 
+	private ActorModel@ model;
+	private ActorIdleAnim@ idleAnim;
+	private ActorRunAnim@ runAnim;
+	private ActorJumpAnim@ jumpAnim;
+	private ActorJumpingJacksAnim@ jumpingJacksAnim;
+
+	bool taunting = false;
+
 	SandboxActor(CPlayer@ player, Vec3f position)
 	{
 		super(player, position);
 
-		SetInitCommand("init sandbox actor");
 		SetCollider(AABB(Vec3f(-0.3f, 0.0f, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
 		SetGravity(Vec3f(0, -0.04f, 0));
@@ -38,12 +44,29 @@ class SandboxActor : Actor
 	{
 		Actor::OnInit();
 
+		SetInitCommand("init sandbox actor");
+		SetSyncCommand("sync sandbox actor");
+
 		if (player.isMyPlayer())
 		{
-			@controls = getControls();
 			@map = Map::getMap();
 			@driver = getDriver();
 		}
+
+		if (isClient())
+		{
+			@model = ActorModel(this, "KnightSkin.png");
+			@idleAnim = ActorIdleAnim(model);
+			@runAnim = ActorRunAnim(model);
+			@jumpAnim = ActorJumpAnim(model);
+			@jumpingJacksAnim = ActorJumpingJacksAnim(model);
+		}
+	}
+
+	void opAssign(SandboxActor actor)
+	{
+		opAssign(cast<Actor>(actor));
+		taunting = actor.taunting;
 	}
 
 	void Update()
@@ -52,9 +75,37 @@ class SandboxActor : Actor
 
 		if (player.isMyPlayer())
 		{
+			taunting = controls.ActionKeyPressed(AK_TAUNTS);
+
 			Movement();
 			ChangeBlockColor();
 			BlockPlacement();
+		}
+
+		if (isClient())
+		{
+			if (taunting)
+			{
+				model.SetAnimation(jumpingJacksAnim);
+			}
+			else
+			{
+				if (isOnGround())
+				{
+					if (velocity.magSquared() > 0.005f)
+					{
+						model.SetAnimation(runAnim);
+					}
+					else
+					{
+						model.SetAnimation(idleAnim);
+					}
+				}
+				else
+				{
+					model.SetAnimation(jumpAnim);
+				}
+			}
 		}
 	}
 
@@ -95,26 +146,40 @@ class SandboxActor : Actor
 		}
 	}
 
+	void Render()
+	{
+		Actor::Render();
+		model.Render();
+	}
+
+	bool isVisible()
+	{
+		return true;
+	}
+
 	private void Movement()
 	{
 		Vec2f dir;
 		s8 verticalDir = 0;
 
-		if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
-		if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
-		if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
-		if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
-
-		float len = dir.Length();
-		if (len > 0)
+		if (!taunting)
 		{
-			dir /= len; // Normalize
-			dir = dir.RotateBy(camera.rotation.y);
-		}
+			if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
+			if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
+			if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
+			if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
 
-		if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
-		{
-			velocity.y = jumpForce;
+			float len = dir.Length();
+			if (len > 0)
+			{
+				dir /= len; // Normalize
+				dir = dir.RotateBy(camera.rotation.y);
+			}
+
+			if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
+			{
+				velocity.y = jumpForce;
+			}
 		}
 
 		// Move actor
@@ -161,5 +226,17 @@ class SandboxActor : Actor
 			Vec3f position = raycast.hitWorldPos;
 			map.ClientSetBlockSafe(position, 0);
 		}
+	}
+
+	void SerializeTick(CBitStream@ bs = CBitStream())
+	{
+		bs.write_bool(taunting);
+		Actor::SerializeTick(bs);
+	}
+
+	void DeserializeTick(CBitStream@ bs)
+	{
+		if (!bs.saferead_bool(taunting)) return;
+		Actor::DeserializeTick(bs);
 	}
 }

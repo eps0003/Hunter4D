@@ -3,25 +3,18 @@
 
 class SpectatorActor : Actor
 {
-	private CControls@ controls;
-
 	float acceleration = 0.2f;
 	float friction = 0.4f;
 
 	SpectatorActor(CPlayer@ player, Vec3f position)
 	{
 		super(player, position);
-		SetInitCommand("init spectator actor");
 	}
 
 	void OnInit()
 	{
 		Actor::OnInit();
-
-		if (player.isMyPlayer())
-		{
-			@controls = getControls();
-		}
+		SetInitCommand("init spectator actor");
 	}
 
 	void Update()

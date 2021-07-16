@@ -3,9 +3,10 @@
 #include "Collision.as"
 #include "ModelSegment.as"
 #include "ActorModel.as"
-#include "ActorRunAnim.as"
 #include "ActorIdleAnim.as"
+#include "ActorRunAnim.as"
 #include "ActorJumpAnim.as"
+#include "ActorJumpingJacksAnim.as"
 
 class Actor : ICollision
 {
@@ -39,14 +40,10 @@ class Actor : ICollision
 
 	private float cameraHeight = 1.6f;
 
-	private ActorModel@ model;
-	private ActorRunAnim@ runAnim;
-	private ActorIdleAnim@ idleAnim;
-	private ActorJumpAnim@ jumpAnim;
-
 	private float[] matrix;
 
 	private CRules@ rules = getRules();
+	private CControls@ controls;
 	private Camera@ camera;
 	private Mouse@ mouse;
 
@@ -227,8 +224,6 @@ class Actor : ICollision
 		}
 
 		hasSyncedInit = true;
-
-		Actor::AddActor(this);
 	}
 
 	void DeserializeTick(CBitStream@ bs)
@@ -237,20 +232,11 @@ class Actor : ICollision
 		if (!position.deserialize(bs)) return;
 		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
-
-		// Update actor
-		Actor@ oldActor = Actor::getActor(id);
-		if (oldActor !is null && !oldActor.getPlayer().isMyPlayer())
-		{
-			oldActor = this;
-		}
 	}
 
 	void DeserializeRemove(CBitStream@ bs)
 	{
 		if (!bs.saferead_u16(id)) return;
-
-		Actor::RemoveActor(id);
 	}
 
 	u8 getTeamNum()
@@ -282,25 +268,6 @@ class Actor : ICollision
 			rotation += Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
 			rotation.x = Maths::Clamp(rotation.x, -90, 90);
 			rotation.z = Maths::Clamp(rotation.z, -90, 90);
-		}
-
-		if (isClient())
-		{
-			if (isOnGround())
-			{
-				if (velocity.magSquared() > 0.005f)
-				{
-					model.SetAnimation(runAnim);
-				}
-				else
-				{
-					model.SetAnimation(idleAnim);
-				}
-			}
-			else
-			{
-				model.SetAnimation(jumpAnim);
-			}
 		}
 	}
 
@@ -360,7 +327,7 @@ class Actor : ICollision
 
 	void Render()
 	{
-		model.Render();
+
 	}
 
 	void RenderHUD()
@@ -393,7 +360,7 @@ class Actor : ICollision
 
 	bool isVisible()
 	{
-		return model !is null; //!player.isMyPlayer() && hasCollider();
+		return !player.isMyPlayer();
 	}
 
 	bool isNameplateVisible()
@@ -444,16 +411,9 @@ class Actor : ICollision
 	{
 		print("Added actor: " + player.getUsername());
 
-		if (isClient())
-		{
-			@model = ActorModel(this, "KnightSkin.png");
-			@runAnim = ActorRunAnim(model);
-			@idleAnim = ActorIdleAnim(model);
-			@jumpAnim = ActorJumpAnim(model);
-		}
-
 		if (player.isMyPlayer())
 		{
+			@controls = getControls();
 			@camera = Camera::getCamera();
 			@mouse = Mouse::getMouse();
 		}

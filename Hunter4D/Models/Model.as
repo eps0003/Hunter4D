@@ -8,7 +8,7 @@ class Model
 	private ModelSegment@[] segments;
 
 	private IAnimation@ animation;
-	private uint animStartTime = 0;
+	uint animStartTime = 0;
 	private uint animTransitionDuration = 3;
 
 	Model(string texture, float scale)
