@@ -152,11 +152,6 @@ shared class SandboxActor : Actor
 		model.Render();
 	}
 
-	bool isVisible()
-	{
-		return true;
-	}
-
 	private void Movement()
 	{
 		Vec2f dir;
