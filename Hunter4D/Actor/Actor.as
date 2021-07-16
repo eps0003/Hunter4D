@@ -370,7 +370,6 @@ shared class Actor : ICollision
 
 	bool isNameplateVisible()
 	{
-		return false;
 		u8 localTeam = getLocalPlayer().getTeamNum();
 		return (
 			isVisible() &&
