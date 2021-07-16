@@ -58,5 +58,5 @@ void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
 
 void SpawnPlayer(CPlayer@ player)
 {
-	Actor::AddActor(SandboxActor(player, Vec3f(50, 10, 50)));
+	Actor::AddActor(SandboxActor(player, Vec3f(4, 4, 4)));
 }

@@ -2,6 +2,10 @@
 #include "Mouse.as"
 #include "Collision.as"
 #include "ModelSegment.as"
+#include "ActorModel.as"
+#include "ActorRunAnim.as"
+#include "ActorIdleAnim.as"
+#include "ActorJumpAnim.as"
 
 class Actor : ICollision
 {
@@ -35,16 +39,10 @@ class Actor : ICollision
 
 	private float cameraHeight = 1.6f;
 
-	private ModelSegment@ head;
-	private ModelSegment@ body;
-	private ModelSegment@ upperLeftArm;
-	private ModelSegment@ lowerLeftArm;
-	private ModelSegment@ upperRightArm;
-	private ModelSegment@ lowerRightArm;
-	private ModelSegment@ upperLeftLeg;
-	private ModelSegment@ lowerLeftLeg;
-	private ModelSegment@ upperRightLeg;
-	private ModelSegment@ lowerRightLeg;
+	private ActorModel@ model;
+	private ActorRunAnim@ runAnim;
+	private ActorIdleAnim@ idleAnim;
+	private ActorJumpAnim@ jumpAnim;
 
 	private float[] matrix;
 
@@ -285,6 +283,25 @@ class Actor : ICollision
 			rotation.x = Maths::Clamp(rotation.x, -90, 90);
 			rotation.z = Maths::Clamp(rotation.z, -90, 90);
 		}
+
+		if (isClient())
+		{
+			if (isOnGround())
+			{
+				if (velocity.magSquared() > 0.005f)
+				{
+					model.SetAnimation(runAnim);
+				}
+				else
+				{
+					model.SetAnimation(idleAnim);
+				}
+			}
+			else
+			{
+				model.SetAnimation(jumpAnim);
+			}
+		}
 	}
 
 	void PostUpdate()
@@ -343,67 +360,7 @@ class Actor : ICollision
 
 	void Render()
 	{
-		float gt = Interpolation::getGameTime() * 0.4f;
-		float vel = interVelocity.toXZ().Length() * 4.0f;
-
-		float sin = Maths::Sin(gt) * vel;
-		float cos = Maths::Cos(gt) * vel;
-
-		float limbSin = sin * 40.0f;
-		float limbCos = cos * 40.0f;
-
-		float bodyAngle = -interVelocity.toXZ().Angle() - 90;
-
-		// Head
-
-		head.position = Vec3f(0, 0.75f, 0);
-		head.rotation = interRotation + Vec3f(Maths::Sin(gt * 2.0f) * vel * 4.0f, -bodyAngle, 0);
-
-		// Body
-
-		body.position = Vec3f(0, 0.75f + Maths::Abs(cos * 0.1f) * 1.5f, 0);
-		body.rotation = Vec3f(-6.0f * vel + Maths::Sin(gt * 2.0f) * vel * -4.0f, bodyAngle, 0);
-
-		// Left arm
-
-		upperLeftArm.position = Vec3f(-0.25f, 0.75f, 0);
-		upperLeftArm.rotation = Vec3f(-limbCos, 0, 0);
-
-		lowerLeftArm.position = Vec3f(-0.125f, -0.375f, -0.125f);
-		lowerLeftArm.rotation = Vec3f(Maths::Max(0, -limbCos), 0, 0);
-
-		// Right arm
-
-		upperRightArm.position = Vec3f(0.25f, 0.75f, 0);
-		upperRightArm.rotation = Vec3f(limbCos, 0, 0);
-
-		lowerRightArm.position = Vec3f(0.125f, -0.375f, -0.125f);
-		lowerRightArm.rotation = Vec3f(Maths::Max(0, limbCos), 0, 0);
-
-		// Left leg
-
-		upperLeftLeg.rotation = Vec3f(limbCos, 0, 0);
-
-		lowerLeftLeg.position = Vec3f(-0.125f, -0.375f, 0.125f);
-		lowerLeftLeg.rotation = Vec3f(Maths::Min(0, limbSin), 0, 0);
-
-		// Right leg
-
-		upperRightLeg.rotation = Vec3f(-limbCos, 0, 0);
-
-		lowerRightLeg.position = Vec3f(0.125f, -0.375f, 0.125f);
-		lowerRightLeg.rotation = Vec3f(Maths::Min(0, -limbSin), 0, 0);
-
-		// Render
-
-		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
-		Matrix::SetScale(matrix, 0.9f, 0.9f, 0.9f);
-
-		Render::SetBackfaceCull(false);
-		Render::SetAlphaBlend(true);
-		body.Render(matrix);
-		Render::SetAlphaBlend(false);
-		Render::SetBackfaceCull(true);
+		model.Render();
 	}
 
 	void RenderHUD()
@@ -436,7 +393,7 @@ class Actor : ICollision
 
 	bool isVisible()
 	{
-		return true; //!player.isMyPlayer() && hasCollider();
+		return model !is null; //!player.isMyPlayer() && hasCollider();
 	}
 
 	bool isNameplateVisible()
@@ -489,45 +446,10 @@ class Actor : ICollision
 
 		if (isClient())
 		{
-			Matrix::MakeIdentity(matrix);
-
-			@head = ModelSegment("ActorHead.obj");
-			@body = ModelSegment("ActorBody.obj");
-			@upperLeftArm = ModelSegment("ActorUpperLeftArm.obj");
-			@lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj");
-			@upperRightArm = ModelSegment("ActorUpperRightArm.obj");
-			@lowerRightArm = ModelSegment("ActorLowerRightArm.obj");
-			@upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj");
-			@lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj");
-			@upperRightLeg = ModelSegment("ActorUpperRightLeg.obj");
-			@lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj");
-
-			SMaterial@ material = head.mesh.GetMaterial();
-			material.AddTexture("KnightSkin.png");
-			material.SetFlag(SMaterial::LIGHTING, false);
-			material.SetFlag(SMaterial::BILINEAR_FILTER, false);
-
-			head.mesh.SetMaterial(material);
-			body.mesh.SetMaterial(material);
-			upperLeftArm.mesh.SetMaterial(material);
-			lowerLeftArm.mesh.SetMaterial(material);
-			upperRightArm.mesh.SetMaterial(material);
-			lowerRightArm.mesh.SetMaterial(material);
-			upperLeftLeg.mesh.SetMaterial(material);
-			lowerLeftLeg.mesh.SetMaterial(material);
-			upperRightLeg.mesh.SetMaterial(material);
-			lowerRightLeg.mesh.SetMaterial(material);
-
-			body.AddChild(head);
-			body.AddChild(upperLeftArm);
-			body.AddChild(upperRightArm);
-			body.AddChild(upperLeftLeg);
-			body.AddChild(upperRightLeg);
-
-			upperLeftArm.AddChild(lowerLeftArm);
-			upperRightArm.AddChild(lowerRightArm);
-			upperLeftLeg.AddChild(lowerLeftLeg);
-			upperRightLeg.AddChild(lowerRightLeg);
+			@model = ActorModel(this, "KnightSkin.png");
+			@runAnim = ActorRunAnim(model);
+			@idleAnim = ActorIdleAnim(model);
+			@jumpAnim = ActorJumpAnim(model);
 		}
 
 		if (player.isMyPlayer())

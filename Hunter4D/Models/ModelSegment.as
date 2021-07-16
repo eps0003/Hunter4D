@@ -1,15 +1,16 @@
 class ModelSegment
 {
-	SMesh mesh;
-
-	ModelSegment@ parent;
-	ModelSegment@[] children;
-
-	private Vec3f _position;
-	private Vec3f _rotation;
-	private bool transform = true;
-
+	private SMesh mesh;
+	private ModelSegment@[] children;
 	private float[] matrix;
+
+	Vec3f position;
+	Vec3f oldPosition;
+	Vec3f interPosition;
+
+	Vec3f rotation;
+	Vec3f oldRotation;
+	Vec3f interRotation;
 
 	ModelSegment(string modelPath)
 	{
@@ -17,66 +18,51 @@ class ModelSegment
 		Matrix::MakeIdentity(matrix);
 	}
 
-	void Render(float[] matrix)
+	void Render(float[] matrix, float t)
 	{
+		Interpolate(t);
 		Transform(matrix);
+
 		mesh.RenderMeshWithMaterial();
 
 		for (uint i = 0; i < children.size(); i++)
 		{
-			children[i].Render(matrix);
+			children[i].Render(matrix, t);
 		}
 	}
 
 	void AddChild(ModelSegment@ segment)
 	{
 		children.push_back(segment);
-		@segment.parent = segment;
 	}
 
-	void AddParent(ModelSegment@ segment)
+	void SetParent(ModelSegment@ segment)
 	{
-		@parent = segment;
-		segment.children.push_back(segment);
+		segment.children.push_back(this);
+	}
+
+	ModelSegment@[] getChildren()
+	{
+		return children;
+	}
+
+	SMesh@ getMesh()
+	{
+		return mesh;
+	}
+
+	private void Interpolate(float t)
+	{
+		interPosition = oldPosition.lerp(this.position, t);
+		interRotation = oldRotation.lerpAngle(this.rotation, t);
 	}
 
 	private void Transform(float[]@ matrix)
 	{
-		if (transform)
-		{
-			transform = false;
+		Matrix::SetTranslation(this.matrix, interPosition.x, interPosition.y, interPosition.z);
+		Matrix::SetRotationDegrees(this.matrix, -interRotation.x, -interRotation.y, -interRotation.z);
 
-			Matrix::SetTranslation(this.matrix, position.x, position.y, position.z);
-			Matrix::SetRotationDegrees(this.matrix, -rotation.x, -rotation.y, -rotation.z);
-
-			Matrix::MultiplyImmediate(matrix, this.matrix);
-			Render::SetModelTransform(matrix);
-		}
-	}
-
-	Vec3f position
-	{
-		get const
-		{
-			return _position;
-		}
-		set
-		{
-			_position = value;
-			transform = true;
-		}
-	}
-
-	Vec3f rotation
-	{
-		get const
-		{
-			return _rotation;
-		}
-		set
-		{
-			_rotation = value;
-			transform = true;
-		}
+		Matrix::MultiplyImmediate(matrix, this.matrix);
+		Render::SetModelTransform(matrix);
 	}
 }

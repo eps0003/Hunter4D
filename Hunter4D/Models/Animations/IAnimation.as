@@ -1,0 +1,4 @@
+interface IAnimation
+{
+	void Update();
+}
