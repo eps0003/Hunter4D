@@ -1,4 +1,4 @@
-class Chunk
+shared class Chunk
 {
 	Map@ map;
 	MapRenderer@ renderer;

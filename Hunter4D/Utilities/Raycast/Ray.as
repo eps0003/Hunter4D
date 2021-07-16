@@ -2,7 +2,7 @@
 #include "Vec3f.as"
 #include "Map.as"
 
-class Ray
+shared class Ray
 {
 	Vec3f position;
 	Vec3f direction;
@@ -117,7 +117,7 @@ class Ray
 	}
 }
 
-class RaycastInfo
+shared class RaycastInfo
 {
 	Ray ray;
 	float distance = 0;

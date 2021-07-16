@@ -1,7 +1,7 @@
 #include "Actor.as"
 #include "Ray.as"
 
-class SandboxActor : Actor
+shared class SandboxActor : Actor
 {
 	private Map@ map;
 	private Driver@ driver;

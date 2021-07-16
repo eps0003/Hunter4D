@@ -5,7 +5,7 @@
 const uint MAX_PARTICLES = 400;
 const float MAX_DISTANCE = 30.0f;
 
-class Particle
+shared class Particle
 {
 	Vec3f position;
 	Vec3f velocity;
@@ -17,7 +17,7 @@ class Particle
 	float friction = 1.0f;
 }
 
-class ParticleManager
+shared class ParticleManager
 {
 	private uint count = 0;
 

@@ -1,6 +1,6 @@
 #include "IBounds.as"
 
-class AABB : IBounds
+shared class AABB : IBounds
 {
 	Vec3f min;
 	Vec3f max;

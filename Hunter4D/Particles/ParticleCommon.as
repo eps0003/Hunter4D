@@ -1,6 +1,6 @@
 namespace Particles
 {
-	ParticleManager@ getManager()
+	shared ParticleManager@ getManager()
 	{
 		ParticleManager@ manager;
 		if (!getRules().get("particle manager", @manager))
@@ -11,7 +11,7 @@ namespace Particles
 		return manager;
 	}
 
-	void EmitBlockBreakParticles(int index, SColor block)
+	shared void EmitBlockBreakParticles(int index, SColor block)
 	{
 		ParticleManager@ particleManager = Particles::getManager();
 		Map@ map = Map::getMap();

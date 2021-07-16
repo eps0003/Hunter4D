@@ -1,7 +1,7 @@
 #include "MouseCommon.as"
 #include "Interpolation.as"
 
-class Mouse
+shared class Mouse
 {
 	Vec2f velocity;
 	private Vec2f oldVelocity;

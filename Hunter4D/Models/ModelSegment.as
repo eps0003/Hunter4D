@@ -1,4 +1,4 @@
-class ModelSegment
+shared class ModelSegment
 {
 	private SMesh mesh;
 	private ModelSegment@[] children;

@@ -1,7 +1,7 @@
 #include "ObjectCommon.as"
 #include "Collision.as"
 
-class Object : ICollision
+shared class Object : ICollision
 {
 	private u16 id = 0;
 

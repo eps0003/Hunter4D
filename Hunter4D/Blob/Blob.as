@@ -1,7 +1,7 @@
 #include "Object.as"
 #include "Actor.as"
 
-class Blob : Object
+shared class Blob : Object
 {
 	float jumpInterval = 1.0f;
 	float jumpForce = 0.3f;

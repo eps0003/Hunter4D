@@ -1,7 +1,7 @@
 #include "Actor.as"
 #include "Ray.as"
 
-class SpleefActor : Actor
+shared class SpleefActor : Actor
 {
 	private CControls@ controls;
 	private Mouse@ mouse;

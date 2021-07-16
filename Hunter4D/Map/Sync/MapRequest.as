@@ -1,4 +1,4 @@
-class MapRequest
+shared class MapRequest
 {
 	CPlayer@ player;
 	u16 packet;

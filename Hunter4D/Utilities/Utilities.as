@@ -1,14 +1,14 @@
-int getFPS()
+shared int getFPS()
 {
 	return getRules().get_u32("fps");
 }
 
-bool isTickPaused()
+shared bool isTickPaused()
 {
 	return isLocalHost() && Menu::getMainMenu() !is null;
 }
 
-bool isLocalHost()
+shared bool isLocalHost()
 {
 	return isClient() && isServer();
 }

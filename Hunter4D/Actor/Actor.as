@@ -8,7 +8,7 @@
 #include "ActorJumpAnim.as"
 #include "ActorJumpingJacksAnim.as"
 
-class Actor : ICollision
+shared class Actor : ICollision
 {
 	private u16 id = 0;
 	private CPlayer@ player;

@@ -1,6 +1,6 @@
 namespace Actor
 {
-	Actor@ getActor(CPlayer@ player)
+	shared Actor@ getActor(CPlayer@ player)
 	{
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)
@@ -14,7 +14,7 @@ namespace Actor
 		return null;
 	}
 
-	Actor@ getActor(u16 id)
+	shared Actor@ getActor(u16 id)
 	{
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)
@@ -28,12 +28,12 @@ namespace Actor
 		return null;
 	}
 
-	Actor@ getMyActor()
+	shared Actor@ getMyActor()
 	{
 		return Actor::getActor(getLocalPlayer());
 	}
 
-	void AddActor(Actor@ actor)
+	shared void AddActor(Actor@ actor)
 	{
 		Actor@[]@ actors = Actor::getActors();
 		actors.push_back(actor);
@@ -47,7 +47,7 @@ namespace Actor
 		}
 	}
 
-	void RemoveActor(CPlayer@ player)
+	shared void RemoveActor(CPlayer@ player)
 	{
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)
@@ -68,7 +68,7 @@ namespace Actor
 		}
 	}
 
-	void RemoveActor(u16 id)
+	shared void RemoveActor(u16 id)
 	{
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)
@@ -89,12 +89,12 @@ namespace Actor
 		}
 	}
 
-	bool actorExists(CPlayer@ player)
+	shared bool actorExists(CPlayer@ player)
 	{
 		return Actor::getActor(player) !is null;
 	}
 
-	Actor@[]@ getActors()
+	shared Actor@[]@ getActors()
 	{
 		Actor@[]@ actors;
 		if (!getRules().get("actors", @actors))
@@ -105,12 +105,12 @@ namespace Actor
 		return actors;
 	}
 
-	uint getActorCount()
+	shared uint getActorCount()
 	{
 		return Actor::getActors().size();
 	}
 
-	void ClearActors()
+	shared void ClearActors()
 	{
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)

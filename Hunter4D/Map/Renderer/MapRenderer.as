@@ -2,7 +2,7 @@
 #include "Chunk.as"
 #include "FaceFlags.as"
 
-class MapRenderer
+shared class MapRenderer
 {
 	Map@ map;
 

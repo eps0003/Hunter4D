@@ -8,7 +8,7 @@
 #include "Particle.as"
 #include "Loading.as"
 
-class Map
+shared class Map
 {
 	private SColor[] blocks;
 	Vec3f dimensions;

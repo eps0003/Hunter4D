@@ -1,16 +1,16 @@
 namespace Loading
 {
-	bool isPlayerLoaded(CPlayer@ player)
+	shared bool isPlayerLoaded(CPlayer@ player)
 	{
 		return getRules().get_bool(player.getUsername() + "loaded");
 	}
 
-	bool isMyPlayerLoaded()
+	shared bool isMyPlayerLoaded()
 	{
 		return isPlayerLoaded(getLocalPlayer());
 	}
 
-	void SetPlayerLoaded(CPlayer@ player, bool loaded)
+	shared void SetPlayerLoaded(CPlayer@ player, bool loaded)
 	{
 		if (loaded == isPlayerLoaded(player)) return;
 
@@ -26,12 +26,12 @@ namespace Loading
 		}
 	}
 
-	void SetMyPlayerLoaded(bool loaded)
+	shared void SetMyPlayerLoaded(bool loaded)
 	{
 		SetPlayerLoaded(getLocalPlayer(), loaded);
 	}
 
-	bool areAllPlayersLoaded()
+	shared bool areAllPlayersLoaded()
 	{
 		for (uint i = 0; i < getPlayerCount(); i++)
 		{
@@ -44,7 +44,7 @@ namespace Loading
 		return true;
 	}
 
-	void SetAllPlayersLoaded(bool loaded)
+	shared void SetAllPlayersLoaded(bool loaded)
 	{
 		for (uint i = 0; i < getPlayerCount(); i++)
 		{

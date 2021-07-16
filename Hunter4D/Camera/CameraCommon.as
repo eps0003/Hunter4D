@@ -1,6 +1,6 @@
 namespace Camera
 {
-	Camera@ getCamera()
+	shared Camera@ getCamera()
 	{
 		Camera@ camera;
 		if (!getRules().get("camera", @camera))

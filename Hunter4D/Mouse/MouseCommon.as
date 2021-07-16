@@ -1,6 +1,6 @@
 namespace Mouse
 {
-	Mouse@ getMouse()
+	shared Mouse@ getMouse()
 	{
 		Mouse@ mouse;
 		if (!getRules().get("mouse", @mouse))

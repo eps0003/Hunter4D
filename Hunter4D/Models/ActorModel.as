@@ -2,7 +2,7 @@
 #include "Camera.as"
 #include "ActorRunAnim.as"
 
-class ActorModel : Model
+shared class ActorModel : Model
 {
 	Actor@ actor;
 

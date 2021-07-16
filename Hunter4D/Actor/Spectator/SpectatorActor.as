@@ -1,7 +1,7 @@
 #include "Actor.as"
 #include "Ray.as"
 
-class SpectatorActor : Actor
+shared class SpectatorActor : Actor
 {
 	float acceleration = 0.2f;
 	float friction = 0.4f;

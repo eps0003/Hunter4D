@@ -1,7 +1,7 @@
 #include "IAnimation.as"
 #include "ActorModel.as"
 
-class ActorIdleAnim : IAnimation
+shared class ActorIdleAnim : IAnimation
 {
 	private ActorModel@ model;
 	private Actor@ actor;

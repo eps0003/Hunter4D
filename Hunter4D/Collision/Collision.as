@@ -3,7 +3,7 @@
 #include "Vec3f.as"
 #include "Map.as"
 
-interface ICollision
+shared interface ICollision
 {
 	AABB@ getCollider();
 	void SetCollider(AABB@ collider);
@@ -14,7 +14,7 @@ interface ICollision
 	bool hasCollisionFlags(u8 flags);
 }
 
-bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
+shared bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
 {
 	bool collided = false;
 
@@ -66,7 +66,7 @@ bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
 	return collided;
 }
 
-bool CollisionZ(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
+shared bool CollisionZ(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
 {
 	bool collided = false;
 
@@ -118,7 +118,7 @@ bool CollisionZ(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
 	return collided;
 }
 
-bool CollisionY(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
+shared bool CollisionY(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
 {
 	bool collided = false;
 

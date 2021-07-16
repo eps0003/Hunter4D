@@ -2,7 +2,7 @@
 #include "Vec3f.as"
 #include "Interpolation.as"
 
-class Camera
+shared class Camera
 {
 	Vec3f position;
 	private Vec3f oldPosition;

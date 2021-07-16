@@ -1,6 +1,6 @@
 namespace Map
 {
-	Map@ getMap()
+	shared Map@ getMap()
 	{
 		Map@ map;
 		if (!getRules().get("map", @map))
@@ -11,7 +11,7 @@ namespace Map
 		return map;
 	}
 
-	MapSyncer@ getSyncer()
+	shared MapSyncer@ getSyncer()
 	{
 		MapSyncer@ syncer;
 		if (!getRules().get("map syncer", @syncer))
@@ -22,7 +22,7 @@ namespace Map
 		return syncer;
 	}
 
-	MapRenderer@ getRenderer()
+	shared MapRenderer@ getRenderer()
 	{
 		MapRenderer@ renderer;
 		if (!getRules().get("map renderer", @renderer))

@@ -2,7 +2,7 @@
 #include "Map.as"
 #include "Utilities.as"
 
-class MapSyncer
+shared class MapSyncer
 {
 	private Map@ map = Map::getMap();
 	private MapRequest@[] mapRequests;

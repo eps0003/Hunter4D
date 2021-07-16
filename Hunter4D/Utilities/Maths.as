@@ -1,6 +1,6 @@
 namespace Maths
 {
-	s8 Sign(float value)
+	shared s8 Sign(float value)
 	{
 		if (value > 0)
 			return 1;
@@ -9,7 +9,7 @@ namespace Maths
 		return 0;
 	}
 
-	float Clamp2(float value, float low, float high)
+	shared float Clamp2(float value, float low, float high)
 	{
 		if (low > high)
 		{
@@ -21,23 +21,23 @@ namespace Maths
 		return Maths::Clamp(value, low, high);
 	}
 
-	float AngleDifference(float a1, float a2)
+	shared float AngleDifference(float a1, float a2)
 	{
 		float diff = (a2 - a1 + 180) % 360 - 180;
 		return diff < -180 ? diff + 360 : diff;
 	}
 
-	float LerpAngle(float a1, float a2, float t)
+	shared float LerpAngle(float a1, float a2, float t)
 	{
 		return a1 + AngleDifference(a1, a2) * t;
 	}
 
-	float toRadians(float degrees)
+	shared float toRadians(float degrees)
 	{
 		return degrees * Maths::Pi / 180.0f;
 	}
 
-	float toDegrees(float radians)
+	shared float toDegrees(float radians)
 	{
 		return radians * 180.0f / Maths::Pi;
 	}

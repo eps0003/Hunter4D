@@ -1,6 +1,6 @@
 #include "IAnimation.as"
 
-class Model
+shared class Model
 {
 	private float[] matrix;
 	private SMaterial material;
