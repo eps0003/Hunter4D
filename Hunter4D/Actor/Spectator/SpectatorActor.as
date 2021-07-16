@@ -19,7 +19,7 @@ shared class SpectatorActor : Actor
 
 	void Update()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			Vec2f dir;
 			s8 verticalDir = 0;

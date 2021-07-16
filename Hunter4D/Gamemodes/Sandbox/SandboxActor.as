@@ -47,7 +47,7 @@ shared class SandboxActor : Actor
 		SetInitCommand("init sandbox actor");
 		SetSyncCommand("sync sandbox actor");
 
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			@map = Map::getMap();
 			@driver = getDriver();
@@ -73,7 +73,7 @@ shared class SandboxActor : Actor
 	{
 		Actor::Update();
 
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			taunting = controls.ActionKeyPressed(AK_TAUNTS);
 

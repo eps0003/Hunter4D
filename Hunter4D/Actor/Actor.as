@@ -78,6 +78,11 @@ shared class Actor : ICollision
 		return player;
 	}
 
+	bool isMyActor()
+	{
+		return player.isMyPlayer();
+	}
+
 	void SetInitCommand(string cmd)
 	{
 		initCommand = cmd;
@@ -251,7 +256,7 @@ shared class Actor : ICollision
 
 	void PreUpdate()
 	{
-		if (player.isMyPlayer() || getGameTime() > lastUpdate + 1)
+		if (isMyActor() || getGameTime() > lastUpdate + 1)
 		{
 			oldPosition = position;
 			oldRotation = rotation;
@@ -261,7 +266,7 @@ shared class Actor : ICollision
 
 	void Update()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			velocity += gravity;
 
@@ -273,7 +278,7 @@ shared class Actor : ICollision
 
 	void PostUpdate()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			velocity.y = Maths::Clamp(velocity.y, -1, 1);
 
@@ -360,7 +365,7 @@ shared class Actor : ICollision
 
 	bool isVisible()
 	{
-		return !player.isMyPlayer();
+		return !isMyActor();
 	}
 
 	bool isNameplateVisible()
@@ -411,7 +416,7 @@ shared class Actor : ICollision
 	{
 		print("Added actor: " + player.getUsername());
 
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			@controls = getControls();
 			@camera = Camera::getCamera();

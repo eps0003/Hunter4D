@@ -47,7 +47,7 @@ void onRender(CRules@ this)
 	{
 		Actor@ actor = actors[i];
 
-		if (actor.getPlayer().isMyPlayer())
+		if (actor.isMyActor())
 		{
 			actor.RenderHUD();
 		}

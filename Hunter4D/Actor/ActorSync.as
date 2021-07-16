@@ -28,7 +28,7 @@ void onTick(CRules@ this)
 		Actor@ actor = actors[i];
 		actor.PostUpdate();
 
-		if (actor.getPlayer().isMyPlayer())
+		if (actor.isMyActor())
 		{
 			actor.SerializeTick();
 		}
@@ -72,7 +72,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		actor.DeserializeTick(params);
 
 		Actor@ oldActor = Actor::getActor(actor.getID());
-		if (oldActor !is null && !oldActor.getPlayer().isMyPlayer())
+		if (oldActor !is null && !oldActor.isMyActor())
 		{
 			oldActor = actor;
 		}

@@ -20,7 +20,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		actor.DeserializeTick(params);
 
 		SandboxActor@ oldActor = cast<SandboxActor@>(Actor::getActor(actor.getID()));
-		if (oldActor !is null && !oldActor.getPlayer().isMyPlayer())
+		if (oldActor !is null && !oldActor.isMyActor())
 		{
 			oldActor = actor;
 		}
