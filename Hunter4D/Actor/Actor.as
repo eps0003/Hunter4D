@@ -20,6 +20,10 @@ class Actor : ICollision
 	private Vec3f oldPosition;
 	Vec3f interPosition;
 
+	Vec3f rotation;
+	private Vec3f oldRotation;
+	Vec3f interRotation;
+
 	Vec3f velocity;
 	private Vec3f oldVelocity;
 	Vec3f interVelocity;
@@ -59,9 +63,11 @@ class Actor : ICollision
 	void opAssign(Actor actor)
 	{
 		oldPosition = position;
+		oldRotation = rotation;
 		oldVelocity = velocity;
 
 		position = actor.position;
+		rotation = actor.rotation;
 		velocity = actor.velocity;
 
 		lastUpdate = getGameTime();
@@ -158,6 +164,7 @@ class Actor : ICollision
 		bs.write_netid(this.player.getNetworkID());
 		bs.write_u16(id);
 		position.Serialize(bs);
+		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 		gravity.Serialize(bs);
 		bs.write_u8(collisionFlags);
@@ -184,6 +191,7 @@ class Actor : ICollision
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
+		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 
 		rules.SendCommand(rules.getCommandID(syncCommand), bs, true);
@@ -206,6 +214,7 @@ class Actor : ICollision
 
 		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
+		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 		if (!gravity.deserialize(bs)) return;
 		if (!bs.saferead_u8(collisionFlags)) return;
@@ -228,6 +237,7 @@ class Actor : ICollision
 	{
 		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
+		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 
 		// Update actor
@@ -260,6 +270,7 @@ class Actor : ICollision
 		if (player.isMyPlayer() || getGameTime() > lastUpdate + 1)
 		{
 			oldPosition = position;
+			oldRotation = rotation;
 			oldVelocity = velocity;
 		}
 	}
@@ -269,6 +280,10 @@ class Actor : ICollision
 		if (player.isMyPlayer())
 		{
 			velocity += gravity;
+
+			rotation += Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
+			rotation.x = Maths::Clamp(rotation.x, -90, 90);
+			rotation.z = Maths::Clamp(rotation.z, -90, 90);
 		}
 	}
 
@@ -337,11 +352,17 @@ class Actor : ICollision
 		float limbSin = sin * 40.0f;
 		float limbCos = cos * 40.0f;
 
-		head.position = Vec3f(0, 0.75f, 0);
-		head.rotation = Vec3f(camera.interRotation.x, 0, 0);
+		float bodyAngle = -interVelocity.toXZ().Angle() - 90;
 
-		body.position = Vec3f(0, 0.75f + Maths::Abs(cos * 0.1f), 0);
-		body.rotation = Vec3f(Maths::Sin(gt * 2.0f) * vel * -4.0f, 0, 0);
+		// Head
+
+		head.position = Vec3f(0, 0.75f, 0);
+		head.rotation = interRotation + Vec3f(Maths::Sin(gt * 2.0f) * vel * 4.0f, -bodyAngle, 0);
+
+		// Body
+
+		body.position = Vec3f(0, 0.75f + Maths::Abs(cos * 0.1f) * 1.5f, 0);
+		body.rotation = Vec3f(-6.0f * vel + Maths::Sin(gt * 2.0f) * vel * -4.0f, bodyAngle, 0);
 
 		// Left arm
 
@@ -376,12 +397,7 @@ class Actor : ICollision
 		// Render
 
 		Matrix::SetTranslation(matrix, interPosition.x, interPosition.y, interPosition.z);
-		Matrix::SetRotationDegrees(matrix, 0, -camera.interRotation.y, 0);
-
-		float[] scaleMatrix;
-		Matrix::MakeIdentity(scaleMatrix);
-		Matrix::SetScale(scaleMatrix, 0.9f, 0.9f, 0.9f);
-		Matrix::MultiplyImmediate(matrix, scaleMatrix);
+		Matrix::SetScale(matrix, 0.9f, 0.9f, 0.9f);
 
 		Render::SetBackfaceCull(false);
 		Render::SetAlphaBlend(true);
@@ -414,6 +430,7 @@ class Actor : ICollision
 		interPosition = oldPosition.lerp(position, t);
 		// interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		// interPosition = interPosition.clamp(oldPosition, position);
+		interRotation = oldRotation.lerp(rotation, t);
 		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 
@@ -444,14 +461,8 @@ class Actor : ICollision
 
 	private void UpdateCamera()
 	{
-		// Move and rotate camera
 		camera.position = position + Vec3f(0, cameraHeight, 0);
-		camera.rotation = camera.rotation + Vec3f(mouse.velocity.y, mouse.velocity.x, 0);
-		camera.rotation = Vec3f(
-			Maths::Clamp(camera.rotation.x, -90, 90),
-			camera.rotation.y,
-			Maths::Clamp(camera.rotation.z, -90, 90)
-		);
+		camera.rotation = rotation;
 	}
 
 	private void DrawCrosshair(int spacing, int length, int thickness, SColor color)
@@ -485,7 +496,7 @@ class Actor : ICollision
 			@upperLeftArm = ModelSegment("ActorUpperLeftArm.obj");
 			@lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj");
 			@upperRightArm = ModelSegment("ActorUpperRightArm.obj");
-			@lowerRightArm= ModelSegment("ActorLowerRightArm.obj");
+			@lowerRightArm = ModelSegment("ActorLowerRightArm.obj");
 			@upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj");
 			@lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj");
 			@upperRightLeg = ModelSegment("ActorUpperRightLeg.obj");
