@@ -19,6 +19,8 @@ shared class SpectatorActor : Actor
 
 	void Update()
 	{
+		Actor::Update();
+
 		if (isMyActor())
 		{
 			Vec2f dir;
