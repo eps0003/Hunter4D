@@ -2,9 +2,6 @@
 #include "Map.as"
 #include "Camera.as"
 
-const uint MAX_PARTICLES = 400;
-const float MAX_DISTANCE = 30.0f;
-
 shared class Particle
 {
 	Vec3f position;
@@ -20,6 +17,8 @@ shared class Particle
 shared class ParticleManager
 {
 	private uint count = 0;
+	private uint maxParticles = 300;
+	private float maxDistance = 30.0f;
 
 	private Vec3f[] position;
 	private Vec3f[] oldPosition;
@@ -65,7 +64,7 @@ shared class ParticleManager
 		for (int i = count - 1; i >= 0; i--)
 		{
 			float dist = (camera.position - position[i]).magSquared();
-			if (position[i].y <= -10 || dist >= MAX_DISTANCE * MAX_DISTANCE || gameTime >= spawnTime[i] + timeToLive[i])
+			if (position[i].y <= -10 || dist >= maxDistance * maxDistance || gameTime >= spawnTime[i] + timeToLive[i])
 			{
 				RemoveParticle(i);
 				continue;
@@ -150,9 +149,9 @@ shared class ParticleManager
 		if (v_fastrender) return;
 
 		float dist = (camera.position - particle.position).magSquared();
-		if (dist >= MAX_DISTANCE * MAX_DISTANCE) return;
+		if (dist >= maxDistance * maxDistance) return;
 
-		if (count >= MAX_PARTICLES)
+		if (count >= maxParticles)
 		{
 			RemoveParticle(0);
 		}
