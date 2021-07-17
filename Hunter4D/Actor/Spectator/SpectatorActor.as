@@ -11,6 +11,11 @@ shared class SpectatorActor : Actor
 		super(player, position);
 	}
 
+	SpectatorActor(Actor@ actor)
+	{
+		super(actor.getPlayer(), actor.position, actor.rotation);
+	}
+
 	void OnInit()
 	{
 		Actor::OnInit();

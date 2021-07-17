@@ -47,11 +47,16 @@ shared class Actor : ICollision
 	private Camera@ camera;
 	private Mouse@ mouse;
 
-	Actor(CPlayer@ player, Vec3f position)
+	Actor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f())
 	{
 		@this.player = player;
+
 		this.position = position;
+		this.rotation = rotation;
+
 		oldPosition = position;
+		oldRotation = rotation;
+
 		id = rules.add_u32("id", 1);
 	}
 

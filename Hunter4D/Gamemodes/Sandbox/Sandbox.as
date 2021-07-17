@@ -24,7 +24,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		CPlayer@ player = getPlayerByNetworkId(playerId);
 		if (player is null) return;
 
-		SpawnPlayer(player);
+		SpawnPlayer(this, player);
 	}
 }
 
@@ -32,7 +32,7 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 {
 	if (isServer())
 	{
-		SpawnPlayer(victim);
+		SpawnPlayer(this, victim);
 	}
 }
 
@@ -49,22 +49,32 @@ void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
 {
 	if (oldTeam == newTeam || !Loading::isPlayerLoaded(player)) return;
 
-	u8 spectatorTeam = this.getSpectatorTeamNum();
-
-	if (newTeam == spectatorTeam)
-	{
-		Actor@ oldActor = Actor::getActor(player);
-		Actor::RemoveActor(player);
-		Actor::AddActor(SpectatorActor(oldActor.getPlayer(), oldActor.position));
-	}
-	else if (oldTeam == spectatorTeam)
-	{
-		Actor::RemoveActor(player);
-		SpawnPlayer(player);
-	}
+	SpawnPlayer(this, player);
 }
 
-void SpawnPlayer(CPlayer@ player)
+void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
-	Actor::AddActor(SandboxActor(player, Vec3f(4, 2, 4)));
+	Vec3f spawnPos = Vec3f(4, 2, 4);
+
+	Actor@ oldActor = Actor::getActor(player);
+	if (oldActor !is null)
+	{
+		Actor::RemoveActor(player);
+	}
+
+	if (player.getTeamNum() == this.getSpectatorTeamNum())
+	{
+		if (oldActor !is null)
+		{
+			Actor::AddActor(SpectatorActor(oldActor));
+		}
+		else
+		{
+			Actor::AddActor(SpectatorActor(player, spawnPos));
+		}
+	}
+	else
+	{
+		Actor::AddActor(SandboxActor(player, spawnPos));
+	}
 }
