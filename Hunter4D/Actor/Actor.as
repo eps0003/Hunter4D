@@ -290,14 +290,6 @@ shared class Actor : ICollision
 			Collision();
 			UpdateCamera();
 		}
-
-		if (isServer())
-		{
-			if (position.y <= -10)
-			{
-				Kill();
-			}
-		}
 	}
 
 	void Collision()

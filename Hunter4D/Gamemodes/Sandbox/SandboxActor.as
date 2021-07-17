@@ -109,6 +109,19 @@ shared class SandboxActor : Actor
 		}
 	}
 
+	void PostUpdate()
+	{
+		Actor::PostUpdate();
+
+		if (isServer())
+		{
+			if (position.y <= -10)
+			{
+				Kill();
+			}
+		}
+	}
+
 	void RenderHUD()
 	{
 		Actor::RenderHUD();
