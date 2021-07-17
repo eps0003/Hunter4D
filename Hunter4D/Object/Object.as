@@ -116,6 +116,8 @@ shared class Object : ICollision
 
 	void SetGravity(Vec3f gravity)
 	{
+		if (this.gravity == gravity) return;
+
 		this.gravity = gravity;
 
 		if (!isClient() && hasSyncedInit)
@@ -134,6 +136,8 @@ shared class Object : ICollision
 
 	void SetFriction(float friction)
 	{
+		if (this.friction == friction) return;
+
 		this.friction = friction;
 
 		if (!isClient() && hasSyncedInit)

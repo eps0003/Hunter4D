@@ -130,6 +130,8 @@ shared class Actor : ICollision
 
 	void SetCollisionFlags(u8 flags)
 	{
+		if (collisionFlags == flags) return;
+
 		collisionFlags = flags;
 
 		if (!isClient() && hasSyncedInit)
@@ -153,6 +155,8 @@ shared class Actor : ICollision
 
 	void SetGravity(Vec3f gravity)
 	{
+		if (this.gravity == gravity) return;
+
 		this.gravity = gravity;
 
 		if (!isClient() && hasSyncedInit)
