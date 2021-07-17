@@ -75,27 +75,24 @@ shared class SandboxActor : Actor
 
 		if (isClient())
 		{
-			if (taunting)
+			if (isOnGround())
 			{
-				model.SetAnimation(jumpingJacksAnim);
-			}
-			else
-			{
-				if (isOnGround())
+				if (velocity.magSquared() > 0.005f)
 				{
-					if (velocity.magSquared() > 0.005f)
-					{
-						model.SetAnimation(runAnim);
-					}
-					else
-					{
-						model.SetAnimation(idleAnim);
-					}
+					model.SetAnimation(runAnim);
+				}
+				else if (taunting)
+				{
+					model.SetAnimation(jumpingJacksAnim);
 				}
 				else
 				{
-					model.SetAnimation(jumpAnim);
+					model.SetAnimation(idleAnim);
 				}
+			}
+			else
+			{
+				model.SetAnimation(jumpAnim);
 			}
 		}
 	}
