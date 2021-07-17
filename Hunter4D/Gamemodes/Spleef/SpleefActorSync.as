@@ -9,6 +9,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isServer() && cmd == this.getCommandID("init spleef actor"))
 	{
-		SpleefActor().DeserializeInit(params);
+		SpleefActor actor;
+		actor.DeserializeInit(params);
+		Actor::AddActor(actor);
 	}
 }
