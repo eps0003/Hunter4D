@@ -40,9 +40,9 @@ shared class Actor : ICollision
 
 	private float cameraHeight = 1.6f;
 
-	private float[] matrix;
-
 	private CRules@ rules = getRules();
+	private Map@ map = Map::getMap();
+	private Driver@ driver;
 	private CControls@ controls;
 	private Camera@ camera;
 	private Mouse@ mouse;
@@ -418,6 +418,7 @@ shared class Actor : ICollision
 
 		if (isMyActor())
 		{
+			@driver = getDriver();
 			@controls = getControls();
 			@camera = Camera::getCamera();
 			@mouse = Mouse::getMouse();

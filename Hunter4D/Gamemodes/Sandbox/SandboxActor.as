@@ -3,9 +3,6 @@
 
 shared class SandboxActor : Actor
 {
-	private Map@ map;
-	private Driver@ driver;
-
 	float acceleration = 0.08f;
 	float friction = 0.3f;
 	float jumpForce = 0.3f;
@@ -46,12 +43,6 @@ shared class SandboxActor : Actor
 
 		SetInitCommand("init sandbox actor");
 		SetSyncCommand("sync sandbox actor");
-
-		if (isMyActor())
-		{
-			@map = Map::getMap();
-			@driver = getDriver();
-		}
 
 		if (isClient())
 		{
