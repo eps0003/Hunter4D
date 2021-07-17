@@ -1,6 +1,7 @@
 #include "CameraCommon.as"
 #include "Vec3f.as"
 #include "Interpolation.as"
+#include "Config.as"
 
 shared class Camera
 {
@@ -12,8 +13,8 @@ shared class Camera
 	private Vec3f oldRotation;
 	private Vec3f _interRotation;
 
-	private float fov = 70.0f;
-	private float renderDistance = 150.0f;
+	private float fov;
+	private float renderDistance;
 	private SColor fogColor = SColor(255, 165, 189, 200);
 
 	private float[] modelMatrix;
@@ -27,6 +28,10 @@ shared class Camera
 		Matrix::MakeIdentity(viewMatrix);
 		Matrix::MakeIdentity(projectionMatrix);
 		Matrix::MakeIdentity(rotationMatrix);
+
+		ConfigFile cfg = Config::getConfig();
+		fov = cfg.read_f32("fov");
+		renderDistance = cfg.read_f32("render_distance");
 
 		UpdateViewMatrix();
 		UpdateRotationMatrix();
@@ -89,8 +94,14 @@ shared class Camera
 
 	void SetFOV(float fov)
 	{
+		if (this.fov == fov) return;
+
 		this.fov = fov;
 		UpdateProjectionMatrix();
+
+		ConfigFile cfg = Config::getConfig();
+		cfg.add_f32("fov", fov);
+		Config::SaveConfig(cfg);
 	}
 
 	float getRenderDistance()
@@ -100,8 +111,14 @@ shared class Camera
 
 	void SetRenderDistance(float distance)
 	{
+		if (renderDistance == distance) return;
+
 		renderDistance = distance;
 		UpdateProjectionMatrix();
+
+		ConfigFile cfg = Config::getConfig();
+		cfg.add_f32("render_distance", distance);
+		Config::SaveConfig(cfg);
 	}
 
 	float[] getModelMatrix()

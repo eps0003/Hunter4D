@@ -1,5 +1,6 @@
 #include "MouseCommon.as"
 #include "Interpolation.as"
+#include "Config.as"
 
 shared class Mouse
 {
@@ -7,11 +8,17 @@ shared class Mouse
 	private Vec2f oldVelocity;
 	Vec2f interVelocity;
 
-	private float sensitivity = 0.7f;
+	private float sensitivity;
 
 	private bool wasInControl = false;
 
 	private CRules@ rules = getRules();
+
+	Mouse()
+	{
+		ConfigFile cfg = Config::getConfig();
+		sensitivity = cfg.read_f32("sensitivity");
+	}
 
 	void Update()
 	{
@@ -40,7 +47,13 @@ shared class Mouse
 
 	void SetSensitivity(float sens)
 	{
+		if (sensitivity == sens) return;
+
 		sensitivity = sens;
+
+		ConfigFile cfg = Config::getConfig();
+		cfg.add_f32("sensitivity", sens);
+		Config::SaveConfig(cfg);
 	}
 
 	private void CalculateVelocity()

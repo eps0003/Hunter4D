@@ -15,6 +15,7 @@ void onRestart(CRules@ this)
 	this.set("particle manager", null);
 	this.set("objects", null);
 	this.set("actors", null);
+	this.set("config", null);
 
 	this.AddScript("LoadMap.as");
 	this.AddScript("LoadingScreen.as");
