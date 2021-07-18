@@ -22,8 +22,12 @@ shared class Camera
 	private float[] projectionMatrix;
 	private float[] rotationMatrix;
 
+	private Driver@ driver;
+
 	Camera()
 	{
+		@driver = getDriver();
+
 		Matrix::MakeIdentity(modelMatrix);
 		Matrix::MakeIdentity(viewMatrix);
 		Matrix::MakeIdentity(projectionMatrix);
@@ -47,7 +51,7 @@ shared class Camera
 
 	void Render()
 	{
-		Vec2f screenDim = getDriver().getScreenDimensions();
+		Vec2f screenDim = driver.getScreenDimensions();
 		GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
 
 		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
