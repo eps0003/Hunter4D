@@ -1,10 +1,11 @@
 namespace Config
 {
-	shared ConfigFile getConfig()
+	shared ConfigFile@ getConfig()
 	{
-		ConfigFile cfg;
-		if (!getRules().get("config", cfg))
+		ConfigFile@ cfg;
+		if (!getRules().get("config", @cfg))
 		{
+			@cfg = ConfigFile();
 			if (!cfg.loadFile("../Cache/Hunter4D.cfg"))
 			{
 				// Set default values
@@ -16,7 +17,7 @@ namespace Config
 				cfg.saveFile("Hunter4D.cfg");
 				print("Initialized config!");
 			}
-			getRules().set("config", cfg);
+			getRules().set("config", @cfg);
 		}
 		return cfg;
 	}

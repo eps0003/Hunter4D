@@ -16,7 +16,7 @@ shared class Mouse
 
 	Mouse()
 	{
-		ConfigFile cfg = Config::getConfig();
+		ConfigFile@ cfg = Config::getConfig();
 		sensitivity = cfg.read_f32("sensitivity");
 	}
 
@@ -51,7 +51,7 @@ shared class Mouse
 
 		sensitivity = sens;
 
-		ConfigFile cfg = Config::getConfig();
+		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("sensitivity", sens);
 		Config::SaveConfig(cfg);
 	}

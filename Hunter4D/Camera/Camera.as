@@ -29,7 +29,7 @@ shared class Camera
 		Matrix::MakeIdentity(projectionMatrix);
 		Matrix::MakeIdentity(rotationMatrix);
 
-		ConfigFile cfg = Config::getConfig();
+		ConfigFile@ cfg = Config::getConfig();
 		fov = cfg.read_f32("fov");
 		renderDistance = cfg.read_f32("render_distance");
 
@@ -99,7 +99,7 @@ shared class Camera
 		this.fov = fov;
 		UpdateProjectionMatrix();
 
-		ConfigFile cfg = Config::getConfig();
+		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("fov", fov);
 		Config::SaveConfig(cfg);
 	}
@@ -116,7 +116,7 @@ shared class Camera
 		renderDistance = distance;
 		UpdateProjectionMatrix();
 
-		ConfigFile cfg = Config::getConfig();
+		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("render_distance", distance);
 		Config::SaveConfig(cfg);
 	}
