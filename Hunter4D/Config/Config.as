@@ -6,16 +6,13 @@ namespace Config
 		if (!getRules().get("config", @cfg))
 		{
 			@cfg = ConfigFile();
-			if (!cfg.loadFile("../Cache/Hunter4D.cfg"))
+			if (!cfg.loadFile("../Cache/" + Config::getConfigName()))
 			{
-				// Set default values
 				cfg.add_f32("fov", 70.0f);
 				cfg.add_f32("render_distance", 150.0f);
 				cfg.add_f32("sensitivity", 1.0f);
 
-				// Save to cache
-				cfg.saveFile("Hunter4D.cfg");
-				print("Initialized config!");
+				Config::SaveConfig(cfg);
 			}
 			getRules().set("config", @cfg);
 		}
@@ -24,7 +21,11 @@ namespace Config
 
 	shared void SaveConfig(ConfigFile cfg)
 	{
-		cfg.saveFile("Hunter4D.cfg");
-		print("Saved config!");
+		cfg.saveFile(Config::getConfigName());
+	}
+
+	shared string getConfigName()
+	{
+		return "Hunter4D.cfg";
 	}
 }
