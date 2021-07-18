@@ -36,8 +36,7 @@ shared class Camera
 		UpdateViewMatrix();
 		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
-
-		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+		UpdateFog();
 	}
 
 	void Update()
@@ -115,6 +114,7 @@ shared class Camera
 
 		renderDistance = distance;
 		UpdateProjectionMatrix();
+		UpdateFog();
 
 		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("render_distance", distance);
@@ -182,5 +182,10 @@ shared class Camera
 
 		Matrix::Multiply(tempX, tempZ, rotationMatrix);
 		Matrix::Multiply(rotationMatrix, tempY, rotationMatrix);
+	}
+
+	private void UpdateFog()
+	{
+		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
 	}
 }
