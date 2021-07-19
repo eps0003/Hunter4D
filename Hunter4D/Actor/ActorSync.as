@@ -85,11 +85,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Actor@ actor = Actor::getActor(id);
-		if (actor is null) return;
+		Actor@ actor;
+		if (!Actor::saferead(params, @actor)) return;
 
 		u8 collisionFlags;
 		if (!params.saferead_u8(collisionFlags)) return;
@@ -98,11 +95,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set actor gravity"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Actor@ actor = Actor::getActor(id);
-		if (actor is null) return;
+		Actor@ actor;
+		if (!Actor::saferead(params, @actor)) return;
 
 		Vec3f gravity;
 		if (!gravity.deserialize(params)) return;

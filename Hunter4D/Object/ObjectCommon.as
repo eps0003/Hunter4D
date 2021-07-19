@@ -81,4 +81,13 @@ namespace Object
 		}
 		getRules().clear("objects");
 	}
+
+	shared bool saferead(CBitStream@ bs, Object@ &out object)
+	{
+		u16 id;
+		if (!bs.saferead_u16(id)) return false;
+
+		@object = Object::getObject(id);
+		return object !is null;
+	}
 }

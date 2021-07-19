@@ -64,11 +64,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Object@ object = Object::getObject(id);
-		if (object is null) return;
+		Object@ object;
+		if (!Object::saferead(params, @object)) return;
 
 		u8 collisionFlags;
 		if (!params.saferead_u8(collisionFlags)) return;
@@ -77,11 +74,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object gravity"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Object@ object = Object::getObject(id);
-		if (object is null) return;
+		Object@ object;
+		if (!Object::saferead(params, @object)) return;
 
 		Vec3f gravity;
 		if (!gravity.deserialize(params)) return;
@@ -90,11 +84,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object friction"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
-		Object@ object = Object::getObject(id);
-		if (object is null) return;
+		Object@ object;
+		if (!Object::saferead(params, @object)) return;
 
 		float friction;
 		if (!params.saferead_f32(friction)) return;

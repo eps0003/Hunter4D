@@ -121,4 +121,13 @@ namespace Actor
 		}
 		getRules().clear("actors");
 	}
+
+	shared bool saferead(CBitStream@ bs, Actor@ &out actor)
+	{
+		u16 id;
+		if (!bs.saferead_u16(id)) return false;
+
+		@actor = Actor::getActor(id);
+		return actor !is null;
+	}
 }
