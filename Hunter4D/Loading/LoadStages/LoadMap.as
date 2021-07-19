@@ -1,11 +1,11 @@
 #include "Map.as"
-#include "Ephtracy.as"
+#include "sex.as"
 #include "Utilities.as"
 
 Map@ map;
-uint sectionIndex = 0;
-uint blocksPerSection = 2000;
-uint sectionCount;
+//uint sectionIndex = 0;
+//uint blocksPerSection = 2000;
+//uint sectionCount;
 
 uint size = mapData.size() / 6;
 uint yOffset = MAP_SIZE.y * 0.5f;
@@ -23,8 +23,8 @@ void onRestart(CRules@ this)
 	{
 		@map = Map::getMap();
 		map = Map(MAP_SIZE);
-		sectionIndex = 0;
-		sectionCount = Maths::Ceil(size / float(blocksPerSection));
+		//sectionIndex = 0;
+		//sectionCount = Maths::Ceil(size / float(blocksPerSection));
 
 		this.set_bool("map generated", false);
 		this.Sync("map generated", true);
@@ -37,8 +37,30 @@ void onTick(CRules@ this)
 {
 	if (isServer())
 	{
+		uint last_block_index = 0;
+		for (uint needle = 0; needle < mapData.size();)
+		{
+			uint amount = mapData[needle];
+			
+			for(uint i = 0; i < amount; i++)
+			{
+				uint index = (needle+1)+i*2;
+				uint z = mapData[index];
+				uint col = mapData[index + 1];
+				SColor color = SColor(col);
+				color.setAlpha(255);
+				
+				Vec3f pos = Vec3f((last_block_index % MAP_SIZE.x), z, int(last_block_index / MAP_SIZE.x));
+
+				map.SetBlock(pos, color);
+			}
+			
+			needle += amount*2+1;
+			last_block_index++;
+		}
+		
 		// Get start and end block index
-		uint startIndex = sectionIndex * blocksPerSection;
+		/*uint startIndex = sectionIndex * blocksPerSection;
 		uint endIndex = Maths::Min(startIndex + blocksPerSection, size);
 
 		// Loop through blocks in this section
@@ -76,7 +98,7 @@ void onTick(CRules@ this)
 			// Move onto next section
 			sectionIndex++;
 		}
-		else
+		else*/
 		{
 			// Map generation complete
 			this.set_bool("map generated", true);
