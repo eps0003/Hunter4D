@@ -159,6 +159,20 @@ shared class Vec3f
 		z /= vec.z;
 	}
 
+	void opModAssign(const float &in val)
+	{
+		x %= val;
+		y %= val;
+		z %= val;
+	}
+
+	void opModAssign(const Vec3f &in vec)
+	{
+		x %= vec.x;
+		y %= vec.y;
+		z %= vec.z;
+	}
+
 	float opIndex(const int &in index)
 	{
 		switch (index)
