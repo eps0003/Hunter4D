@@ -24,6 +24,7 @@ shared class Object : ICollision
 	private u8 collisionFlags = 0;
 
 	private uint lastUpdate = 0;
+	private uint spawnTime = 0;
 
 	private float[] matrix;
 
@@ -33,7 +34,9 @@ shared class Object : ICollision
 	{
 		this.position = position;
 		oldPosition = position;
+
 		id = rules.add_u32("id", 1);
+		spawnTime = getGameTime();
 	}
 
 	void opAssign(Object object)
@@ -49,6 +52,11 @@ shared class Object : ICollision
 	u16 getID()
 	{
 		return id;
+	}
+
+	uint getSpawnTime()
+	{
+		return spawnTime;
 	}
 
 	void SetInitCommand(string cmd)

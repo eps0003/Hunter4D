@@ -37,6 +37,7 @@ shared class Actor : ICollision
 	private u8 collisionFlags = 0;
 
 	private uint lastUpdate = 0;
+	private uint spawnTime = 0;
 
 	private float cameraHeight = 1.6f;
 
@@ -58,6 +59,7 @@ shared class Actor : ICollision
 		oldRotation = rotation;
 
 		id = rules.add_u32("id", 1);
+		spawnTime = getGameTime();
 	}
 
 	void opAssign(Actor actor)
@@ -76,6 +78,11 @@ shared class Actor : ICollision
 	u16 getID()
 	{
 		return id;
+	}
+
+	uint getSpawnTime()
+	{
+		return spawnTime;
 	}
 
 	CPlayer@ getPlayer()

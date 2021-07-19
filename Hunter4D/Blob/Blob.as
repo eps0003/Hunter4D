@@ -6,19 +6,16 @@ shared class Blob : Object
 	float jumpInterval = 1.0f;
 	float jumpForce = 0.3f;
 	float forwardForce = 0.2f;
-	private uint spawnTime;
 	private bool midJump = false;
 
 	Blob(Vec3f position)
 	{
 		super(position);
 
-		SetCollider(AABB(Vec3f(-0.3f), Vec3f(0.3f)));
+		SetCollider(AABB(Vec3f(-0.3f, 0, -0.3f), Vec3f(0.3f, 0.6f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
 		SetGravity(Vec3f(0, -0.04f, 0));
 		SetFriction(0.5f);
-
-		spawnTime = getGameTime();
 	}
 
 	void Update()
@@ -32,7 +29,7 @@ shared class Blob : Object
 			{
 				Actor@ actor = actors[0];
 
-				if ((getGameTime() - spawnTime) % Maths::Round(getTicksASecond() * jumpInterval) == 0)
+				if ((getGameTime() - getSpawnTime()) % Maths::Round(getTicksASecond() * jumpInterval) == 0)
 				{
 					Vec3f dir = actor.position - position;
 					dir.y = 0;
