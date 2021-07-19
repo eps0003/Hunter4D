@@ -13,40 +13,40 @@ shared class Frustum
 	void Update(float[] matrix)
 	{
 		// Left clipping plane
-		plane2.normal.x			= matrix[3]  + matrix[0];
-		plane2.normal.y			= matrix[7]  + matrix[4];
-		plane2.normal.z			= matrix[11] + matrix[8];
-		plane2.distanceToOrigin	= matrix[15] + matrix[12];
+		plane2.normal.x         = matrix[3]  + matrix[0];
+		plane2.normal.y         = matrix[7]  + matrix[4];
+		plane2.normal.z         = matrix[11] + matrix[8];
+		plane2.distanceToOrigin = matrix[15] + matrix[12];
 
 		// Right clipping plane
-		plane3.normal.x			= matrix[3]  - matrix[0];
-		plane3.normal.y			= matrix[7]  - matrix[4];
-		plane3.normal.z			= matrix[11] - matrix[8];
-		plane3.distanceToOrigin	= matrix[15] - matrix[12];
+		plane3.normal.x         = matrix[3]  - matrix[0];
+		plane3.normal.y         = matrix[7]  - matrix[4];
+		plane3.normal.z         = matrix[11] - matrix[8];
+		plane3.distanceToOrigin = matrix[15] - matrix[12];
 
 		// Top clipping plane
-		plane4.normal.x			= matrix[3]  - matrix[1];
-		plane4.normal.y			= matrix[7]  - matrix[5];
-		plane4.normal.z			= matrix[11] - matrix[9];
-		plane4.distanceToOrigin	= matrix[15] - matrix[13];
+		plane4.normal.x         = matrix[3]  - matrix[1];
+		plane4.normal.y         = matrix[7]  - matrix[5];
+		plane4.normal.z         = matrix[11] - matrix[9];
+		plane4.distanceToOrigin = matrix[15] - matrix[13];
 
 		// Bottom clipping plane
-		plane5.normal.x			= matrix[3]  + matrix[1];
-		plane5.normal.y			= matrix[7]  + matrix[5];
-		plane5.normal.z			= matrix[11] + matrix[9];
-		plane5.distanceToOrigin	= matrix[15] + matrix[13];
+		plane5.normal.x         = matrix[3]  + matrix[1];
+		plane5.normal.y         = matrix[7]  + matrix[5];
+		plane5.normal.z         = matrix[11] + matrix[9];
+		plane5.distanceToOrigin = matrix[15] + matrix[13];
 
 		// Far clipping plane
-		plane1.normal.x			= matrix[3]  - matrix[2];
-		plane1.normal.y			= matrix[7]  - matrix[6];
-		plane1.normal.z			= matrix[11] - matrix[10];
-		plane1.distanceToOrigin	= matrix[15] - matrix[14];
+		plane1.normal.x         = matrix[3]  - matrix[2];
+		plane1.normal.y         = matrix[7]  - matrix[6];
+		plane1.normal.z         = matrix[11] - matrix[10];
+		plane1.distanceToOrigin = matrix[15] - matrix[14];
 
 		// Near clipping plane
-		plane0.normal.x			= matrix[2];
-		plane0.normal.y			= matrix[6];
-		plane0.normal.z			= matrix[10];
-		plane0.distanceToOrigin	= matrix[14];
+		plane0.normal.x         = matrix[2];
+		plane0.normal.y         = matrix[6];
+		plane0.normal.z         = matrix[10];
+		plane0.distanceToOrigin = matrix[14];
 
 		plane0.Normalize();
 		plane1.Normalize();
