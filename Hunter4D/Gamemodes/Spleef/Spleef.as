@@ -48,11 +48,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (cmd == this.getCommandID("player loaded"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
-
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
+		CPlayer@ player;
+		if (!saferead_player(params, @player)) return;
 
 		Vec3f spawnPos = map.dimensions * Vec3f(0.5f, 1.0f, 0.5f);
 		Actor::AddActor(SpleefActor(player, spawnPos));

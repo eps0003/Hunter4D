@@ -215,12 +215,7 @@ shared class Actor : ICollision
 
 	void DeserializeInit(CBitStream@ bs)
 	{
-		u16 playerId;
-		if (!bs.saferead_netid(playerId)) return;
-
-		@player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
-
+		if (!saferead_player(bs, @player)) return;
 		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
 		if (!rotation.deserialize(bs)) return;

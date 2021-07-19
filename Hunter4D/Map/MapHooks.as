@@ -33,11 +33,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		if (hasPlayer)
 		{
-			u16 playerId;
-			if (!params.saferead_netid(playerId)) return;
-
-			CPlayer@ player = getPlayerByNetworkId(playerId);
-			if (player !is null && player.isMyPlayer()) return;
+			CPlayer@ player;
+			if (saferead_player(params, @player) && player.isMyPlayer()) return;
 		}
 
 		uint index;
@@ -57,11 +54,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isClient() && cmd == this.getCommandID("place block"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
-
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
+		CPlayer@ player;
+		if (!saferead_player(params, @player)) return;
 
 		uint index;
 		if (!params.saferead_u32(index)) return;

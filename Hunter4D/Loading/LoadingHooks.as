@@ -1,4 +1,5 @@
 #include "Loading.as"
+#include "Utilities.as"
 
 void onInit(CRules@ this)
 {
@@ -21,11 +22,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isClient() && cmd == this.getCommandID("player loaded"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
-
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
+		CPlayer@ player;
+		if (!saferead_player(params, @player)) return;
 
 		Loading::SetPlayerLoaded(player, true);
 	}

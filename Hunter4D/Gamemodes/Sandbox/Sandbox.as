@@ -18,11 +18,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (cmd == this.getCommandID("player loaded"))
 	{
-		u16 playerId;
-		if (!params.saferead_netid(playerId)) return;
-
-		CPlayer@ player = getPlayerByNetworkId(playerId);
-		if (player is null) return;
+		CPlayer@ player;
+		if (!saferead_player(params, @player)) return;
 
 		SpawnPlayer(this, player);
 	}
