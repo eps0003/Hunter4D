@@ -27,7 +27,7 @@ void onTick(CRules@ this)
 
 	for (uint i = 0; i < chunksThisTick; i++)
 	{
-		@renderer.chunks[index] = Chunk(renderer, index);
+		renderer.SetChunk(index, Chunk(renderer, index));
 
 		index++;
 		if (index >= renderer.chunkCount)

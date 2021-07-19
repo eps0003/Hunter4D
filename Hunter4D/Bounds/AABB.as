@@ -1,18 +1,25 @@
 #include "IBounds.as"
+#include "Map.as"
 
 shared class AABB : IBounds
 {
 	Vec3f min;
 	Vec3f max;
 	Vec3f dim;
+	Vec3f center;
+	float corner; // Radius of a sphere, that is outside the box and collides with each corner
 
 	private Random random(getGameTime());
+	private Map@ map = Map::getMap();
 
 	AABB(Vec3f min, Vec3f max)
 	{
 		this.min = min;
 		this.max = max;
-		this.dim = (max - min).abs();
+
+		dim = (max - min).abs();
+		center = dim / 2.0f + min;
+		corner = Maths::Pow(Maths::Pow(dim.x, 3) + Maths::Pow(dim.y, 3) + Maths::Pow(dim.z, 3), 1.0f / 3.0f) * 0.6f;
 	}
 
 	bool intersectsAABB(Vec3f thisPos, AABB other, Vec3f otherPos)
@@ -41,7 +48,7 @@ shared class AABB : IBounds
 
 	bool intersectsMapEdge(Vec3f worldPos)
 	{
-		Vec3f dim = Map::getMap().dimensions;
+		Vec3f dim = map.dimensions;
 		return (
 			worldPos.x + min.x < 0 ||
 			worldPos.x + max.x > dim.x ||

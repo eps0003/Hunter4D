@@ -1,17 +1,20 @@
 #include "Map.as"
 #include "Chunk.as"
 #include "FaceFlags.as"
+#include "Camera.as"
 
 shared class MapRenderer
 {
-	Map@ map;
+	Map@ map = Map::getMap();
+	private Camera@ camera = Camera::getCamera();
 
-	Chunk@[] chunks;
+	private Chunk@[] chunks;
 	u8[] faceFlags;
 
 	u8 chunkDimension = 8;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
+	uint visibleChunkCount = 0;
 
 	string texture = "Pixel.png";
 	SMaterial@ material = SMaterial();
@@ -19,8 +22,6 @@ shared class MapRenderer
 	MapRenderer()
 	{
 		InitMaterial();
-
-		@map = Map::getMap();
 
 		faceFlags.set_length(map.blockCount);
 
@@ -121,17 +122,23 @@ shared class MapRenderer
 		material.SetVideoMaterial();
 
 		bool synced = Map::getSyncer().isSynced();
+		visibleChunkCount = 0;
 
 		for (uint i = 0; i < chunks.size(); i++)
 		{
 			Chunk@ chunk = chunks[i];
 
-			if (synced && chunk.rebuild)
+			if (chunk.isWithinFrustum(camera.getFrustum(), camera.interPosition))
 			{
-				chunk.GenerateMesh(i);
+				if (synced && chunk.rebuild)
+				{
+					chunk.GenerateMesh();
+				}
+
+				chunk.Render();
+				visibleChunkCount++;
 			}
 
-			chunk.Render();
 		}
 	}
 
@@ -185,6 +192,11 @@ shared class MapRenderer
 		}
 
 		faceFlags[index] = faces;
+	}
+
+	void SetChunk(int index, Chunk@ chunk)
+	{
+		@chunks[index] = chunk;
 	}
 
 	Chunk@ getChunkSafe(Vec3f position)

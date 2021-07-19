@@ -110,6 +110,23 @@ namespace Actor
 		return Actor::getActors().size();
 	}
 
+	shared uint getVisibleActorCount()
+	{
+		uint count = 0;
+
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
+		{
+			Actor@ actor = actors[i];
+			if (actor.isVisible())
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	shared void ClearActors()
 	{
 		Actor@[]@ actors = Actor::getActors();

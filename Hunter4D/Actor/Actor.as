@@ -39,6 +39,8 @@ shared class Actor : ICollision
 	private uint lastUpdate = 0;
 	private uint spawnTime = 0;
 
+	private float cullRadius = 3.0f;
+
 	private float cameraHeight = 1.6f;
 
 	private CRules@ rules = getRules();
@@ -173,6 +175,11 @@ shared class Actor : ICollision
 			gravity.Serialize(bs);
 			rules.SendCommand(rules.getCommandID("set actor gravity"), bs, true);
 		}
+	}
+
+	void SetCullRadius(float radius)
+	{
+		cullRadius = radius;
 	}
 
 	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream())
@@ -368,14 +375,17 @@ shared class Actor : ICollision
 
 	bool isVisible()
 	{
-		return !isMyActor();
+		return (
+			!isMyActor() &&
+			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius)
+		);
 	}
 
 	bool isNameplateVisible()
 	{
 		u8 localTeam = getLocalPlayer().getTeamNum();
 		return (
-			isVisible() &&
+			!isMyActor() &&
 			(getTeamNum() == localTeam || localTeam == rules.getSpectatorTeamNum())
 		);
 	}
@@ -418,11 +428,15 @@ shared class Actor : ICollision
 	{
 		print("Added actor: " + player.getUsername());
 
+		if (isClient())
+		{
+			@camera = Camera::getCamera();
+		}
+
 		if (isMyActor())
 		{
 			@driver = getDriver();
 			@controls = getControls();
-			@camera = Camera::getCamera();
 			@mouse = Mouse::getMouse();
 		}
 	}

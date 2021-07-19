@@ -2,6 +2,7 @@
 #include "Vec3f.as"
 #include "Interpolation.as"
 #include "Config.as"
+#include "Frustum.as"
 
 shared class Camera
 {
@@ -22,6 +23,8 @@ shared class Camera
 	private float[] projectionMatrix;
 	private float[] rotationMatrix;
 
+	private Frustum frustum;
+
 	private Driver@ driver;
 
 	Camera()
@@ -41,6 +44,7 @@ shared class Camera
 		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
 		UpdateFog();
+		UpdateFrustum();
 	}
 
 	void Update()
@@ -87,6 +91,7 @@ shared class Camera
 		{
 			_interRotation = value;
 			UpdateRotationMatrix();
+			UpdateFrustum();
 		}
 	}
 
@@ -101,6 +106,7 @@ shared class Camera
 
 		this.fov = fov;
 		UpdateProjectionMatrix();
+		UpdateFrustum();
 
 		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("fov", fov);
@@ -119,10 +125,16 @@ shared class Camera
 		renderDistance = distance;
 		UpdateProjectionMatrix();
 		UpdateFog();
+		UpdateFrustum();
 
 		ConfigFile@ cfg = Config::getConfig();
 		cfg.add_f32("render_distance", distance);
 		Config::SaveConfig(cfg);
+	}
+
+	Frustum@ getFrustum()
+	{
+		return frustum;
 	}
 
 	float[] getModelMatrix()
@@ -191,5 +203,12 @@ shared class Camera
 	private void UpdateFog()
 	{
 		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+	}
+
+	private void UpdateFrustum()
+	{
+		float[] rotProjMatrix;
+		Matrix::Multiply(projectionMatrix, rotationMatrix, rotProjMatrix);
+		frustum.Update(rotProjMatrix);
 	}
 }

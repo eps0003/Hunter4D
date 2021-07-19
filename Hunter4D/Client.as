@@ -58,9 +58,10 @@ void onRender(CRules@ this)
 		}
 	}
 
-	GUI::DrawText("Actors: " + actors.size(), Vec2f(10, 30), color_black);
-	GUI::DrawText("Objects: " + objects.size(), Vec2f(10, 50), color_black);
-	GUI::DrawText("Particles: " + particleManager.getParticleCount(), Vec2f(10, 70), color_black);
+	GUI::DrawText("Actors: " + Actor::getVisibleActorCount() + " / "  + actors.size(), Vec2f(10, 30), color_black);
+	GUI::DrawText("Objects: " + Object::getVisibleObjectCount() + " / "  + objects.size(), Vec2f(10, 50), color_black);
+	GUI::DrawText("Chunks: " + mapRenderer.visibleChunkCount + " / " + mapRenderer.chunkCount, Vec2f(10, 70), color_black);
+	GUI::DrawText("Particles: " + particleManager.getParticleCount(), Vec2f(10, 90), color_black);
 }
 
 void Render(int id)

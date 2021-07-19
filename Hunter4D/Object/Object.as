@@ -1,5 +1,6 @@
 #include "ObjectCommon.as"
 #include "Collision.as"
+#include "Camera.as"
 
 shared class Object : ICollision
 {
@@ -26,9 +27,12 @@ shared class Object : ICollision
 	private uint lastUpdate = 0;
 	private uint spawnTime = 0;
 
+	private float cullRadius = 3.0f;
+
 	private float[] matrix;
 
 	private CRules@ rules = getRules();
+	private Camera@ camera;
 
 	Object(Vec3f position)
 	{
@@ -155,6 +159,11 @@ shared class Object : ICollision
 			bs.write_f32(friction);
 			rules.SendCommand(rules.getCommandID("set object friction"), bs, true);
 		}
+	}
+
+	void SetCullRadius(float radius)
+	{
+		cullRadius = radius;
 	}
 
 	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init object")
@@ -352,7 +361,10 @@ shared class Object : ICollision
 
 	bool isVisible()
 	{
-		return hasCollider();
+		return (
+			hasCollider() &&
+			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius)
+		);
 	}
 
 	bool isOnGround()
@@ -367,6 +379,8 @@ shared class Object : ICollision
 		if (isClient())
 		{
 			Matrix::MakeIdentity(matrix);
+
+			@camera = Camera::getCamera();
 		}
 	}
 

@@ -70,6 +70,23 @@ namespace Object
 		return Object::getObjects().size();
 	}
 
+	shared uint getVisibleObjectCount()
+	{
+		uint count = 0;
+
+		Object@[]@ objects = Object::getObjects();
+		for (uint i = 0; i < objects.size(); i++)
+		{
+			Object@ object = objects[i];
+			if (object.isVisible())
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	shared void ClearObjects()
 	{
 		Object@[]@ objects = Object::getObjects();

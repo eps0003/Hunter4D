@@ -1,9 +1,14 @@
+#include "AABB.as"
+
 shared class Chunk
 {
 	Map@ map;
 	MapRenderer@ renderer;
 
 	uint index;
+	Vec3f position;
+
+	AABB bounds;
 
 	SMesh mesh;
 	Vertex[] vertices;
@@ -15,9 +20,18 @@ shared class Chunk
 	{
 		@this.renderer = renderer;
 		@map = renderer.map;
+
 		this.index = index;
+		position = renderer.chunkIndexToPos(index);
+
+		bounds = AABB(position * renderer.chunkDimension, (position + 1) * renderer.chunkDimension);
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
+	}
+
+	bool isWithinFrustum(Frustum@ frustum, Vec3f position)
+	{
+		return frustum.containsSphere(bounds.center - position, bounds.corner);
 	}
 
 	void Render()
@@ -41,16 +55,14 @@ shared class Chunk
 		return (flags & face) == face;
 	}
 
-	void GenerateMesh(uint chunkIndex)
+	void GenerateMesh()
 	{
 		rebuild = false;
 
 		vertices.clear();
 		indices.clear();
 
-		Vec3f chunkPos = renderer.chunkIndexToPos(chunkIndex);
-
-		Vec3f startWorldPos = chunkPos * renderer.chunkDimension;
+		Vec3f startWorldPos = position * renderer.chunkDimension;
 		Vec3f endWorldPos = (startWorldPos + renderer.chunkDimension).min(map.dimensions);
 
 		for (uint x = startWorldPos.x; x < endWorldPos.x; x++)
