@@ -121,6 +121,15 @@ shared class Object : ICollision
 		return (collisionFlags & flags) == flags;
 	}
 
+	bool isOnGround()
+	{
+		return (
+			hasCollider() &&
+			hasCollisionFlags(CollisionFlag::Blocks) &&
+			collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0))
+		);
+	}
+
 	Vec3f getGravity()
 	{
 		return gravity;
@@ -365,11 +374,6 @@ shared class Object : ICollision
 			hasCollider() &&
 			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius)
 		);
-	}
-
-	bool isOnGround()
-	{
-		return hasCollider() && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0));
 	}
 
 	void OnInit()

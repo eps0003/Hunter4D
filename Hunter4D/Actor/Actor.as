@@ -157,6 +157,15 @@ shared class Actor : ICollision
 		return (collisionFlags & flags) == flags;
 	}
 
+	bool isOnGround()
+	{
+		return (
+			hasCollider() &&
+			hasCollisionFlags(CollisionFlag::Blocks) &&
+			collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0))
+		);
+	}
+
 	Vec3f getGravity()
 	{
 		return gravity;
@@ -393,11 +402,6 @@ shared class Actor : ICollision
 	bool isCrosshairVisible()
 	{
 		return true;
-	}
-
-	bool isOnGround()
-	{
-		return hasCollider() && collider.intersectsNewSolid(position, position + Vec3f(0, -0.001f, 0));
 	}
 
 	private void UpdateCamera()

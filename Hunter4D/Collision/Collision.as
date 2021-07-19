@@ -12,6 +12,7 @@ shared interface ICollision
 	void RemoveCollisionFlags(u8 flags);
 	void SetCollisionFlags(u8 flags);
 	bool hasCollisionFlags(u8 flags);
+	bool isOnGround();
 }
 
 shared bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
