@@ -11,6 +11,7 @@
 shared class Map
 {
 	private SColor[] blocks;
+	private string[] usernames;
 	Vec3f dimensions;
 	uint blockCount = 0;
 
@@ -23,6 +24,11 @@ shared class Map
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
 		blocks = array<SColor>(blockCount, 0);
 
+		if (isServer())
+		{
+			usernames = array<string>(blockCount);
+		}
+
 		if (isClient())
 		{
 			@particleManager = Particles::getManager();
@@ -32,6 +38,7 @@ shared class Map
 	void opAssign(Map map)
 	{
 		blocks = map.blocks;
+		usernames = map.usernames;
 		dimensions = map.dimensions;
 		blockCount = map.blockCount;
 	}
@@ -133,6 +140,8 @@ shared class Map
 		// Sync block to clients
 		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as"))
 		{
+			usernames[index] = player !is null ? player.getUsername() : "";
+
 			CBitStream bs;
 			bs.write_bool(player !is null);
 			if (player !is null)
@@ -195,6 +204,21 @@ shared class Map
 	SColor getBlock(int index)
 	{
 		return blocks[index];
+	}
+
+	string getPlayerUsername(Vec3f position)
+	{
+		return getPlayerUsername(position.x, position.y, position.z);
+	}
+
+	string getPlayerUsername(int x, int y, int z)
+	{
+		return getPlayerUsername(posToIndex(x, y, z));
+	}
+
+	string getPlayerUsername(int index)
+	{
+		return usernames[index];
 	}
 
 	bool isValidBlock(Vec3f position)
