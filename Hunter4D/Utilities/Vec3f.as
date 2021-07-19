@@ -348,6 +348,16 @@ shared class Vec3f
 		);
 	}
 
+	float min()
+	{
+		return Maths::Min(Maths::Min(x, y), z);
+	}
+
+	float max()
+	{
+		return Maths::Max(Maths::Max(x, y), z);
+	}
+
 	Vec3f floor()
 	{
 		return Vec3f(
