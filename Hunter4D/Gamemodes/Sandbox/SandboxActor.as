@@ -99,6 +99,14 @@ shared class SandboxActor : Actor
 
 	void PostUpdate()
 	{
+		if (isClient())
+		{
+			if (controls.ActionKeyPressed(AK_BUILD_MODIFIER))
+			{
+				EdgeCollision();
+			}
+		}
+
 		Actor::PostUpdate();
 
 		if (isServer())
@@ -221,6 +229,41 @@ shared class SandboxActor : Actor
 		{
 			Vec3f position = raycast.hitWorldPos;
 			map.ClientSetBlockSafe(position, 0);
+		}
+	}
+
+	private void EdgeCollision()
+	{
+		if (!isOnGround() || velocity.y > 0) return;
+
+		AABB@ collider = getCollider();
+
+		if (!collider.intersectsNewSolid(position, position + Vec3f(velocity.x, velocity.y, 0)))
+		{
+			if (velocity.x > 0)
+			{
+				position.x = Maths::Floor(position.x + collider.max.x) + collider.max.x - 0.0001f;
+			}
+			else
+			{
+				position.x = Maths::Ceil(position.x + collider.min.x) + collider.min.x + 0.0001f;
+			}
+
+			velocity.x = 0;
+		}
+
+		if (!collider.intersectsNewSolid(position, position + Vec3f(0, velocity.y, velocity.z)))
+		{
+			if (velocity.z > 0)
+			{
+				position.z = Maths::Floor(position.z + collider.max.z) + collider.max.z - 0.0001f;
+			}
+			else
+			{
+				position.z = Maths::Ceil(position.z + collider.min.z) + collider.min.z + 0.0001f;
+			}
+
+			velocity.z = 0;
 		}
 	}
 
