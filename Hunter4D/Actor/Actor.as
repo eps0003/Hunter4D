@@ -12,6 +12,7 @@ shared class Actor : ICollision
 {
 	private u16 id = 0;
 	private CPlayer@ player;
+	private CBlob@ blob;
 
 	private string initCommand = "init actor";
 	private string syncCommand = "sync actor";
@@ -53,6 +54,7 @@ shared class Actor : ICollision
 	Actor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f())
 	{
 		@this.player = player;
+		@blob = player.getBlob();
 
 		this.position = position;
 		this.rotation = rotation;
@@ -90,6 +92,11 @@ shared class Actor : ICollision
 	CPlayer@ getPlayer()
 	{
 		return player;
+	}
+
+	CBlob@ getBlob()
+	{
+		return blob;
 	}
 
 	bool isMyActor()
