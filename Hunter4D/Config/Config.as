@@ -9,7 +9,7 @@ namespace Config
 			if (!cfg.loadFile("../Cache/" + Config::getConfigName()))
 			{
 				cfg.add_f32("fov", 70.0f);
-				cfg.add_f32("render_distance", 150.0f);
+				cfg.add_f32("render_distance", 100.0f);
 				cfg.add_f32("sensitivity", 1.0f);
 
 				Config::SaveConfig(cfg);
