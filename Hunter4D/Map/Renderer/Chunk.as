@@ -29,14 +29,12 @@ shared class Chunk
 		mesh.SetHardwareMapping(SMesh::STATIC);
 	}
 
-	bool isWithinFrustum(Frustum@ frustum, Vec3f position)
-	{
-		return frustum.containsSphere(bounds.center - position, bounds.corner);
-	}
-
 	void Render()
 	{
-		mesh.RenderMesh();
+		if (!vertices.empty())
+		{
+			mesh.RenderMesh();
+		}
 	}
 
 	private void AddIndices()

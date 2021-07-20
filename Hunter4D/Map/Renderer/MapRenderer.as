@@ -2,6 +2,7 @@
 #include "Chunk.as"
 #include "FaceFlags.as"
 #include "Camera.as"
+#include "Tree.as"
 
 shared class MapRenderer
 {
@@ -11,7 +12,9 @@ shared class MapRenderer
 	private Chunk@[] chunks;
 	u8[] faceFlags;
 
-	u8 chunkDimension = 8;
+	Tree@ tree;
+
+	u8 chunkDimension = 16;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 	uint visibleChunkCount = 0;
@@ -112,6 +115,20 @@ shared class MapRenderer
 		}
 	}
 
+	bool isValidChunk(Vec3f position)
+	{
+		return isValidChunk(position.x, position.y, position.z);
+	}
+
+	bool isValidChunk(int x, int y, int z)
+	{
+		return (
+			x >= 0 && x < chunkDimensions.x &&
+			y >= 0 && y < chunkDimensions.y &&
+			z >= 0 && z < chunkDimensions.z
+		);
+	}
+
 	bool isValidChunk(int index)
 	{
 		return index >= 0 && index < chunks.size();
@@ -121,24 +138,22 @@ shared class MapRenderer
 	{
 		material.SetVideoMaterial();
 
-		bool synced = Map::getSyncer().isSynced();
 		visibleChunkCount = 0;
+
+		Chunk@[] chunks;
+		tree.GetVisibleChunks(chunks);
 
 		for (uint i = 0; i < chunks.size(); i++)
 		{
 			Chunk@ chunk = chunks[i];
 
-			if (chunk.isWithinFrustum(camera.getFrustum(), camera.interPosition))
+			if (chunk.rebuild)
 			{
-				if (synced && chunk.rebuild)
-				{
-					chunk.GenerateMesh();
-				}
-
-				chunk.Render();
-				visibleChunkCount++;
+				chunk.GenerateMesh();
 			}
 
+			chunk.Render();
+			visibleChunkCount++;
 		}
 	}
 
@@ -206,16 +221,36 @@ shared class MapRenderer
 
 	Chunk@ getChunkSafe(int x, int y, int z)
 	{
-		return getChunkSafe(chunkPosToChunkIndex(x, y, z));
+		if (isValidChunk(x, y, z))
+		{
+			return getChunk(x, y, z);
+		}
+		return null;
 	}
 
 	Chunk@ getChunkSafe(int index)
 	{
 		if (isValidChunk(index))
 		{
-			return chunks[index];
+			return getChunk(index);
 		}
 		return null;
+	}
+
+	Chunk@ getChunk(Vec3f position)
+	{
+		return getChunk(position.x, position.y, position.z);
+	}
+
+
+	Chunk@ getChunk(int x, int y, int z)
+	{
+		return getChunk(chunkPosToChunkIndex(x, y, z));
+	}
+
+	Chunk@ getChunk(int index)
+	{
+		return chunks[index];
 	}
 
 	Vec3f worldPosToChunkPos(Vec3f position)

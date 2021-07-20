@@ -34,6 +34,8 @@ void onTick(CRules@ this)
 		{
 			print("Chunks generated!");
 
+			@renderer.tree = Tree();
+
 			this.RemoveScript("GenerateChunks.as");
 			this.RemoveScript("LoadingScreen.as");
 			this.AddScript("Client.as");
