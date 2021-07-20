@@ -26,16 +26,13 @@ shared bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout ve
 
 		if (thing.hasCollisionFlags(CollisionFlag::Blocks) && velocity.x != 0 && collider.intersectsNewSolid(position, xPosition))
 		{
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
 			if (velocity.x > 0)
 			{
-				position.x = max.x - collider.max.x - 0.0001f;
+				position.x = Maths::Ceil(position.x + collider.max.x) - collider.max.x - 0.0001f;
 			}
 			else
 			{
-				position.x = min.x - collider.min.x + 0.0001f;
+				position.x = Maths::Floor(position.x + collider.min.x) - collider.min.x + 0.0001f;
 			}
 
 			collided = true;
@@ -78,16 +75,13 @@ shared bool CollisionZ(ICollision@ thing, Vec3f &inout position, Vec3f &inout ve
 
 		if (thing.hasCollisionFlags(CollisionFlag::Blocks) && velocity.z != 0 && collider.intersectsNewSolid(position, zPosition))
 		{
-			Vec3f min = (position + collider.min).floor();
-			Vec3f max = (position + collider.max).ceil();
-
 			if (velocity.z > 0)
 			{
-				position.z = max.z - collider.max.z - 0.0001f;
+				position.z = Maths::Ceil(position.z + collider.max.z) - collider.max.z - 0.0001f;
 			}
 			else
 			{
-				position.z = min.z - collider.min.z + 0.0001f;
+				position.z = Maths::Floor(position.z + collider.min.z) - collider.min.z + 0.0001f;
 			}
 
 			collided = true;
