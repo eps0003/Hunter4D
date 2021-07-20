@@ -28,6 +28,8 @@ shared class SandboxActor : Actor
 
 	bool taunting = false;
 
+	private bool canJump = true;
+
 	SandboxActor(CPlayer@ player, Vec3f position)
 	{
 		super(player, position);
@@ -58,6 +60,16 @@ shared class SandboxActor : Actor
 	{
 		opAssign(cast<Actor>(actor));
 		taunting = actor.taunting;
+	}
+
+	void PreUpdate()
+	{
+		Actor::PreUpdate();
+
+		if (!controls.ActionKeyPressed(AK_ACTION3))
+		{
+			canJump = true;
+		}
 	}
 
 	void Update()
@@ -180,9 +192,10 @@ shared class SandboxActor : Actor
 				dir = dir.RotateBy(camera.rotation.y);
 			}
 
-			if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
+			if (canJump && isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
 			{
 				velocity.y = jumpForce;
+				canJump = false;
 			}
 		}
 
