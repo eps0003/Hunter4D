@@ -140,9 +140,7 @@ shared class MapRenderer
 
 		visibleChunkCount = 0;
 
-		Chunk@[] chunks;
-		tree.GetVisibleChunks(chunks);
-
+		Chunk@[] chunks = tree.getVisibleChunks();
 		for (uint i = 0; i < chunks.size(); i++)
 		{
 			Chunk@ chunk = chunks[i];

@@ -13,10 +13,11 @@ shared class Tree
 		@branch = Branch(mapRenderer, Vec3f(), Vec3f(mapRenderer.chunkDimensions.max()));
 	}
 
-	void GetVisibleChunks(Chunk@[]@ visibleChunks)
+	Chunk@[] getVisibleChunks()
 	{
-		visibleChunks.clear();
-		branch.GetVisibleChunks(camera.getFrustum(), camera.interPosition, visibleChunks);
+		Chunk@[] chunks;
+		branch.GetVisibleChunks(camera.getFrustum(), camera.interPosition, chunks);
+		return chunks;
 	}
 }
 
@@ -43,7 +44,7 @@ shared class Branch
 	private Chunk@ chunk6;
 	private Chunk@ chunk7;
 
-	Branch(MapRenderer@ mapRenderer, Vec3f min, Vec3f max, uint i = 0)
+	Branch(MapRenderer@ mapRenderer, Vec3f min, Vec3f max)
 	{
 		bounds = AABB(min, max);
 		worldBounds = AABB(min * mapRenderer.chunkDimension, max * mapRenderer.chunkDimension);
@@ -59,46 +60,47 @@ shared class Branch
 			Vec3f half = min + (dim / 2.0f).floor();
 
 			// Subdivide bottom half
-			@branch0 = Branch(mapRenderer, Vec3f(min.x, min.y, min.z), Vec3f(half.x, half.y, half.z), i + 1);
+			@branch0 = Branch(mapRenderer, Vec3f(min.x, min.y, min.z), Vec3f(half.x, half.y, half.z));
 
 			if (half.x < chunkDim.x)
 			{
-				@branch1 = Branch(mapRenderer, Vec3f(half.x, min.y, min.z), Vec3f(max.x, half.y, half.z), i + 1);
+				@branch1 = Branch(mapRenderer, Vec3f(half.x, min.y, min.z), Vec3f(max.x, half.y, half.z));
 			}
 
 			if (half.z < chunkDim.z)
 			{
-				@branch2 = Branch(mapRenderer, Vec3f(min.x, min.y, half.z), Vec3f(half.x, half.y, max.z), i + 1);
+				@branch2 = Branch(mapRenderer, Vec3f(min.x, min.y, half.z), Vec3f(half.x, half.y, max.z));
 
 				if (half.x < chunkDim.x)
 				{
-					@branch3 = Branch(mapRenderer, Vec3f(half.x, min.y, half.z), Vec3f(max.x, half.y, max.z), i + 1);
+					@branch3 = Branch(mapRenderer, Vec3f(half.x, min.y, half.z), Vec3f(max.x, half.y, max.z));
 				}
 			}
 
 			// Subdivide top half
 			if (half.y < chunkDim.y)
 			{
-				@branch4 = Branch(mapRenderer, Vec3f(min.x, half.y, min.z), Vec3f(half.x, max.y, half.z), i + 1);
+				@branch4 = Branch(mapRenderer, Vec3f(min.x, half.y, min.z), Vec3f(half.x, max.y, half.z));
 
 				if (half.x < chunkDim.x)
 				{
-					@branch5 = Branch(mapRenderer, Vec3f(half.x, half.y, min.z), Vec3f(max.x, max.y, half.z), i + 1);
+					@branch5 = Branch(mapRenderer, Vec3f(half.x, half.y, min.z), Vec3f(max.x, max.y, half.z));
 				}
 
 				if (half.z < chunkDim.z)
 				{
-					@branch6 = Branch(mapRenderer, Vec3f(min.x, half.y, half.z), Vec3f(half.x, max.y, max.z), i + 1);
+					@branch6 = Branch(mapRenderer, Vec3f(min.x, half.y, half.z), Vec3f(half.x, max.y, max.z));
 
 					if (half.x < chunkDim.x)
 					{
-						@branch7 = Branch(mapRenderer, Vec3f(half.x, half.y, half.z), Vec3f(max.x, max.y,  max.z), i + 1);
+						@branch7 = Branch(mapRenderer, Vec3f(half.x, half.y, half.z), Vec3f(max.x, max.y,  max.z));
 					}
 				}
 			}
 		}
 		else
 		{
+			// Get bottom chunks
 			@chunk0 = mapRenderer.getChunk(min.x, min.y, min.z);
 
 			if (min.x + 1 < chunkDim.x)
@@ -116,6 +118,7 @@ shared class Branch
 				}
 			}
 
+			// Get top chunks
 			if (min.y + 1 < chunkDim.y)
 			{
 				@chunk4 = mapRenderer.getChunk(min.x, min.y + 1, min.z);
