@@ -18,7 +18,7 @@ shared class AABB : IBounds
 		this.max = max;
 
 		dim = (max - min).abs();
-		center = dim / 2.0f + min;
+		center = (max + min) * 0.5f;
 		radius = Maths::Sqrt(dim.x*dim.x + dim.y*dim.y + dim.z*dim.z) * 0.5f;
 	}
 

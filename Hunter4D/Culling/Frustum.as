@@ -43,10 +43,10 @@ shared class Frustum
 		plane1.distanceToOrigin = matrix[15] - matrix[14];
 
 		// Near clipping plane
-		plane0.normal.x         = matrix[2];
-		plane0.normal.y         = matrix[6];
-		plane0.normal.z         = matrix[10];
-		plane0.distanceToOrigin = matrix[14];
+		plane0.normal.x         = matrix[3]  - matrix[2];
+		plane0.normal.y         = matrix[7]  - matrix[6];
+		plane0.normal.z         = matrix[11] - matrix[10];
+		plane0.distanceToOrigin = matrix[15] - matrix[14];
 
 		plane0.Normalize();
 		plane1.Normalize();
