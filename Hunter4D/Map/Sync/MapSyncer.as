@@ -111,7 +111,9 @@ shared class MapSyncer
 		// Serialize map size
 		if (index == 0)
 		{
-			map.dimensions.Serialize(bs);
+			bs.write_u16(map.dimensions.x);
+			bs.write_u16(map.dimensions.y);
+			bs.write_u16(map.dimensions.z);
 		}
 
 		// Loop through these blocks and serialize
@@ -120,7 +122,14 @@ shared class MapSyncer
 			if (i >= map.blockCount) break;
 
 			SColor block = map.getBlock(i);
-			bs.write_u32(block.color);
+
+			bool visible = map.isVisible(block);
+			bs.write_bool(visible);
+
+			if (visible)
+			{
+				bs.write_u32(block.color);
+			}
 		}
 
 		// Send to requesting player
@@ -146,9 +155,12 @@ shared class MapSyncer
 
 		if (index == 0)
 		{
-			Vec3f dimensions;
-			if (!dimensions.deserialize(packet)) return;
-			map = Map(dimensions);
+			u16 x, y, z;
+			if (!packet.saferead_u16(x)) return;
+			if (!packet.saferead_u16(y)) return;
+			if (!packet.saferead_u16(z)) return;
+
+			map = Map(Vec3f(x, y, z));
 		}
 
 		// Loop through these blocks and deserialize
@@ -156,10 +168,16 @@ shared class MapSyncer
 		{
 			if (i >= map.blockCount) break;
 
-			uint block;
-			if (!packet.saferead_u32(block)) return;
+			bool visible;
+			if (!packet.saferead_bool(visible)) return;
 
-			map.SetBlock(i, block);
+			if (visible)
+			{
+				uint block;
+				if (!packet.saferead_u32(block)) return;
+
+				map.SetBlock(i, block);
+			}
 		}
 
 		if (index == getTotalPackets() - 1)
