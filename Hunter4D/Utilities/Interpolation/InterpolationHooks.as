@@ -30,6 +30,10 @@ void onTick(CRules@ this)
 		fps /= size;
 		fpsArr.clear();
 	}
+	else if (!isWindowFocused())
+	{
+		fps = 60;
+	}
 	this.set_u32("fps", Maths::Round(fps));
 }
 
