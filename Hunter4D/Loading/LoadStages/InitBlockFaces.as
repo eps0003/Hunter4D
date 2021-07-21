@@ -6,12 +6,18 @@
 Map@ map;
 MapRenderer@ renderer;
 uint index = 0;
+uint x = 0;
+uint y = 0;
+uint z = 0;
 
 void onInit(CRules@ this)
 {
 	@map = Map::getMap();
 	@renderer = Map::getRenderer();
 	index = 0;
+	x = 0;
+	y = 0;
+	z = 0;
 
 	this.set_string("loading message", "Initializing block faces...");
 }
@@ -23,23 +29,38 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint blocksThisTick = getFPS() * 30;
-
-	for (uint i = 0; i < blocksThisTick; i++)
-	{
-		renderer.UpdateBlockFaces(index);
-
-		index++;
-		if (index >= map.blockCount)
-		{
-			print("Block faces initialized!");
-
-			this.RemoveScript("InitBlockFaces.as");
-			this.AddScript("GenerateChunks.as");
-
-			break;
-		}
-	}
+	uint blocksThisTick = getFPS() * 60;
+	uint i = 0;
 
 	this.set_f32("loading progress", index / Maths::Max(1, map.blockCount));
+
+	for (; y < map.dimensions.y; y++)
+	{
+		for (; x < map.dimensions.x; x++)
+		{
+			for (; z < map.dimensions.z; z++)
+			{
+				renderer.UpdateBlockFaces(x, y, z);
+
+				if (++index >= map.blockCount)
+				{
+					print("Block faces initialized!");
+
+					this.RemoveScript("InitBlockFaces.as");
+					this.AddScript("GenerateChunks.as");
+
+					return;
+				}
+
+				if (++i >= blocksThisTick)
+				{
+					return;
+				}
+			}
+
+			z = 0;
+		}
+
+		x = 0;
+	}
 }
