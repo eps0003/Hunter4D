@@ -1,5 +1,4 @@
 #include "AABB.as"
-#include "CollisionFlags.as"
 #include "Vec3f.as"
 #include "Map.as"
 
@@ -13,6 +12,14 @@ shared interface ICollision
 	void SetCollisionFlags(u8 flags);
 	bool hasCollisionFlags(u8 flags);
 	bool isOnGround();
+}
+
+enum CollisionFlag
+{
+	None = 0,
+	Blocks = 1,
+	MapEdge = 2,
+	All = 3
 }
 
 shared bool CollisionX(ICollision@ thing, Vec3f &inout position, Vec3f &inout velocity)
