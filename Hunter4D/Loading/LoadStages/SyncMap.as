@@ -17,10 +17,6 @@ void onRestart(CRules@ this)
 	this.RemoveScript("SyncMap.as");
 }
 
-void onInitRestart(CRules@ this)
-{
-}
-
 void onTick(CRules@ this)
 {
 	if (isServer())
