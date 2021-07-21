@@ -10,6 +10,7 @@ shared class Frustum
 	private Plane plane4;
 	private Plane plane5;
 
+	// https://stackoverflow.com/a/51335003/10456572
 	void Update(float[] matrix)
 	{
 		// Left clipping plane
