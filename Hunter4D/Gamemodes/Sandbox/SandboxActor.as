@@ -30,9 +30,9 @@ shared class SandboxActor : Actor
 
 	private bool canJump = true;
 
-	SandboxActor(CPlayer@ player, Vec3f position)
+	SandboxActor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f())
 	{
-		super(player, position);
+		super(player, position, rotation);
 
 		SetCollider(AABB(Vec3f(-0.3f, 0.0f, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);

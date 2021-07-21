@@ -6,9 +6,9 @@ shared class SpectatorActor : Actor
 	float acceleration = 0.2f;
 	float friction = 0.4f;
 
-	SpectatorActor(CPlayer@ player, Vec3f position)
+	SpectatorActor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f())
 	{
-		super(player, position);
+		super(player, position, rotation);
 	}
 
 	SpectatorActor(Actor@ actor)
