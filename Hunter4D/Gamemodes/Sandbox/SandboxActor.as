@@ -258,11 +258,11 @@ shared class SandboxActor : Actor
 		{
 			if (velocity.x > 0)
 			{
-				position.x = Maths::Floor(position.x + collider.max.x) + collider.max.x - 0.0001f;
+				position.x = Maths::Ceil(position.x + collider.min.x) + collider.max.x - 0.0001f;
 			}
 			else
 			{
-				position.x = Maths::Ceil(position.x + collider.min.x) + collider.min.x + 0.0001f;
+				position.x = Maths::Floor(position.x + collider.max.x) + collider.min.x + 0.0001f;
 			}
 
 			velocity.x = 0;
@@ -272,11 +272,11 @@ shared class SandboxActor : Actor
 		{
 			if (velocity.z > 0)
 			{
-				position.z = Maths::Floor(position.z + collider.max.z) + collider.max.z - 0.0001f;
+				position.z = Maths::Ceil(position.z + collider.min.z) + collider.max.z - 0.0001f;
 			}
 			else
 			{
-				position.z = Maths::Ceil(position.z + collider.min.z) + collider.min.z + 0.0001f;
+				position.z = Maths::Floor(position.z + collider.max.z) + collider.min.z + 0.0001f;
 			}
 
 			velocity.z = 0;
