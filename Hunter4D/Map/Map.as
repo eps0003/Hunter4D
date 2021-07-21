@@ -1,5 +1,4 @@
 #include "MapCommon.as"
-#include "Blocks.as"
 #include "MapRenderer.as"
 #include "Vec3f.as"
 #include "MapSyncer.as"
@@ -80,7 +79,7 @@ shared class Map
 
 		if (canSetBlock(player, index, block))
 		{
-			if (!Blocks::isVisible(block))
+			if (!isVisible(block))
 			{
 				Particles::EmitBlockBreakParticles(index, blocks[index]);
 			}
@@ -160,7 +159,7 @@ shared class Map
 				Map::getRenderer().GenerateMesh(indexToPos(index));
 			}
 
-			if (!Blocks::isVisible(block) && Loading::isMyPlayerLoaded())
+			if (!isVisible(block) && Loading::isMyPlayerLoaded())
 			{
 				ParticleManager@ particleManager = Particles::getManager();
 				particleManager.CheckStaticParticles();
@@ -262,7 +261,7 @@ shared class Map
 
 	bool canSetBlock(CPlayer@ player, int index, SColor block)
 	{
-		if (Blocks::isSolid(block))
+		if (isSolid(block))
 		{
 			Vec3f position = indexToPos(index);
 
@@ -296,5 +295,20 @@ shared class Map
 		}
 
 		return true;
+	}
+
+	bool isVisible(SColor block)
+	{
+		return block.getAlpha() > 0;
+	}
+
+	bool isSolid(SColor block)
+	{
+		return isVisible(block);
+	}
+
+	bool isDestructible(SColor block)
+	{
+		return isVisible(block);
 	}
 }

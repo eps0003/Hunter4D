@@ -1,4 +1,3 @@
-#include "Blocks.as"
 #include "Vec3f.as"
 #include "Map.as"
 
@@ -69,7 +68,7 @@ shared class Ray
 			SColor block = map.getBlockSafe(worldPos);
 
 			//hit a block
-			bool hit = solidOnly ? Blocks::isSolid(block) : Blocks::isVisible(block);
+			bool hit = solidOnly ? map.isSolid(block) : map.isVisible(block);
 			if (hit)
 			{
 				dist = Maths::Max(0, dist);

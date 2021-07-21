@@ -155,59 +155,6 @@ shared class Chunk
 					vertices.push_back(Vertex(x + w, y    , z + w, x1, y2, col));
 					AddIndices();
 				}
-
-				// if (Blocks::isTransparent(block))
-				// {
-				// 	float o = 0.005f;
-
-				// 	//right inner
-				// 	col = colors[Direction::Left];
-				// 	vertices.push_back(Vertex(x + w - o, y + w, z + w, x1, y1, col));
-				// 	vertices.push_back(Vertex(x + w - o, y + w, z    , x2, y1, col));
-				// 	vertices.push_back(Vertex(x + w - o, y    , z    , x2, y2, col));
-				// 	vertices.push_back(Vertex(x + w - o, y    , z + w, x1, y2, col));
-				// 	AddIndices();
-
-				// 	//left inner
-				// 	col = colors[Direction::Right];
-				// 	vertices.push_back(Vertex(x + o, y + w, z    , x1, y1, col));
-				// 	vertices.push_back(Vertex(x + o, y + w, z + w, x2, y1, col));
-				// 	vertices.push_back(Vertex(x + o, y    , z + w, x2, y2, col));
-				// 	vertices.push_back(Vertex(x + o, y    , z    , x1, y2, col));
-				// 	AddIndices();
-
-				// 	//up inner
-				// 	col = colors[Direction::Down];
-				// 	vertices.push_back(Vertex(x + w, y + w - o, z + w, x1, y1, col));
-				// 	vertices.push_back(Vertex(x    , y + w - o, z + w, x2, y1, col));
-				// 	vertices.push_back(Vertex(x    , y + w - o, z    , x2, y2, col));
-				// 	vertices.push_back(Vertex(x + w, y + w - o, z    , x1, y2, col));
-				// 	AddIndices();
-
-				// 	//down inner
-				// 	col = colors[Direction::Up];
-				// 	vertices.push_back(Vertex(x    , y + o, z + w, x1, y1, col));
-				// 	vertices.push_back(Vertex(x + w, y + o, z + w, x2, y1, col));
-				// 	vertices.push_back(Vertex(x + w, y + o, z    , x2, y2, col));
-				// 	vertices.push_back(Vertex(x    , y + o, z    , x1, y2, col));
-				// 	AddIndices();
-
-				// 	//back inner
-				// 	col = colors[Direction::Front];
-				// 	vertices.push_back(Vertex(x    , y + w, z + w - o, x1, y1, col));
-				// 	vertices.push_back(Vertex(x + w, y + w, z + w - o, x2, y1, col));
-				// 	vertices.push_back(Vertex(x + w, y    , z + w - o, x2, y2, col));
-				// 	vertices.push_back(Vertex(x    , y    , z + w - o, x1, y2, col));
-				// 	AddIndices();
-
-				// 	//front inner
-				// 	col = colors[Direction::Back];
-				// 	vertices.push_back(Vertex(x + w, y + w, z + o, x1, y1, col));
-				// 	vertices.push_back(Vertex(x    , y + w, z + o, x2, y1, col));
-				// 	vertices.push_back(Vertex(x    , y    , z + o, x2, y2, col));
-				// 	vertices.push_back(Vertex(x + w, y    , z + o, x1, y2, col));
-				// 	AddIndices();
-				// }
 			}
 		}
 

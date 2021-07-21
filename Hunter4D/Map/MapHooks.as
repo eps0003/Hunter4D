@@ -45,7 +45,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!params.saferead_u32(blockInt)) return;
 		SColor block(blockInt);
 
-		if (!Blocks::isVisible(block))
+		if (!map.isVisible(block))
 		{
 			Particles::EmitBlockBreakParticles(index, map.getBlock(index));
 		}

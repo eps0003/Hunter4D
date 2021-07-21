@@ -171,34 +171,34 @@ shared class MapRenderer
 	{
 		u8 faces = FaceFlag::None;
 
-		if (Blocks::isVisible(map.getBlock(index)))
+		if (map.isVisible(map.getBlock(index)))
 		{
-			if (x == 0 || Blocks::isTransparent(map.getBlock(x - 1, y, z)))
+			if (x == 0 || !map.isVisible(map.getBlock(x - 1, y, z)))
 			{
 				faces |= FaceFlag::Left;
 			}
 
-			if (x == map.dimensions.x - 1 || Blocks::isTransparent(map.getBlock(x + 1, y, z)))
+			if (x == map.dimensions.x - 1 || !map.isVisible(map.getBlock(x + 1, y, z)))
 			{
 				faces |= FaceFlag::Right;
 			}
 
-			if (y == 0 || Blocks::isTransparent(map.getBlock(x, y - 1, z)))
+			if (y == 0 || !map.isVisible(map.getBlock(x, y - 1, z)))
 			{
 				faces |= FaceFlag::Down;
 			}
 
-			if (y == map.dimensions.y - 1 || Blocks::isTransparent(map.getBlock(x, y + 1, z)))
+			if (y == map.dimensions.y - 1 || !map.isVisible(map.getBlock(x, y + 1, z)))
 			{
 				faces |= FaceFlag::Up;
 			}
 
-			if (z == 0 || Blocks::isTransparent(map.getBlock(x, y, z - 1)))
+			if (z == 0 || !map.isVisible(map.getBlock(x, y, z - 1)))
 			{
 				faces |= FaceFlag::Front;
 			}
 
-			if (z == map.dimensions.z - 1 || Blocks::isTransparent(map.getBlock(x, y, z + 1)))
+			if (z == map.dimensions.z - 1 || !map.isVisible(map.getBlock(x, y, z + 1)))
 			{
 				faces |= FaceFlag::Back;
 			}

@@ -80,7 +80,7 @@ shared class ParticleManager
 
 			Vec3f opf = oldPosition[i].floor();
 			Vec3f pf = position[i].floor();
-			if (opf != pf && Blocks::isSolid(map.getBlockSafe(pf)))
+			if (opf != pf && map.isSolid(map.getBlockSafe(pf)))
 			{
 				if (dieOnCollide[i])
 				{
@@ -262,7 +262,7 @@ shared class ParticleManager
 			if (!static[i] || gravity[i] == 0.0f) continue;
 
 			Vec3f pos = position[i] - Vec3f(0, gravity[i], 0);
-			if (!Blocks::isSolid(map.getBlockSafe(pos)))
+			if (!map.isSolid(map.getBlockSafe(pos)))
 			{
 				static[i] = false;
 			}

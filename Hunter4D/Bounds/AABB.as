@@ -90,7 +90,7 @@ shared class AABB : IBounds
 			}
 
 			SColor block = map.getBlockSafe(x, y, z);
-			if (Blocks::isSolid(block))
+			if (map.isSolid(block))
 			{
 				return true;
 			}
