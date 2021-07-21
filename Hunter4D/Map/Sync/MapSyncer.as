@@ -7,7 +7,7 @@ shared class MapSyncer
 	private Map@ map = Map::getMap();
 	private MapRequest@[] mapRequests;
 	CBitStream@[] mapPackets;
-	private uint blocksPerPacket = 10000;
+	private uint blocksPerPacket = 20000;
 	private bool synced = false;
 	private u16 index = 0;
 

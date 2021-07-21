@@ -23,7 +23,7 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint chunksThisTick = getFPS() * Maths::Pow(renderer.chunkDimension, -3) * 60;
+	uint chunksThisTick = getFPS() * Maths::Pow(renderer.chunkDimension, -3) * 300;
 
 	for (uint i = 0; i < chunksThisTick; i++)
 	{

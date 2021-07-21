@@ -29,7 +29,7 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint blocksThisTick = getFPS() * 60;
+	uint blocksThisTick = getFPS() * 40;
 	uint i = 0;
 
 	this.set_f32("loading progress", index / Maths::Max(1, map.blockCount));
