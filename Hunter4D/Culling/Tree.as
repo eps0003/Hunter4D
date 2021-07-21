@@ -13,11 +13,9 @@ shared class Tree
 		@branch = Branch(mapRenderer, Vec3f(), Vec3f(mapRenderer.chunkDimensions.max()));
 	}
 
-	Chunk@[] getVisibleChunks()
+	uint RenderVisibleChunks()
 	{
-		Chunk@[] chunks;
-		branch.GetVisibleChunks(camera.getFrustum(), camera.interPosition, chunks);
-		return chunks;
+		return branch.RenderVisibleChunks(camera.getFrustum(), camera.interPosition);
 	}
 }
 
@@ -51,6 +49,7 @@ shared class Branch
 
 		min = bounds.min;
 		max = bounds.max;
+
 		Vec3f dim = bounds.dim;
 		Vec3f chunkDim = mapRenderer.chunkDimensions;
 
@@ -103,36 +102,36 @@ shared class Branch
 			// Get bottom chunks
 			@chunk0 = mapRenderer.getChunk(min.x, min.y, min.z);
 
-			if (min.x + 1 < chunkDim.x)
+			if (dim.x == 2)
 			{
 				@chunk1 = mapRenderer.getChunk(min.x + 1, min.y, min.z);
 			}
 
-			if (min.z + 1 < chunkDim.z)
+			if (dim.z == 2)
 			{
 				@chunk2 = mapRenderer.getChunk(min.x, min.y, min.z + 1);
 
-				if (min.x + 1 < chunkDim.x)
+				if (dim.x == 2)
 				{
 					@chunk3 = mapRenderer.getChunk(min.x + 1, min.y, min.z + 1);
 				}
 			}
 
 			// Get top chunks
-			if (min.y + 1 < chunkDim.y)
+			if (dim.y == 2 && max.y <= chunkDim.y)
 			{
 				@chunk4 = mapRenderer.getChunk(min.x, min.y + 1, min.z);
 
-				if (min.x + 1 < chunkDim.x)
+				if (dim.x == 2)
 				{
 					@chunk5 = mapRenderer.getChunk(min.x + 1, min.y + 1, min.z);
 				}
 
-				if (min.z + 1 < chunkDim.z)
+				if (dim.z == 2)
 				{
 					@chunk6 = mapRenderer.getChunk(min.x, min.y + 1, min.z + 1);
 
-					if (min.x + 1 < chunkDim.x)
+					if (dim.x == 2)
 					{
 						@chunk7 = mapRenderer.getChunk(min.x + 1, min.y + 1, min.z + 1);
 					}
@@ -141,55 +140,75 @@ shared class Branch
 		}
 	}
 
-	void GetVisibleChunks(Frustum frustum, Vec3f camPos, Chunk@[]@ visibleChunks)
+	uint RenderVisibleChunks(Frustum frustum, Vec3f camPos)
 	{
+		uint visibleChunkCount = 0;
+
 		if (frustum.containsSphere(worldBounds.center - camPos, worldBounds.radius))
 		{
 			if (chunk0 !is null)
 			{
-				uint index = visibleChunks.size();
+				if (frustum.containsSphere(chunk0.bounds.center - camPos, chunk0.bounds.radius))
+				{
+					chunk0.Render();
+					visibleChunkCount++;
+				}
 
-				bool c0 = frustum.containsSphere(chunk0.bounds.center - camPos, chunk0.bounds.radius);
-				bool c1 = chunk1 !is null && frustum.containsSphere(chunk1.bounds.center - camPos, chunk1.bounds.radius);
-				bool c2 = chunk2 !is null && frustum.containsSphere(chunk2.bounds.center - camPos, chunk2.bounds.radius);
-				bool c3 = chunk3 !is null && frustum.containsSphere(chunk3.bounds.center - camPos, chunk3.bounds.radius);
-				bool c4 = chunk4 !is null && frustum.containsSphere(chunk4.bounds.center - camPos, chunk4.bounds.radius);
-				bool c5 = chunk5 !is null && frustum.containsSphere(chunk5.bounds.center - camPos, chunk5.bounds.radius);
-				bool c6 = chunk6 !is null && frustum.containsSphere(chunk6.bounds.center - camPos, chunk6.bounds.radius);
-				bool c7 = chunk7 !is null && frustum.containsSphere(chunk7.bounds.center - camPos, chunk7.bounds.radius);
+				if (chunk1 !is null && frustum.containsSphere(chunk1.bounds.center - camPos, chunk1.bounds.radius))
+				{
+					chunk1.Render();
+					visibleChunkCount++;
+				}
 
-				u8 visibleCount = 0;
-				if (c0) visibleCount++;
-				if (c1) visibleCount++;
-				if (c2) visibleCount++;
-				if (c3) visibleCount++;
-				if (c4) visibleCount++;
-				if (c5) visibleCount++;
-				if (c6) visibleCount++;
-				if (c7) visibleCount++;
+				if (chunk2 !is null && frustum.containsSphere(chunk2.bounds.center - camPos, chunk2.bounds.radius))
+				{
+					chunk2.Render();
+					visibleChunkCount++;
+				}
 
-				visibleChunks.set_length(index + visibleCount);
+				if (chunk3 !is null && frustum.containsSphere(chunk3.bounds.center - camPos, chunk3.bounds.radius))
+				{
+					chunk3.Render();
+					visibleChunkCount++;
+				}
 
-				if (c0) @visibleChunks[index++] = chunk0;
-				if (c1) @visibleChunks[index++] = chunk1;
-				if (c2) @visibleChunks[index++] = chunk2;
-				if (c3) @visibleChunks[index++] = chunk3;
-				if (c4) @visibleChunks[index++] = chunk4;
-				if (c5) @visibleChunks[index++] = chunk5;
-				if (c6) @visibleChunks[index++] = chunk6;
-				if (c7) @visibleChunks[index++] = chunk7;
+				if (chunk4 !is null && frustum.containsSphere(chunk4.bounds.center - camPos, chunk4.bounds.radius))
+				{
+					chunk4.Render();
+					visibleChunkCount++;
+				}
+
+				if (chunk5 !is null && frustum.containsSphere(chunk5.bounds.center - camPos, chunk5.bounds.radius))
+				{
+					chunk5.Render();
+					visibleChunkCount++;
+				}
+
+				if (chunk6 !is null && frustum.containsSphere(chunk6.bounds.center - camPos, chunk6.bounds.radius))
+				{
+					chunk6.Render();
+					visibleChunkCount++;
+				}
+
+				if (chunk7 !is null && frustum.containsSphere(chunk7.bounds.center - camPos, chunk7.bounds.radius))
+				{
+					chunk7.Render();
+					visibleChunkCount++;
+				}
 			}
 			else
 			{
-				branch0.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch1 !is null) branch1.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch2 !is null) branch2.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch3 !is null) branch3.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch4 !is null) branch4.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch5 !is null) branch5.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch6 !is null) branch6.GetVisibleChunks(frustum, camPos, visibleChunks);
-				if (branch7 !is null) branch7.GetVisibleChunks(frustum, camPos, visibleChunks);
+				visibleChunkCount += branch0.RenderVisibleChunks(frustum, camPos);
+				if (branch1 !is null) visibleChunkCount += branch1.RenderVisibleChunks(frustum, camPos);
+				if (branch2 !is null) visibleChunkCount += branch2.RenderVisibleChunks(frustum, camPos);
+				if (branch3 !is null) visibleChunkCount += branch3.RenderVisibleChunks(frustum, camPos);
+				if (branch4 !is null) visibleChunkCount += branch4.RenderVisibleChunks(frustum, camPos);
+				if (branch5 !is null) visibleChunkCount += branch5.RenderVisibleChunks(frustum, camPos);
+				if (branch6 !is null) visibleChunkCount += branch6.RenderVisibleChunks(frustum, camPos);
+				if (branch7 !is null) visibleChunkCount += branch7.RenderVisibleChunks(frustum, camPos);
 			}
 		}
+
+		return visibleChunkCount;
 	}
 }

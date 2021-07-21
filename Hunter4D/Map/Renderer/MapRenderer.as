@@ -137,22 +137,7 @@ shared class MapRenderer
 	void Render()
 	{
 		material.SetVideoMaterial();
-
-		visibleChunkCount = 0;
-
-		Chunk@[] chunks = tree.getVisibleChunks();
-		for (uint i = 0; i < chunks.size(); i++)
-		{
-			Chunk@ chunk = chunks[i];
-
-			if (chunk.rebuild)
-			{
-				chunk.GenerateMesh();
-			}
-
-			chunk.Render();
-			visibleChunkCount++;
-		}
+		visibleChunkCount = tree.RenderVisibleChunks();
 	}
 
 	void UpdateBlockFaces(int index)

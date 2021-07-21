@@ -33,6 +33,11 @@ shared class Chunk
 
 	void Render()
 	{
+		if (rebuild)
+		{
+			GenerateMesh();
+		}
+
 		if (!vertices.empty())
 		{
 			mesh.RenderMesh();
