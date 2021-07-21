@@ -21,7 +21,7 @@ shared class MapSyncer
 
 	void AddRequestForEveryone()
 	{
-		mapRequests.empty();
+		mapRequests.clear();
 
 		for (uint i = 0; i < getPlayerCount(); i++)
 		{
