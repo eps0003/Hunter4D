@@ -8,6 +8,7 @@ void onInit(CRules@ this)
 	this.addCommandID("sync block");
 	this.addCommandID("place block");
 	this.addCommandID("revert block");
+	this.addCommandID("set block health");
 	this.addCommandID("sync map");
 
 	onRestart(this);
@@ -87,6 +88,26 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		SColor block(blockInt);
 
 		map.SetBlockSafe(index, block);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set block health"))
+	{
+		bool hasPlayer;
+		if (!params.saferead_bool(hasPlayer)) return;
+
+		if (hasPlayer)
+		{
+			CPlayer@ player;
+			if (saferead_player(params, @player) && player.isMyPlayer()) return;
+		}
+
+		uint index;
+		if (!params.saferead_u32(index)) return;
+		if (!map.isValidBlock(index)) return;
+
+		u8 health;
+		if (!params.saferead_u8(health)) return;
+
+		map.SetHealth(index, health);
 	}
 	else if (!isServer() && cmd == this.getCommandID("sync map"))
 	{

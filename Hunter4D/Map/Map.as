@@ -167,6 +167,73 @@ shared class Map
 		}
 	}
 
+	void SetHealth(int index, u8 health, CPlayer@ player = null)
+	{
+		if (health == 0)
+		{
+			SetBlock(index, 0, player);
+			return;
+		}
+
+		blocks[index].setAlpha(health);
+
+		// Sync health to clients
+		if (!isClient())
+		{
+			CBitStream bs;
+			bs.write_bool(player !is null);
+			if (player !is null)
+			{
+				bs.write_netid(player.getNetworkID());
+			}
+			bs.write_u32(index);
+			bs.write_u8(health);
+			rules.SendCommand(rules.getCommandID("set block health"), bs, true);
+		}
+
+		if (isClient() && !rules.hasScript("SyncMap.as"))
+		{
+			Map::getRenderer().GenerateMesh(indexToPos(index));
+		}
+	}
+
+	void DamageBlockSafe(Vec3f position, uint damage, CPlayer@ player = null)
+	{
+		DamageBlockSafe(position.x, position.y, position.z, damage, player);
+	}
+
+	void DamageBlockSafe(int x, int y, int z, uint damage, CPlayer@ player = null)
+	{
+		if (isValidBlock(x, y, z))
+		{
+			DamageBlock(x, y, z, damage, player);
+		}
+	}
+
+	void DamageBlockSafe(int index, uint damage, CPlayer@ player = null)
+	{
+		if (isValidBlock(index))
+		{
+			DamageBlock(index, damage, player);
+		}
+	}
+
+	void DamageBlock(Vec3f position, uint damage, CPlayer@ player = null)
+	{
+		DamageBlock(position.x, position.y, position.z, damage, player);
+	}
+
+	void DamageBlock(int x, int y, int z, uint damage, CPlayer@ player = null)
+	{
+		DamageBlock(posToIndex(x, y, z), damage, player);
+	}
+
+	void DamageBlock(int index, uint damage, CPlayer@ player = null)
+	{
+		u8 newHealth = Maths::Clamp(-damage + blocks[index].getAlpha(), 0, 255);
+		SetHealth(index, newHealth);
+	}
+
 	SColor getBlockSafe(Vec3f position)
 	{
 		return getBlockSafe(position.x, position.y, position.z);
@@ -203,6 +270,11 @@ shared class Map
 	SColor getBlock(int index)
 	{
 		return blocks[index];
+	}
+
+	u8 getHealth(SColor block)
+	{
+		return block.getAlpha();
 	}
 
 	string getPlayerUsername(Vec3f position)

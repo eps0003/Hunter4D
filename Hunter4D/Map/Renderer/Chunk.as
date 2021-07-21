@@ -86,14 +86,14 @@ shared class Chunk
 				u8 red = block.getRed();
 				u8 green = block.getGreen();
 				u8 blue = block.getBlue();
-				u8 alpha = block.getAlpha();
+				float health = map.getHealth(block) / 255.0f;
 				SColor[] colors = {
-					SColor(alpha, red * (1 - shade * 2), green * (1 - shade * 2), blue * (1 - shade * 2)),
-					SColor(alpha, red * (1 - shade * 3), green * (1 - shade * 3), blue * (1 - shade * 3)),
-					SColor(alpha, red * (1 - shade * 5), green * (1 - shade * 5), blue * (1 - shade * 5)),
-					SColor(alpha, red * (1 - shade * 0), green * (1 - shade * 0), blue * (1 - shade * 0)),
-					SColor(alpha, red * (1 - shade * 1), green * (1 - shade * 1), blue * (1 - shade * 1)),
-					SColor(alpha, red * (1 - shade * 4), green * (1 - shade * 4), blue * (1 - shade * 4)),
+					SColor(255, red * (1 - shade * 2) * health, green * (1 - shade * 2) * health, blue * (1 - shade * 2) * health),
+					SColor(255, red * (1 - shade * 3) * health, green * (1 - shade * 3) * health, blue * (1 - shade * 3) * health),
+					SColor(255, red * (1 - shade * 5) * health, green * (1 - shade * 5) * health, blue * (1 - shade * 5) * health),
+					SColor(255, red * (1 - shade * 0) * health, green * (1 - shade * 0) * health, blue * (1 - shade * 0) * health),
+					SColor(255, red * (1 - shade * 1) * health, green * (1 - shade * 1) * health, blue * (1 - shade * 1) * health),
+					SColor(255, red * (1 - shade * 4) * health, green * (1 - shade * 4) * health, blue * (1 - shade * 4) * health),
 				};
 
 				if (blockHasFace(faces, FaceFlag::Left))
