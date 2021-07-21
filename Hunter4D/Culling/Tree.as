@@ -143,20 +143,20 @@ shared class Branch
 
 	void GetVisibleChunks(Frustum frustum, Vec3f camPos, Chunk@[]@ visibleChunks)
 	{
-		if (frustum.containsSphere(worldBounds.center - camPos, worldBounds.corner))
+		if (frustum.containsSphere(worldBounds.center - camPos, worldBounds.radius))
 		{
 			if (chunk0 !is null)
 			{
 				uint index = visibleChunks.size();
 
-				bool c0 = frustum.containsSphere(chunk0.bounds.center - camPos, chunk0.bounds.corner);
-				bool c1 = chunk1 !is null && frustum.containsSphere(chunk1.bounds.center - camPos, chunk1.bounds.corner);
-				bool c2 = chunk2 !is null && frustum.containsSphere(chunk2.bounds.center - camPos, chunk2.bounds.corner);
-				bool c3 = chunk3 !is null && frustum.containsSphere(chunk3.bounds.center - camPos, chunk3.bounds.corner);
-				bool c4 = chunk4 !is null && frustum.containsSphere(chunk4.bounds.center - camPos, chunk4.bounds.corner);
-				bool c5 = chunk5 !is null && frustum.containsSphere(chunk5.bounds.center - camPos, chunk5.bounds.corner);
-				bool c6 = chunk6 !is null && frustum.containsSphere(chunk6.bounds.center - camPos, chunk6.bounds.corner);
-				bool c7 = chunk7 !is null && frustum.containsSphere(chunk7.bounds.center - camPos, chunk7.bounds.corner);
+				bool c0 = frustum.containsSphere(chunk0.bounds.center - camPos, chunk0.bounds.radius);
+				bool c1 = chunk1 !is null && frustum.containsSphere(chunk1.bounds.center - camPos, chunk1.bounds.radius);
+				bool c2 = chunk2 !is null && frustum.containsSphere(chunk2.bounds.center - camPos, chunk2.bounds.radius);
+				bool c3 = chunk3 !is null && frustum.containsSphere(chunk3.bounds.center - camPos, chunk3.bounds.radius);
+				bool c4 = chunk4 !is null && frustum.containsSphere(chunk4.bounds.center - camPos, chunk4.bounds.radius);
+				bool c5 = chunk5 !is null && frustum.containsSphere(chunk5.bounds.center - camPos, chunk5.bounds.radius);
+				bool c6 = chunk6 !is null && frustum.containsSphere(chunk6.bounds.center - camPos, chunk6.bounds.radius);
+				bool c7 = chunk7 !is null && frustum.containsSphere(chunk7.bounds.center - camPos, chunk7.bounds.radius);
 
 				u8 visibleCount = 0;
 				if (c0) visibleCount++;

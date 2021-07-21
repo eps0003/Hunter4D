@@ -7,7 +7,7 @@ shared class AABB : IBounds
 	Vec3f max;
 	Vec3f dim;
 	Vec3f center;
-	float corner; // Radius of a sphere, that is outside the box and collides with each corner
+	float radius; // Radius of a sphere that this box inscribes
 
 	private Random random(getGameTime());
 	private Map@ map = Map::getMap();
@@ -19,7 +19,7 @@ shared class AABB : IBounds
 
 		dim = (max - min).abs();
 		center = dim / 2.0f + min;
-		corner = Maths::Pow(Maths::Pow(dim.x, 3) + Maths::Pow(dim.y, 3) + Maths::Pow(dim.z, 3), 1.0f / 3.0f) * 0.6f;
+		radius = Maths::Sqrt(dim.x*dim.x + dim.y*dim.y + dim.z*dim.z) * 0.5f;
 	}
 
 	bool intersectsAABB(Vec3f thisPos, AABB other, Vec3f otherPos)
