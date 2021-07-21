@@ -114,7 +114,7 @@ shared class SandboxActor : Actor
 
 	void PostUpdate()
 	{
-		if (isClient())
+		if (isMyActor())
 		{
 			if (controls.ActionKeyPressed(AK_BUILD_MODIFIER))
 			{
