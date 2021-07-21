@@ -27,6 +27,8 @@ shared class Chunk
 		bounds = AABB(position * renderer.chunkDimension, (position + 1) * renderer.chunkDimension);
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
+
+		GenerateMesh();
 	}
 
 	void Render()
