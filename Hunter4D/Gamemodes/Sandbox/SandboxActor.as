@@ -66,9 +66,12 @@ shared class SandboxActor : Actor
 	{
 		Actor::PreUpdate();
 
-		if (!controls.ActionKeyPressed(AK_ACTION3))
+		if (isMyActor())
 		{
-			canJump = true;
+			if (!controls.ActionKeyPressed(AK_ACTION3))
+			{
+				canJump = true;
+			}
 		}
 	}
 
