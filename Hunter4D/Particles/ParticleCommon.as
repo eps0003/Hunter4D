@@ -18,7 +18,7 @@ namespace Particles
 
 		Vec3f position = map.indexToPos(index);
 		AABB bounds(position, position + 1);
-		Random random(getGameTime());
+		Random random(Time());
 
 		for (uint i = 0; i < 20; i++)
 		{
