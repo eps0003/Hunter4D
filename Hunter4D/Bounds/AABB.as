@@ -66,38 +66,36 @@ shared class AABB : IBounds
 		);
 	}
 
-	bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
+bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
+{
+	Map@ map = Map::getMap();
+
+	Vec3f floor = (currentPos + min).floor();
+	Vec3f ceil = (currentPos + max).ceil();
+
+	Vec3f min2 = Vec3f().max(worldPos + min);
+	Vec3f max2 = map.dimensions.min(worldPos + max);
+
+	for (int y = min2.y; y < max2.y; y++)
+	for (int x = min2.x; x < max2.x; x++)
+	for (int z = min2.z; z < max2.z; z++)
 	{
-		Map@ map = Map::getMap();
-
-		Vec3f floor = (currentPos + min).floor();
-		Vec3f ceil = (currentPos + max).ceil();
-
-		for (int x = worldPos.x + min.x; x < worldPos.x + max.x; x++)
-		for (int y = worldPos.y + min.y; y < worldPos.y + max.y; y++)
-		for (int z = worldPos.z + min.z; z < worldPos.z + max.z; z++)
+		// Ignore voxels the actor is currently intersecting
+		if (x >= floor.x && x < ceil.x &&
+			y >= floor.y && y < ceil.y &&
+			z >= floor.z && z < ceil.z)
 		{
-			bool alreadyIntersecting = (
-				x >= floor.x && x < ceil.x &&
-				y >= floor.y && y < ceil.y &&
-				z >= floor.z && z < ceil.z
-			);
-
-			// Ignore voxels the actor is currently intersecting
-			if (alreadyIntersecting)
-			{
-				continue;
-			}
-
-			SColor block = map.getBlockSafe(x, y, z);
-			if (map.isSolid(block))
-			{
-				return true;
-			}
+			continue;
 		}
 
-		return false;
+		if (map.isSolid(map.getBlock(x, y, z)))
+		{
+			return true;
+		}
 	}
+
+	return false;
+}
 
 	bool intersectsVoxel(Vec3f worldPos, Vec3f voxelWorldPos)
 	{
