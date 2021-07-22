@@ -415,29 +415,9 @@ shared class Vec3f
 		bs.write_f32(z);
 	}
 
-	string serializeString()
-	{
-		return x + " " + y + " " + z;
-	}
-
 	bool deserialize(CBitStream@ bs)
 	{
 		return bs.saferead_f32(x) && bs.saferead_f32(y) && bs.saferead_f32(z);
-	}
-
-	bool deserializeString(string str)
-	{
-		string[] values = str.split(" ");
-		if (values.size() == 3)
-		{
-			x = parseFloat(values[0]);
-			y = parseFloat(values[1]);
-			z = parseFloat(values[2]);
-			return true;
-		}
-
-		warn("Unable to parse serialized Vec3f string: " + str);
-		return false;
 	}
 
 	float[] toArray()
