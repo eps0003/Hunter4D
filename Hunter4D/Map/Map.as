@@ -6,6 +6,7 @@
 #include "Actor.as"
 #include "Particle.as"
 #include "Loading.as"
+#include "MapManager.as"
 
 shared class Map
 {

@@ -2,6 +2,7 @@
 
 Map@ map;
 MapSyncer@ mapSyncer;
+MapManager@ mapManager;
 
 void onInit(CRules@ this)
 {
@@ -18,6 +19,9 @@ void onRestart(CRules@ this)
 {
 	@map = Map::getMap();
 	@mapSyncer = Map::getSyncer();
+	@mapManager = Map::getManager();
+
+	@mapManager.currentMap = mapManager.nextMap;
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)

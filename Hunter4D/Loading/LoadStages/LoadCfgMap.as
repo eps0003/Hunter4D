@@ -1,19 +1,11 @@
-#include "Map.as"
-#include "Utilities.as"
+#include "MapBuilder.as"
 
-uint blocksPerSection = 5000;
-
-Map@ map;
-ConfigFile cfg;
-uint[] data;
-uint index;
-uint needle;
-uint size;
+MapManager@ mapManager;
+MapBuilder@ mapBuilder;
 
 void onInit(CRules@ this)
 {
 	this.addCommandID("map generated");
-
 	onRestart(this);
 }
 
@@ -21,20 +13,17 @@ void onRestart(CRules@ this)
 {
 	if (isServer())
 	{
-		@map = Map::getMap();
+		@mapManager = Map::getManager();
+		@mapBuilder = mapManager.getCurrentMap();
 
-		index = 0;
-		needle = 0;
+		if (mapBuilder is null)
+		{
+			error("The map is unable to generate because a map hasn't been set");
+			this.RemoveScript("LoadCfgMap.as");
+			return;
+		}
 
-		cfg.loadFile("Ephtracy.cfg");
-
-		uint[] dimensions;
-		cfg.readIntoArray_u32(dimensions, "size");
-		map = Map(Vec3f(dimensions[0], dimensions[1], dimensions[2]));
-
-		data.clear();
-		cfg.readIntoArray_u32(data, "blocks");
-		size = data.size();
+		mapBuilder.Init();
 
 		this.set_bool("map generated", false);
 		this.Sync("map generated", true);
@@ -47,28 +36,14 @@ void onTick(CRules@ this)
 {
 	if (isServer())
 	{
-		for (uint i = 0; i < blocksPerSection && needle < size;)
-		{
-			uint val = data[needle];
-			if (val > 0)
-			{
-				map.SetBlock(index++, val);
-				i++;
-			}
-			else
-			{
-				index += data[++needle] + 1;
-			}
-
-			needle++;
-		}
+		mapBuilder.Load();
 
 		// Set loading progress
-		float progress = needle / Maths::Max(1, size);
+		float progress = mapBuilder.getProgress();
 		this.set_f32("map gen progress", progress);
 		this.Sync("map gen progress", true);
 
-		if (needle < size)
+		if (!mapBuilder.isLoaded())
 		{
 			// Print loading progress
 			if (getGameTime() % getTicksASecond() == 0)

@@ -32,4 +32,15 @@ namespace Map
 		}
 		return renderer;
 	}
+
+	shared MapManager@ getManager()
+	{
+		MapManager@ manager;
+		if (!getRules().get("map manager", @manager))
+		{
+			@manager = MapManager();
+			getRules().set("map manager", @manager);
+		}
+		return manager;
+	}
 }

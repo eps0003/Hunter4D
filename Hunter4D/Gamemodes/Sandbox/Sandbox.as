@@ -1,11 +1,17 @@
 #include "SandboxActor.as"
 #include "SpectatorActor.as"
 #include "Loading.as"
+#include "Map.as"
 
 #define SERVER_ONLY
 
+MapManager@ mapManager;
+
 void onInit(CRules@ this)
 {
+	@mapManager = Map::getManager();
+	mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
+
 	onRestart(this);
 }
 
