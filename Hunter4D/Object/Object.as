@@ -13,13 +13,20 @@ shared class Object : ICollision
 	bool hasSyncedInit = false;
 
 	private Vec3f gravity;
+	private float scale = 1.0f;
 	private float friction = 1.0f;
 
 	Vec3f position;
 	private Vec3f oldPosition;
 	Vec3f interPosition;
 
+	Vec3f rotation;
+	private Vec3f oldRotation;
+	Vec3f interRotation;
+
 	Vec3f velocity;
+	private Vec3f oldVelocity;
+	Vec3f interVelocity;
 
 	private AABB@ collider;
 	private u8 collisionFlags = 0;
@@ -34,10 +41,14 @@ shared class Object : ICollision
 	private CRules@ rules = getRules();
 	private Camera@ camera;
 
-	Object(Vec3f position)
+	Object(Vec3f position, Vec3f rotation = Vec3f(), float scale = 1.0f)
 	{
 		this.position = position;
+		this.rotation = rotation;
+		this.scale = scale;
+
 		oldPosition = position;
+		oldRotation = rotation;
 
 		id = rules.add_u32("id", 1);
 		spawnTime = getGameTime();
@@ -46,8 +57,11 @@ shared class Object : ICollision
 	void opAssign(Object object)
 	{
 		oldPosition = position;
+		oldRotation = rotation;
+		oldVelocity = velocity;
 
 		position = object.position;
+		rotation = object.rotation;
 		velocity = object.velocity;
 
 		lastUpdate = getGameTime();
@@ -150,6 +164,11 @@ shared class Object : ICollision
 		}
 	}
 
+	float getScale()
+	{
+		return scale;
+	}
+
 	float getFriction()
 	{
 		return friction;
@@ -179,8 +198,11 @@ shared class Object : ICollision
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
+		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 		gravity.Serialize(bs);
+		bs.write_f32(scale);
+		bs.write_f32(friction);
 		bs.write_u8(collisionFlags);
 
 		bs.write_bool(hasCollider());
@@ -205,6 +227,7 @@ shared class Object : ICollision
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
+		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 
 		rules.SendCommand(rules.getCommandID(commandName), bs, true);
@@ -221,8 +244,11 @@ shared class Object : ICollision
 	{
 		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
+		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 		if (!gravity.deserialize(bs)) return;
+		if (!bs.saferead_f32(scale)) return;
+		if (!bs.saferead_f32(friction)) return;
 		if (!bs.saferead_u8(collisionFlags)) return;
 
 		bool hasCollider;
@@ -243,6 +269,7 @@ shared class Object : ICollision
 	{
 		if (!bs.saferead_u16(id)) return;
 		if (!position.deserialize(bs)) return;
+		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 
 		// Update object
@@ -265,6 +292,8 @@ shared class Object : ICollision
 		if (isServer() || getGameTime() > lastUpdate + 1)
 		{
 			oldPosition = position;
+			oldRotation = rotation;
+			oldVelocity = velocity;
 		}
 	}
 
@@ -366,13 +395,15 @@ shared class Object : ICollision
 		interPosition = oldPosition.lerp(position, t);
 		// interPosition = oldPosition.lerp(oldPosition + velocity, t);
 		// interPosition = interPosition.clamp(oldPosition, position);
+		interRotation = oldRotation.lerp(rotation, t);
+		interVelocity = oldVelocity.lerp(velocity, t);
 	}
 
 	bool isVisible()
 	{
 		return (
 			hasCollider() &&
-			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius)
+			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius * scale)
 		);
 	}
 
