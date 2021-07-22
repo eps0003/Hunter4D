@@ -17,7 +17,7 @@ void onRestart(CRules@ this)
 	this.set("actors", null);
 	this.set("config", null);
 
-	this.AddScript("LoadMap.as");
+	this.AddScript("LoadCfgMap.as");
 	this.AddScript("LoadingScreen.as");
 }
 
