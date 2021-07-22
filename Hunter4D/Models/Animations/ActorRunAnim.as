@@ -17,7 +17,7 @@ shared class ActorRunAnim : IAnimation
 	void Update()
 	{
 		float gt = Interpolation::getGameTime() * 0.4f;
-		float vel = actor.interVelocity.toXZ().Length() * 4.0f;
+		float vel = actor.interVelocity.toXZ().Length() * 4.0f / actor.getScale();
 
 		float sin = Maths::Sin(gt) * vel;
 		float cos = Maths::Cos(gt) * vel;

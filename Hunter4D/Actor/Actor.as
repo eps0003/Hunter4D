@@ -21,6 +21,7 @@ shared class Actor : ICollision
 	bool hasSyncedInit = false;
 
 	private Vec3f gravity;
+	private float scale = 1.0f;
 
 	Vec3f position;
 	private Vec3f oldPosition;
@@ -51,13 +52,14 @@ shared class Actor : ICollision
 	private Camera@ camera;
 	private Mouse@ mouse;
 
-	Actor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f())
+	Actor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f(), float scale = 1.0f)
 	{
 		@this.player = player;
 		@blob = player.getBlob();
 
 		this.position = position;
 		this.rotation = rotation;
+		this.scale = scale;
 
 		oldPosition = position;
 		oldRotation = rotation;
@@ -193,6 +195,11 @@ shared class Actor : ICollision
 		}
 	}
 
+	float getScale()
+	{
+		return scale;
+	}
+
 	void SetCullRadius(float radius)
 	{
 		cullRadius = radius;
@@ -206,6 +213,7 @@ shared class Actor : ICollision
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 		gravity.Serialize(bs);
+		bs.write_f32(scale);
 		bs.write_u8(collisionFlags);
 
 		bs.write_bool(hasCollider());
@@ -251,6 +259,7 @@ shared class Actor : ICollision
 		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
 		if (!gravity.deserialize(bs)) return;
+		if (!bs.saferead_f32(scale)) return;
 		if (!bs.saferead_u8(collisionFlags)) return;
 
 		bool hasCollider;
@@ -373,7 +382,7 @@ shared class Actor : ICollision
 
 	void RenderNameplate()
 	{
-		Vec3f pos = interPosition + Vec3f(0, 2, 0);
+		Vec3f pos = interPosition + Vec3f(0, 2 * scale, 0);
 		if (!pos.isInFrontOfCamera()) return;
 		Vec2f screenPos = pos.projectToScreen();
 		GUI::DrawTextCentered(player.getCharacterName(), screenPos, color_white);
@@ -393,7 +402,7 @@ shared class Actor : ICollision
 	{
 		return (
 			!isMyActor() &&
-			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius)
+			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius * scale)
 		);
 	}
 
@@ -413,7 +422,7 @@ shared class Actor : ICollision
 
 	private void UpdateCamera()
 	{
-		camera.position = position + Vec3f(0, cameraHeight, 0);
+		camera.position = position + Vec3f(0, cameraHeight * scale, 0);
 		camera.rotation = rotation;
 	}
 

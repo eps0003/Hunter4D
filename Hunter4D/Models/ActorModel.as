@@ -19,7 +19,7 @@ shared class ActorModel : Model
 
 	ActorModel(Actor@ actor, string texture)
 	{
-		super(texture, 0.9f);
+		super(texture, 0.9f * actor.getScale());
 		@this.actor = actor;
 
 		AddSegment(body);

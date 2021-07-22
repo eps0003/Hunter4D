@@ -197,7 +197,7 @@ shared class SandboxActor : Actor
 
 			if (canJump && isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
 			{
-				velocity.y = jumpForce;
+				velocity.y = jumpForce + (jumpForce * 0.5f) * (getScale() - 1);
 				canJump = false;
 			}
 		}
@@ -234,7 +234,7 @@ shared class SandboxActor : Actor
 
 		Ray ray(camera.position, camera.rotation.dir());
 		RaycastInfo raycast;
-		if (!ray.raycastBlock(6, false, raycast)) return;
+		if (!ray.raycastBlock(6 * scale, false, raycast)) return;
 
 		if (left)
 		{
