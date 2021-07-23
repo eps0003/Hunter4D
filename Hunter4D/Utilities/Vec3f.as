@@ -293,12 +293,12 @@ shared class Vec3f
 		);
 	}
 
-	float dot(Vec3f &in vec)
+	float dot(const Vec3f &in vec)
 	{
 		return (x * vec.x) + (y * vec.y) + (z * vec.z);
 	}
 
-	Vec3f cross(Vec3f &in vec)
+	Vec3f cross(const Vec3f &in vec)
 	{
 		return Vec3f(
 			y * vec.z - z * vec.y,
