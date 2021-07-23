@@ -16,7 +16,11 @@ shared class AABB : IBounds
 	{
 		this.min = min;
 		this.max = max;
+		UpdateProperties();
+	}
 
+	private void UpdateProperties()
+	{
 		dim = (max - min).abs();
 		center = (max + min) * 0.5f;
 		radius = dim.mag() * 0.5f;
@@ -119,6 +123,8 @@ bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
 
 	bool deserialize(CBitStream@ bs)
 	{
-		return min.deserialize(bs) && max.deserialize(bs);
+		bool success = min.deserialize(bs) && max.deserialize(bs);
+		if (success) UpdateProperties();
+		return success;
 	}
 }
