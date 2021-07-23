@@ -48,7 +48,7 @@ shared class SandboxActor : Actor
 
 		if (isClient())
 		{
-			@model = ActorModel(this, "KnightSkin.png");
+			@model = ActorModel(this);
 			@idleAnim = ActorIdleAnim(model);
 			@runAnim = ActorRunAnim(model);
 			@jumpAnim = ActorJumpAnim(model);

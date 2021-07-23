@@ -1,6 +1,7 @@
 #include "Model.as"
 #include "Camera.as"
 #include "ActorRunAnim.as"
+#include "Skins.as"
 
 shared class ActorModel : Model
 {
@@ -17,9 +18,9 @@ shared class ActorModel : Model
 	ModelSegment@ upperRightLeg = ModelSegment("ActorUpperRightLeg.obj");
 	ModelSegment@ lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj");
 
-	ActorModel(Actor@ actor, string texture)
+	ActorModel(Actor@ actor)
 	{
-		super(texture, 0.9f * actor.getScale());
+		super(Skins::getSkinName(actor.getPlayer()), 0.9f * actor.getScale());
 		@this.actor = actor;
 
 		AddSegment(body);
