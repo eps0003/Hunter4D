@@ -2,7 +2,7 @@ namespace Loading
 {
 	shared bool isPlayerLoaded(CPlayer@ player)
 	{
-		return getRules().get_bool(player.getUsername() + "loaded");
+		return getRules().get_bool(player.getNetworkID() + "loaded");
 	}
 
 	shared bool isMyPlayerLoaded()
@@ -14,7 +14,7 @@ namespace Loading
 	{
 		if (loaded == isPlayerLoaded(player)) return;
 
-		string token = player.getUsername() + "loaded";
+		string token = player.getNetworkID() + "loaded";
 		getRules().set_bool(token, loaded);
 		getRules().Sync(token, true);
 
