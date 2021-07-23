@@ -7,6 +7,7 @@ class RenderDistanceCommand : Command
 	{
 		super("distance", "Change render distance.");
 		AddAlias("renderdistance");
+		AddAlias("dist");
 	}
 
 	void Execute(string[] args, CPlayer@ player)
