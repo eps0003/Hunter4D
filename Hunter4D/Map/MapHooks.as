@@ -26,7 +26,10 @@ void onRestart(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	mapSyncer.AddRequest(player);
+	if (!mapSyncer.hasRequest(player))
+	{
+		mapSyncer.AddRequest(player);
+	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

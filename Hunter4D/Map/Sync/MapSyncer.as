@@ -33,6 +33,19 @@ shared class MapSyncer
 		}
 	}
 
+	bool hasRequest(CPlayer@ player)
+	{
+		for (uint i = 0; i < mapRequests.size(); i++)
+		{
+			if (mapRequests[i].player is player)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void AddPacket(CBitStream@ packet)
 	{
 		mapPackets.push_back(packet);
