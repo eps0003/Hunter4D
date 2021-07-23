@@ -71,7 +71,7 @@ shared class Mouse
 			if (wasInControl)
 			{
 				velocity = center - mousePos;
-				velocity *= sensitivity * 0.2f;
+				velocity *= sensitivity * 0.15f;
 
 				// Recenter mouse
 				if (velocity.LengthSquared() > 0)
