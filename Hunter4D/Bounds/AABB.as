@@ -19,7 +19,7 @@ shared class AABB : IBounds
 
 		dim = (max - min).abs();
 		center = (max + min) * 0.5f;
-		radius = Maths::Sqrt(dim.x*dim.x + dim.y*dim.y + dim.z*dim.z) * 0.5f;
+		radius = dim.mag() * 0.5f;
 	}
 
 	bool intersectsAABB(Vec3f thisPos, AABB other, Vec3f otherPos)

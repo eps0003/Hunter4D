@@ -198,15 +198,10 @@ shared class Vec3f
 	Vec3f normalized()
 	{
 		float lengthSq = magSquared();
-		if (lengthSq == 1)
+		if (lengthSq == 0 || lengthSq == 1)
 		{
 			return this;
 		}
-		else if (lengthSq == 0)
-		{
-			return Vec3f();
-		}
-
 		return this / mag();
 	}
 
@@ -230,7 +225,7 @@ shared class Vec3f
 
 	float mag()
 	{
-		return Maths::Sqrt(x*x + y*y + z*z);
+		return Maths::Sqrt(magSquared());
 	}
 
 	float magSquared()

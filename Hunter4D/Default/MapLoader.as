@@ -1,14 +1,16 @@
 const int MINIMAP_WIDTH = 298;
 const int MINIMAP_HEIGHT = 105;
 
-bool LoadMap(CMap@ map, const string&in fileName)
+bool LoadMap(CMap@ map, const string &in fileName)
 {
-	if(!isServer())
+	if (!isServer())
 	{
 		map.CreateTileMap(0, 0, 8.0f, "Sprites/world.png");
-		return true;
 	}
-	map.CreateTileMap(MINIMAP_WIDTH, MINIMAP_HEIGHT, 8.0f, "Sprites/world.png");
+	else
+	{
+		map.CreateTileMap(MINIMAP_WIDTH, MINIMAP_HEIGHT, 8.0f, "Sprites/world.png");
+	}
 	return true;
 }
 
