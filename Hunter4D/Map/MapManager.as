@@ -2,26 +2,26 @@
 
 shared class MapManager
 {
-    MapBuilder@ currentMap;
-    MapBuilder@ nextMap;
+	MapBuilder@ currentMap;
+	MapBuilder@ nextMap;
 
-    void SetMap(MapBuilder@ map)
-    {
-        if (currentMap is null)
-        {
-            @currentMap = map;
-        }
+	void SetMap(MapBuilder@ map)
+	{
+		if (currentMap is null)
+		{
+			@currentMap = map;
+		}
 
-        @nextMap = map;
-    }
+		@nextMap = map;
+	}
 
-    MapBuilder@ getCurrentMap()
-    {
-        return currentMap;
-    }
+	MapBuilder@ getCurrentMap()
+	{
+		return currentMap;
+	}
 
-    MapBuilder@ getNextMap()
-    {
-        return nextMap;
-    }
+	MapBuilder@ getNextMap()
+	{
+		return nextMap;
+	}
 }
