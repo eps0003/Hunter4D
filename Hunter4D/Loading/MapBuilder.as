@@ -39,7 +39,7 @@ shared class ConfigMap : MapBuilder
 	ConfigMap(string fileName)
 	{
 		super();
-		this.fileName = fileName;
+		this.fileName = "../Cache/Hunter4D/Maps/" + fileName;
 	}
 
 	void Init()
