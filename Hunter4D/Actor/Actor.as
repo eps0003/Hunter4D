@@ -205,6 +205,11 @@ shared class Actor : ICollision
 		cullRadius = radius;
 	}
 
+	Vec3f getCenter()
+	{
+		return hasCollider() ? interPosition + collider.center : interPosition;
+	}
+
 	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream())
 	{
 		bs.write_netid(this.player.getNetworkID());
@@ -402,7 +407,7 @@ shared class Actor : ICollision
 	{
 		return (
 			!isMyActor() &&
-			camera.getFrustum().containsSphere(interPosition - camera.interPosition, cullRadius * scale)
+			camera.getFrustum().containsSphere(getCenter() - camera.interPosition, cullRadius * scale)
 		);
 	}
 
