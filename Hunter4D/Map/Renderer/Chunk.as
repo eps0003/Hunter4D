@@ -75,7 +75,7 @@ shared class Chunk
 		for (uint z = startWorldPos.z; z < endWorldPos.z; z++)
 		{
 			int index = renderer.map.posToIndex(x, y, z);
-			u8 faces = renderer.faceFlags[index];
+			u8 faces = renderer.getFaceFlags(index);
 
 			if (faces != FaceFlag::None)
 			{

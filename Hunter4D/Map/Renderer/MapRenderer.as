@@ -10,7 +10,7 @@ shared class MapRenderer
 	private Camera@ camera = Camera::getCamera();
 
 	private Chunk@[] chunks;
-	u8[] faceFlags;
+	private u8[] faceFlags;
 
 	Tree@ tree;
 
@@ -234,6 +234,11 @@ shared class MapRenderer
 	Chunk@ getChunk(int index)
 	{
 		return chunks[index];
+	}
+
+	u8 getFaceFlags(int index)
+	{
+		return faceFlags[index];
 	}
 
 	Vec3f worldPosToChunkPos(Vec3f position)
