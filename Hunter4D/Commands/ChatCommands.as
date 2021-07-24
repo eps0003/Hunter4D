@@ -1,11 +1,13 @@
 #include "SensitivityCommand.as"
 #include "FOVCommand.as"
 #include "RenderDistanceCommand.as"
+#include "KillCommand.as"
 
 Command@[] commands = {
 	SensitivityCommand(),
 	FOVCommand(),
-	RenderDistanceCommand()
+	RenderDistanceCommand(),
+	KillCommand()
 };
 
 void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
