@@ -35,6 +35,7 @@ shared class ConfigMap : MapBuilder
 	private uint needle;
 	private uint size;
 	private uint[] data;
+	private bool encodedDamage;
 
 	ConfigMap(string fileName)
 	{
@@ -57,25 +58,47 @@ shared class ConfigMap : MapBuilder
 
 		data.clear();
 		cfg.readIntoArray_u32(data, "blocks");
+
+		encodedDamage = data[0] == 1;
+		data.removeAt(0);
+
 		size = data.size();
 	}
 
 	void Load()
 	{
-		for (uint i = 0; i < blocksPerSection && needle < size;)
+		for (uint i = 0; i < blocksPerSection && needle < size; needle++)
 		{
-			uint val = data[needle];
-			if (val > 0)
+			uint value = data[needle];
+
+			if (encodedDamage)
 			{
-				map.SetBlock(index++, val);
-				i++;
+				if (value > 0)
+				{
+					map.SetBlock(index++, value);
+
+					i++;
+				}
+				else
+				{
+					index += data[++needle] + 1;
+				}
 			}
 			else
 			{
-				index += data[++needle] + 1;
-			}
+				if (value & 1 == 1)
+				{
+					SColor color(value >> 1);
+					color.setAlpha(255);
+					map.SetBlock(index++, color);
 
-			needle++;
+					i++;
+				}
+				else
+				{
+					index += data[++needle] + 1;
+				}
+			}
 		}
 	}
 

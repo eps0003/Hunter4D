@@ -27,7 +27,7 @@ void SaveMap()
 {
 	Menu::CloseAllMenus();
 
-	string data;
+	string data = "1;";
 	bool prevVisible = true;
 	uint lastVisibleIndex = 0;
 
