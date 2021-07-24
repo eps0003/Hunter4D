@@ -19,7 +19,7 @@ void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
 {
 	if (Loading::isMyPlayerLoaded())
 	{
-		Menu::addContextItem(menu, getTranslatedString("Save Hunter3D map"), "Saving.as", "void SaveMap()");
+		Menu::addContextItem(menu, getTranslatedString("Save Hunter3D Map"), "Saving.as", "void SaveMap()");
 	}
 }
 
