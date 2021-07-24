@@ -1,19 +1,11 @@
-#include "Map.as"
-#include "Ephtracy.as"
-#include "Utilities.as"
+#include "MapBuilder.as"
 
-Map@ map;
-uint sectionIndex = 0;
-uint blocksPerSection = 2000;
-uint sectionCount;
-
-uint size = mapData.size() / 6;
-uint yOffset = MAP_SIZE.y * 0.5f;
+MapManager@ mapManager;
+MapBuilder@ mapBuilder;
 
 void onInit(CRules@ this)
 {
 	this.addCommandID("map generated");
-
 	onRestart(this);
 }
 
@@ -21,10 +13,17 @@ void onRestart(CRules@ this)
 {
 	if (isServer())
 	{
-		@map = Map::getMap();
-		map = Map(MAP_SIZE);
-		sectionIndex = 0;
-		sectionCount = Maths::Ceil(size / float(blocksPerSection));
+		@mapManager = Map::getManager();
+		@mapBuilder = mapManager.getCurrentMap();
+
+		if (mapBuilder is null)
+		{
+			error("The map is unable to generate because a map hasn't been set");
+			this.RemoveScript("LoadMap.as");
+			return;
+		}
+
+		mapBuilder.Init();
 
 		this.set_bool("map generated", false);
 		this.Sync("map generated", true);
@@ -37,34 +36,14 @@ void onTick(CRules@ this)
 {
 	if (isServer())
 	{
-		// Get start and end block index
-		uint startIndex = sectionIndex * blocksPerSection;
-		uint endIndex = Maths::Min(startIndex + blocksPerSection, size);
-
-		// Loop through blocks in this section
-		for (uint i = startIndex; i < endIndex; i++)
-		{
-			uint index = i * 6;
-
-			Vec3f pos;
-			pos.x = mapData[index + 0];
-			pos.y = mapData[index + 2] - yOffset;
-			pos.z = mapData[index + 1];
-
-			SColor color;
-			color.setRed(mapData[index + 3]);
-			color.setGreen(mapData[index + 4]);
-			color.setBlue(mapData[index + 5]);
-
-			map.SetBlock(pos, color);
-		}
+		mapBuilder.Load();
 
 		// Set loading progress
-		float progress = sectionIndex / Maths::Max(1, sectionCount - 2);
+		float progress = mapBuilder.getProgress();
 		this.set_f32("map gen progress", progress);
 		this.Sync("map gen progress", true);
 
-		if (sectionIndex < sectionCount - 1)
+		if (!mapBuilder.isLoaded())
 		{
 			// Print loading progress
 			if (getGameTime() % getTicksASecond() == 0)
@@ -72,9 +51,6 @@ void onTick(CRules@ this)
 				uint perc = Maths::Clamp01(progress) * 100;
 				print("Generating map (" + perc + "%)");
 			}
-
-			// Move onto next section
-			sectionIndex++;
 		}
 		else
 		{

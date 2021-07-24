@@ -144,7 +144,7 @@ shared class Map
 		blocks[index] = block;
 
 		// Sync block to clients
-		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as") && !rules.hasScript("LoadCfgMap.as"))
+		if (!isClient() && !rules.hasScript("GenerateMap.as") && !rules.hasScript("LoadMap.as"))
 		{
 			usernames[index] = player !is null ? player.getUsername() : "";
 

@@ -34,7 +34,7 @@ shared class ConfigMap : MapBuilder
 	private uint index;
 	private uint needle;
 	private uint size;
-	uint[] data;
+	private uint[] data;
 
 	ConfigMap(string fileName)
 	{
