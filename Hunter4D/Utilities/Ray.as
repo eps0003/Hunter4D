@@ -114,6 +114,52 @@ shared class Ray
 
 		return false;
 	}
+
+	bool intersectsAABB(AABB@ aabb, Vec3f aabbPosition, float &out distance)
+	{
+		Vec3f aabbMin = aabbPosition + aabb.min;
+		Vec3f aabbMax = aabbPosition + aabb.max;
+
+		float tMinX = direction.x != 0 ? (aabbMin.x - position.x) / direction.x : 0;
+		float tMaxX = direction.x != 0 ? (aabbMax.x - position.x) / direction.x : 1;
+		if (tMaxX < tMinX)
+		{
+			float temp = tMaxX;
+			tMaxX = tMinX;
+			tMinX = temp;
+		}
+
+		float tMinY = direction.y != 0 ? (aabbMin.y - position.y) / direction.y : 0;
+		float tMaxY = direction.y != 0 ? (aabbMax.y - position.y) / direction.y : 1;
+		if (tMaxY < tMinY)
+		{
+			float temp = tMaxY;
+			tMaxY = tMinY;
+			tMinY = temp;
+		}
+
+		float tMinZ = direction.z != 0 ? (aabbMin.z - position.z) / direction.z : 0;
+		float tMaxZ = direction.z != 0 ? (aabbMax.z - position.z) / direction.z : 1;
+		if (tMaxZ < tMinZ)
+		{
+			float temp = tMaxZ;
+			tMaxZ = tMinZ;
+			tMinZ = temp;
+		}
+
+		float tMin = (tMinX > tMinZ) ? tMinX : tMinZ;
+		float tMax = (tMaxX < tMaxZ) ? tMaxX : tMaxZ;
+
+		if (tMinX > tMaxY || tMinY > tMaxX) return false;
+		if (tMin > tMaxZ || tMinZ > tMax) return false;
+		if (tMinZ > tMin) tMin = tMinZ;
+		if (tMaxZ < tMax) tMax = tMaxZ;
+
+		// https://youtu.be/4h-jlOBsndU?t=1740
+		distance = Maths::Max(0, tMin);
+
+		return true;
+	}
 }
 
 shared class RaycastInfo
