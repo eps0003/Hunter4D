@@ -45,7 +45,10 @@ shared class Map
 
 	void ClientSetBlockSafe(Vec3f position, SColor block)
 	{
-		ClientSetBlockSafe(position.x, position.y, position.z, block);
+		if (isValidBlock(position))
+		{
+			ClientSetBlock(position.x, position.y, position.z, block);
+		}
 	}
 
 	void ClientSetBlockSafe(int x, int y, int z, SColor block)
@@ -101,7 +104,10 @@ shared class Map
 
 	void SetBlockSafe(Vec3f position, SColor block, CPlayer@ player = null)
 	{
-		SetBlockSafe(position.x, position.y, position.z, block, player);
+		if (isValidBlock(position))
+		{
+			SetBlock(position.x, position.y, position.z, block, player);
+		}
 	}
 
 	void SetBlockSafe(int x, int y, int z, SColor block, CPlayer@ player = null)
@@ -237,7 +243,11 @@ shared class Map
 
 	SColor getBlockSafe(Vec3f position)
 	{
-		return getBlockSafe(position.x, position.y, position.z);
+		if (isValidBlock(position))
+		{
+			return getBlock(position.x, position.y, position.z);
+		}
+		return 0;
 	}
 
 	SColor getBlockSafe(int x, int y, int z)
@@ -304,7 +314,11 @@ shared class Map
 
 	bool isValidBlock(int x, int y, int z)
 	{
-		return isValidBlock(Vec3f(x, y, z));
+		return (
+			x >= 0 && x < dimensions.x &&
+			y >= 0 && y < dimensions.y &&
+			z >= 0 && z < dimensions.z
+		);
 	}
 
 	bool isValidBlock(int index)

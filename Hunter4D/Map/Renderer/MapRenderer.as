@@ -125,7 +125,11 @@ shared class MapRenderer
 
 	bool isValidChunk(Vec3f position)
 	{
-		return isValidChunk(position.x, position.y, position.z);
+		return (
+			position.x >= 0 && position.x < chunkDimensions.x &&
+			position.y >= 0 && position.y < chunkDimensions.y &&
+			position.z >= 0 && position.z < chunkDimensions.z
+		);
 	}
 
 	bool isValidChunk(int x, int y, int z)
@@ -212,7 +216,11 @@ shared class MapRenderer
 
 	Chunk@ getChunkSafe(Vec3f position)
 	{
-		return getChunkSafe(position.x, position.y, position.z);
+		if (isValidChunk(position))
+		{
+			return getChunk(position.x, position.y, position.z);
+		}
+		return null;
 	}
 
 	Chunk@ getChunkSafe(int x, int y, int z)
