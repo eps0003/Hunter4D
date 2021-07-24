@@ -9,3 +9,13 @@ enum FaceFlag
 	Back = 32,
 	All = 63
 }
+
+enum Face
+{
+	Left = 0,
+	Right = 1,
+	Down = 2,
+	Up = 3,
+	Front = 4,
+	Back = 5
+}

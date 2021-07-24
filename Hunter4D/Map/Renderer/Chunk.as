@@ -55,11 +55,6 @@ shared class Chunk
 		indices.push_back(n - 1);
 	}
 
-	private bool blockHasFace(u8 flags, u8 face)
-	{
-		return (flags & face) == face;
-	}
-
 	void GenerateMesh()
 	{
 		rebuild = false;
@@ -75,9 +70,8 @@ shared class Chunk
 		for (uint z = startWorldPos.z; z < endWorldPos.z; z++)
 		{
 			int index = renderer.map.posToIndex(x, y, z);
-			u8 faces = renderer.getFaceFlags(index);
 
-			if (faces != FaceFlag::None)
+			if (renderer.getFaceFlags(index) != FaceFlag::None)
 			{
 				SColor block = map.getBlock(index);
 
@@ -88,24 +82,9 @@ shared class Chunk
 
 				float w = 1;
 
-				SColor col;
-				float shade = 0.07f;
-				u8 red = block.getRed();
-				u8 green = block.getGreen();
-				u8 blue = block.getBlue();
-				float health = map.getHealth(block) / 255.0f;
-				SColor[] colors = {
-					SColor(255, red * (1 - shade * 2) * health, green * (1 - shade * 2) * health, blue * (1 - shade * 2) * health),
-					SColor(255, red * (1 - shade * 3) * health, green * (1 - shade * 3) * health, blue * (1 - shade * 3) * health),
-					SColor(255, red * (1 - shade * 5) * health, green * (1 - shade * 5) * health, blue * (1 - shade * 5) * health),
-					SColor(255, red * (1 - shade * 0) * health, green * (1 - shade * 0) * health, blue * (1 - shade * 0) * health),
-					SColor(255, red * (1 - shade * 1) * health, green * (1 - shade * 1) * health, blue * (1 - shade * 1) * health),
-					SColor(255, red * (1 - shade * 4) * health, green * (1 - shade * 4) * health, blue * (1 - shade * 4) * health),
-				};
-
-				if (blockHasFace(faces, FaceFlag::Left))
+				if (renderer.blockHasFace(index, FaceFlag::Left))
 				{
-					col = colors[0];
+					SColor col = renderer.getBlockFaceColor(block, Face::Left);
 					vertices.push_back(Vertex(x, y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x, y + w, z    , x2, y1, col));
 					vertices.push_back(Vertex(x, y    , z    , x2, y2, col));
@@ -113,9 +92,9 @@ shared class Chunk
 					AddIndices();
 				}
 
-				if (blockHasFace(faces, FaceFlag::Right))
+				if (renderer.blockHasFace(index, FaceFlag::Right))
 				{
-					col = colors[1];
+					SColor col = renderer.getBlockFaceColor(block, Face::Right);
 					vertices.push_back(Vertex(x + w, y + w, z    , x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y    , z + w, x2, y2, col));
@@ -123,9 +102,9 @@ shared class Chunk
 					AddIndices();
 				}
 
-				if (blockHasFace(faces, FaceFlag::Down))
+				if (renderer.blockHasFace(index, FaceFlag::Down))
 				{
-					col = colors[2];
+					SColor col = renderer.getBlockFaceColor(block, Face::Down);
 					vertices.push_back(Vertex(x + w, y, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x    , y, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x    , y, z    , x2, y2, col));
@@ -133,9 +112,9 @@ shared class Chunk
 					AddIndices();
 				}
 
-				if (blockHasFace(faces, FaceFlag::Up))
+				if (renderer.blockHasFace(index, FaceFlag::Up))
 				{
-					col = colors[3];
+					SColor col =  renderer.getBlockFaceColor(block, Face::Up);
 					vertices.push_back(Vertex(x    , y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z    , x2, y2, col));
@@ -143,9 +122,9 @@ shared class Chunk
 					AddIndices();
 				}
 
-				if (blockHasFace(faces, FaceFlag::Front))
+				if (renderer.blockHasFace(index, FaceFlag::Front))
 				{
-					col = colors[4];
+					SColor col = renderer.getBlockFaceColor(block, Face::Front);
 					vertices.push_back(Vertex(x    , y + w, z, x1, y1, col));
 					vertices.push_back(Vertex(x + w, y + w, z, x2, y1, col));
 					vertices.push_back(Vertex(x + w, y    , z, x2, y2, col));
@@ -153,9 +132,9 @@ shared class Chunk
 					AddIndices();
 				}
 
-				if (blockHasFace(faces, FaceFlag::Back))
+				if (renderer.blockHasFace(index, FaceFlag::Back))
 				{
-					col = colors[5];
+					SColor col = renderer.getBlockFaceColor(block, Face::Back);
 					vertices.push_back(Vertex(x + w, y + w, z + w, x1, y1, col));
 					vertices.push_back(Vertex(x    , y + w, z + w, x2, y1, col));
 					vertices.push_back(Vertex(x    , y    , z + w, x2, y2, col));

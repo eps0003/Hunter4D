@@ -295,16 +295,16 @@ shared class Map
 
 	bool isValidBlock(Vec3f position)
 	{
-		return isValidBlock(position.x, position.y, position.z);
+		return (
+			position.x >= 0 && position.x < dimensions.x &&
+			position.y >= 0 && position.y < dimensions.y &&
+			position.z >= 0 && position.z < dimensions.z
+		);
 	}
 
 	bool isValidBlock(int x, int y, int z)
 	{
-		return (
-			x >= 0 && x < dimensions.x &&
-			y >= 0 && y < dimensions.y &&
-			z >= 0 && z < dimensions.z
-		);
+		return isValidBlock(Vec3f(x, y, z));
 	}
 
 	bool isValidBlock(int index)

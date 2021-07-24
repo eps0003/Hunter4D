@@ -6,6 +6,7 @@
 
 shared class MapRenderer
 {
+	CRules@ rules = getRules();
 	Map@ map = Map::getMap();
 	private Camera@ camera = Camera::getCamera();
 
@@ -19,8 +20,13 @@ shared class MapRenderer
 	uint chunkCount = 0;
 	uint visibleChunkCount = 0;
 
-	string texture = "Pixel.png";
+	string texture = "pixel";
 	SMaterial@ material = SMaterial();
+
+	private float shadeIntensity = 0.07f;
+	private u8[] shadeScale = { 2, 3, 5, 0, 1, 4 };
+
+	private SMesh xrayMesh;
 
 	MapRenderer()
 	{
@@ -31,6 +37,8 @@ shared class MapRenderer
 		chunkDimensions = (map.dimensions / chunkDimension).ceil();
 		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;
 		chunks.set_length(chunkCount);
+
+		xrayMesh.SetHardwareMapping(SMesh::DYNAMIC);
 	}
 
 	private void InitMaterial()
@@ -138,6 +146,11 @@ shared class MapRenderer
 	{
 		material.SetVideoMaterial();
 		visibleChunkCount = tree.RenderVisibleChunks();
+
+		if (getLocalPlayer().getTeamNum() != rules.getSpectatorTeamNum())
+		{
+			PreventXray();
+		}
 	}
 
 	void UpdateBlockFaces(int index)
@@ -241,6 +254,11 @@ shared class MapRenderer
 		return faceFlags[index];
 	}
 
+	bool blockHasFace(int index, u8 face)
+	{
+		return (faceFlags[index] & face) == face;
+	}
+
 	Vec3f worldPosToChunkPos(Vec3f position)
 	{
 		return position / chunkDimension;
@@ -268,5 +286,177 @@ shared class MapRenderer
 		vec.z = Maths::Floor(index / chunkDimensions.x) % chunkDimensions.z;
 		vec.y = Maths::Floor(index / (chunkDimensions.x * chunkDimensions.z));
 		return vec;
+	}
+
+	private void PreventXray()
+	{
+		Vec3f position = camera.interPosition;
+		if (!map.isValidBlock(position)) return;
+
+		Vec3f worldPos = position.floor();
+		Vec3f center = worldPos + 0.5f;
+		Vec3f dir = (center - position).sign();
+
+		Vertex[] vertices;
+		u16[] indices;
+
+		getSurroundingBlockFaces(worldPos, vertices, indices);
+
+		if (dir.x != 0)
+		{
+			Vec3f pos = worldPos - Vec3f(dir.x, 0, 0);
+			if (pos.x >= 0 && pos.x < map.dimensions.x)
+			{
+				getSurroundingBlockFaces(pos, vertices, indices);
+			}
+		}
+
+		if (dir.y != 0)
+		{
+			Vec3f pos = worldPos - Vec3f(0, dir.y, 0);
+			if (pos.y >= 0 && pos.y < map.dimensions.y)
+			{
+				getSurroundingBlockFaces(pos, vertices, indices);
+			}
+		}
+
+		if (dir.z != 0)
+		{
+			Vec3f pos = worldPos - Vec3f(0, 0, dir.z);
+			if (pos.z >= 0 && pos.z < map.dimensions.z)
+			{
+				getSurroundingBlockFaces(pos, vertices, indices);
+			}
+		}
+
+		if (!vertices.empty())
+		{
+			xrayMesh.SetVertex(vertices);
+			xrayMesh.SetIndices(indices);
+			xrayMesh.SetDirty(SMesh::VERTEX_INDEX);
+			xrayMesh.BuildMesh();
+
+			xrayMesh.RenderMesh();
+		}
+		else
+		{
+			xrayMesh.Clear();
+		}
+	}
+
+	private void getSurroundingBlockFaces(Vec3f worldPos, Vertex[]@ vertices, u16[]@ indices)
+	{
+		SColor block = map.getBlock(worldPos);
+		if (!map.isVisible(block)) return;
+
+		int index = map.posToIndex(worldPos);
+
+		float x1 = 0;
+		float y1 = 0;
+		float x2 = 1;
+		float y2 = 1;
+
+		float w = 1;
+
+		if (!blockHasFace(index, FaceFlag::Left))
+		{
+			Vec3f pos = worldPos + Vec3f(-1, 0, 0);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Right);
+
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z    , x1, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z + w, x2, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y    , pos.z + w, x2, y2, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y    , pos.z    , x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+
+		if (!blockHasFace(index, FaceFlag::Right))
+		{
+			Vec3f pos = worldPos + Vec3f(1, 0, 0);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Left);
+
+			vertices.push_back(Vertex(pos.x, pos.y + w, pos.z + w, x1, y1, col));
+			vertices.push_back(Vertex(pos.x, pos.y + w, pos.z    , x2, y1, col));
+			vertices.push_back(Vertex(pos.x, pos.y    , pos.z    , x2, y2, col));
+			vertices.push_back(Vertex(pos.x, pos.y    , pos.z + w, x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+
+		if (!blockHasFace(index, FaceFlag::Down))
+		{
+			Vec3f pos = worldPos + Vec3f(0, -1, 0);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Up);
+
+			vertices.push_back(Vertex(pos.x    , pos.y + w, pos.z + w, x1, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z + w, x2, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z    , x2, y2, col));
+			vertices.push_back(Vertex(pos.x    , pos.y + w, pos.z    , x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+
+		if (!blockHasFace(index, FaceFlag::Up))
+		{
+			Vec3f pos = worldPos + Vec3f(0, 1, 0);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Down);
+
+			vertices.push_back(Vertex(pos.x + w, pos.y, pos.z + w, x1, y1, col));
+			vertices.push_back(Vertex(pos.x    , pos.y, pos.z + w, x2, y1, col));
+			vertices.push_back(Vertex(pos.x    , pos.y, pos.z    , x2, y2, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y, pos.z    , x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+
+		if (!blockHasFace(index, FaceFlag::Front))
+		{
+			Vec3f pos = worldPos + Vec3f(0, 0, -1);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Back);
+
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z + w, x1, y1, col));
+			vertices.push_back(Vertex(pos.x    , pos.y + w, pos.z + w, x2, y1, col));
+			vertices.push_back(Vertex(pos.x    , pos.y    , pos.z + w, x2, y2, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y    , pos.z + w, x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+
+		if (!blockHasFace(index, FaceFlag::Back))
+		{
+			Vec3f pos = worldPos + Vec3f(0, 0, 1);
+			block = map.getBlock(pos);
+			SColor col = getBlockFaceColor(block, Face::Front);
+
+			vertices.push_back(Vertex(pos.x    , pos.y + w, pos.z, x1, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y + w, pos.z, x2, y1, col));
+			vertices.push_back(Vertex(pos.x + w, pos.y    , pos.z, x2, y2, col));
+			vertices.push_back(Vertex(pos.x    , pos.y    , pos.z, x1, y2, col));
+			AddIndices(vertices, indices);
+		}
+	}
+
+	private void AddIndices(Vertex[]@ vertices, u16[]@ indices)
+	{
+		uint n = vertices.size();
+		indices.push_back(n - 4);
+		indices.push_back(n - 3);
+		indices.push_back(n - 1);
+		indices.push_back(n - 3);
+		indices.push_back(n - 2);
+		indices.push_back(n - 1);
+	}
+
+	SColor getBlockFaceColor(SColor block, u8 face)
+	{
+		float shade = 1 - shadeIntensity * shadeScale[face];
+		float health = map.getHealth(block) / 255.0f;
+
+		return SColor(255,
+			block.getRed() * shade * health,
+			block.getGreen() * shade * health,
+			block.getBlue() * shade * health
+		);
 	}
 }
