@@ -160,6 +160,114 @@ shared class Ray
 
 		return true;
 	}
+
+	// http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
+	// https://github.com/opengl-tutorials/ogl/blob/master/misc05_picking/misc05_picking_custom.cpp
+	bool intersectsOBB(AABB@ aabb, float[] modelMatrix, float &out distance)
+	{
+		float tMin = 0.0f;
+		float tMax = 100000.0f;
+
+		float e, f;
+
+		Vec3f oobPos(modelMatrix[12], modelMatrix[13], modelMatrix[14]);
+
+		Vec3f delta = oobPos - position;
+
+		Vec3f xaxis(modelMatrix[0], modelMatrix[1], modelMatrix[2]);
+		e = xaxis.dot(delta);
+		f = direction.dot(xaxis);
+
+		if (Maths::Abs(f) > 0.001f)
+		{
+			float t1 = (e + aabb.min.x) / f; // Intersection with the "left" plane
+			float t2 = (e + aabb.max.x) / f; // Intersection with the "right" plane
+
+			// Swap if wrong order
+			if (t1 > t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+
+			// tMax is the nearest "far" intersection
+			if (t2 < tMax)
+				tMax = t2;
+			// tMin is the farthest "near" intersection
+			if (t1 > tMin)
+				tMin = t1;
+
+			if (tMax < tMin)
+				return false;
+		}
+		else if (-e + aabb.min.x > 0.0f || -e + aabb.max.x < 0.0f)
+		{
+			// The ray is almost parallel to the planes, so they don't have any "intersection"
+			return false;
+		}
+
+		Vec3f yaxis(modelMatrix[4], modelMatrix[5], modelMatrix[6]);
+		e = yaxis.dot(delta);
+		f = direction.dot(yaxis);
+
+		if (Maths::Abs(f) > 0.001f)
+		{
+			float t1 = (e + aabb.min.y) / f;
+			float t2 = (e + aabb.max.y) / f;
+
+			if (t1 > t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+
+			if (t2 < tMax)
+				tMax = t2;
+			if (t1 > tMin)
+				tMin = t1;
+
+			if (tMax < tMin)
+				return false;
+		}
+		else if (-e + aabb.min.y > 0.0f || -e + aabb.max.y < 0.0f)
+		{
+			return false;
+		}
+
+		Vec3f zaxis(modelMatrix[8], modelMatrix[9], modelMatrix[10]);
+		e = zaxis.dot(delta);
+		f = direction.dot(zaxis);
+
+		if (Maths::Abs(f) > 0.001f)
+		{
+			float t1 = (e + aabb.min.z) / f;
+			float t2 = (e + aabb.max.z) / f;
+
+			if (t1 > t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+
+			if (t2 < tMax)
+				tMax = t2;
+			if (t1 > tMin)
+				tMin = t1;
+
+			if (tMax < tMin)
+				return false;
+		}
+		else if (-e + aabb.min.z > 0.0f || -e + aabb.max.z < 0.0f)
+		{
+			return false;
+		}
+
+		distance = tMin;
+		return true;
+	}
 }
 
 shared class RaycastInfo
