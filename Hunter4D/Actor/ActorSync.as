@@ -7,6 +7,7 @@ void onInit(CRules@ this)
 	this.addCommandID("remove actor");
 	this.addCommandID("set actor collision flags");
 	this.addCommandID("set actor gravity");
+	this.addCommandID("set actor health");
 }
 
 void onTick(CRules@ this)
@@ -102,5 +103,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!gravity.deserialize(params)) return;
 
 		actor.SetGravity(gravity);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set actor health"))
+	{
+		Actor@ actor;
+		if (!Actor::saferead(params, @actor)) return;
+
+		float health;
+		if (!params.saferead_u8(health)) return;
+
+		actor.SetHealth(health);
 	}
 }

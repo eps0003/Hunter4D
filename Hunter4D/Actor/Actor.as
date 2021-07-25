@@ -7,6 +7,7 @@
 #include "ActorRunAnim.as"
 #include "ActorJumpAnim.as"
 #include "ActorJumpingJacksAnim.as"
+#include "Hitters.as"
 
 shared class Actor : ICollision
 {
@@ -34,6 +35,8 @@ shared class Actor : ICollision
 	Vec3f velocity;
 	private Vec3f oldVelocity;
 	Vec3f interVelocity;
+
+	private u8 health = 255;
 
 	private AABB@ collider;
 	private u8 collisionFlags = 0;
@@ -200,6 +203,26 @@ shared class Actor : ICollision
 		return scale;
 	}
 
+	void SetHealth(u8 health)
+	{
+		if (this.health == health) return;
+
+		this.health = health;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_u8(health);
+			rules.SendCommand(rules.getCommandID("set actor health"), bs, true);
+		}
+	}
+
+	u8 getHealth()
+	{
+		return health;
+	}
+
 	void SetCullRadius(float radius)
 	{
 		cullRadius = radius;
@@ -220,6 +243,7 @@ shared class Actor : ICollision
 		gravity.Serialize(bs);
 		bs.write_f32(scale);
 		bs.write_u8(collisionFlags);
+		bs.write_u8(health);
 
 		bs.write_bool(hasCollider());
 		if (hasCollider())
@@ -266,6 +290,7 @@ shared class Actor : ICollision
 		if (!gravity.deserialize(bs)) return;
 		if (!bs.saferead_f32(scale)) return;
 		if (!bs.saferead_u8(collisionFlags)) return;
+		if (!bs.saferead_u8(health)) return;
 
 		bool hasCollider;
 		if (!bs.saferead_bool(hasCollider)) return;
@@ -326,6 +351,14 @@ shared class Actor : ICollision
 
 	void PostUpdate()
 	{
+		if (isServer())
+		{
+			if (health <= 0)
+			{
+				Kill();
+			}
+		}
+
 		if (isMyActor())
 		{
 			velocity.y = Maths::Clamp(velocity.y, -1, 1);
@@ -473,6 +506,28 @@ shared class Actor : ICollision
 
 	void Kill()
 	{
-		player.getBlob().server_Die();
+		blob.server_Die();
+	}
+
+	void Heal(uint health)
+	{
+		if (health == 0) return;
+
+		u8 newHealth = Maths::Min(this.health + health, 255);
+		SetHealth(newHealth);
+	}
+
+	void Damage(uint damage, CPlayer@ damager = null, u8 hitter = Hitters::nothing)
+	{
+		if (damage == 0) return;
+
+		if (damager !is null)
+		{
+			blob.server_Hit(blob, Vec2f_zero, Vec2f_zero, 1.0f, hitter);
+			blob.SetPlayerOfRecentDamage(player, damage);
+		}
+
+		u8 newHealth = Maths::Max(int(health) - damage, 0);
+		SetHealth(newHealth);
 	}
 }
