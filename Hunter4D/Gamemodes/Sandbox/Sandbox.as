@@ -52,6 +52,9 @@ void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
 {
 	if (oldTeam == newTeam || !Loading::isPlayerLoaded(player)) return;
 
+	// Swapping between teams (not spectator) doesn't respawn the player
+	if (oldTeam != this.getSpectatorTeamNum() && newTeam != this.getSpectatorTeamNum()) return;
+
 	SpawnPlayer(this, player);
 }
 
