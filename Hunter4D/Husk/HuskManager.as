@@ -26,7 +26,6 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	{
 		CreateHusk(player);
 		player.server_setTeamNum(0);
-		getSecurity().reloadSecurity();
 	}
 }
 

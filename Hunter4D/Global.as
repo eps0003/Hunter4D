@@ -2,6 +2,7 @@ void onInit(CRules@ this)
 {
 	onRestart(this);
 	InitDefaultMap();
+	getSecurity().reloadSecurity();
 	CFileImage::silent_errors = true;
 }
 
