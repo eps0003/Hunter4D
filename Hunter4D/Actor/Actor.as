@@ -205,6 +205,11 @@ shared class Actor : ICollision
 		cullRadius = radius;
 	}
 
+	float getCullRadius()
+	{
+		return cullRadius;
+	}
+
 	Vec3f getCenter()
 	{
 		return hasCollider() ? interPosition + collider.center : interPosition;

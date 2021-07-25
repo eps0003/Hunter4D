@@ -3,6 +3,8 @@
 #include "MapRenderer.as"
 #include "Particle.as"
 #include "Loading.as"
+#include "ObjectTree.as"
+#include "Blob.as"
 
 #define CLIENT_ONLY
 
@@ -12,6 +14,7 @@ Object@[]@ objects;
 Camera@ camera;
 MapRenderer@ mapRenderer;
 ParticleManager@ particleManager;
+uint visibleObjectCount = 0;
 
 void onInit(CRules@ this)
 {
@@ -25,6 +28,12 @@ void onInit(CRules@ this)
 	@particleManager = Particles::getManager();
 	@camera = Camera::getCamera();
 	@mapRenderer = Map::getRenderer();
+
+	for (uint i = 0; i < 100; i++)
+	{
+		Vec3f pos(XORRandom(200), XORRandom(200), XORRandom(200));
+		Object::AddObject(Blob(pos));
+	}
 }
 
 void onRestart(CRules@ this)
@@ -59,7 +68,7 @@ void onRender(CRules@ this)
 	}
 
 	GUI::DrawText("Actors: " + Actor::getVisibleActorCount() + " / "  + actors.size(), Vec2f(10, 30), color_black);
-	GUI::DrawText("Objects: " + Object::getVisibleObjectCount() + " / "  + objects.size(), Vec2f(10, 50), color_black);
+	GUI::DrawText("Objects: " + visibleObjectCount + " / "  + objects.size(), Vec2f(10, 50), color_black);
 	GUI::DrawText("Chunks: " + mapRenderer.visibleChunkCount + " / " + mapRenderer.chunkCount, Vec2f(10, 70), color_black);
 	GUI::DrawText("Particles: " + particleManager.getParticleCount(), Vec2f(10, 90), color_black);
 }
@@ -88,13 +97,5 @@ void Render(int id)
 		}
 	}
 
-	for (uint i = 0; i < objects.size(); i++)
-	{
-		Object@ object = objects[i];
-		object.Interpolate();
-		if (object.isVisible())
-		{
-			object.Render();
-		}
-	}
+	visibleObjectCount = ObjectTree().RenderVisibleObjects();
 }

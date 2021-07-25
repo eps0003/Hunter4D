@@ -194,6 +194,11 @@ shared class Object : ICollision
 		cullRadius = radius;
 	}
 
+	float getCullRadius()
+	{
+		return cullRadius;
+	}
+
 	Vec3f getCenter()
 	{
 		return hasCollider() ? interPosition + collider.center : interPosition;
