@@ -238,7 +238,7 @@ shared class Map
 	void DamageBlock(int index, uint damage, CPlayer@ player = null)
 	{
 		u8 newHealth = Maths::Clamp(-damage + blocks[index].getAlpha(), 0, 255);
-		SetHealth(index, newHealth);
+		SetHealth(index, newHealth, player);
 	}
 
 	SColor getBlockSafe(Vec3f position)
