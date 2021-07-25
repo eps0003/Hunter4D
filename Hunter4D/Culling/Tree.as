@@ -56,7 +56,7 @@ shared class Branch
 		// Check if branch can be subdivided
 		if (bounds.dim.max() > 2)
 		{
-			Vec3f half = min + (dim / 2.0f).floor();
+			Vec3f half = min + (dim * 0.5f).floor();
 
 			// Subdivide bottom half
 			@branch0 = Branch(mapRenderer, Vec3f(min.x, min.y, min.z), Vec3f(half.x, half.y, half.z));
@@ -140,7 +140,7 @@ shared class Branch
 		}
 	}
 
-	uint RenderVisibleChunks(Frustum frustum, Vec3f camPos)
+	uint RenderVisibleChunks(Frustum@ frustum, Vec3f camPos)
 	{
 		uint visibleChunkCount = 0;
 

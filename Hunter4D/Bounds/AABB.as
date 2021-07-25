@@ -9,7 +9,7 @@ shared class AABB : IBounds
 	Vec3f center;
 	float radius; // Radius of a sphere that this box inscribes
 
-	private Random random(getGameTime());
+	private Random random(Time());
 	private Map@ map = Map::getMap();
 
 	AABB(Vec3f min, Vec3f max)
@@ -70,36 +70,36 @@ shared class AABB : IBounds
 		);
 	}
 
-bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
-{
-	Map@ map = Map::getMap();
-
-	Vec3f floor = (currentPos + min).floor();
-	Vec3f ceil = (currentPos + max).ceil();
-
-	Vec3f min2 = Vec3f().max(worldPos + min);
-	Vec3f max2 = map.dimensions.min(worldPos + max);
-
-	for (int y = min2.y; y < max2.y; y++)
-	for (int x = min2.x; x < max2.x; x++)
-	for (int z = min2.z; z < max2.z; z++)
+	bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
 	{
-		// Ignore voxels the actor is currently intersecting
-		if (x >= floor.x && x < ceil.x &&
-			y >= floor.y && y < ceil.y &&
-			z >= floor.z && z < ceil.z)
+		Map@ map = Map::getMap();
+
+		Vec3f floor = (currentPos + min).floor();
+		Vec3f ceil = (currentPos + max).ceil();
+
+		Vec3f min2 = Vec3f().max(worldPos + min);
+		Vec3f max2 = map.dimensions.min(worldPos + max);
+
+		for (int y = min2.y; y < max2.y; y++)
+		for (int x = min2.x; x < max2.x; x++)
+		for (int z = min2.z; z < max2.z; z++)
 		{
-			continue;
+			// Ignore voxels the actor is currently intersecting
+			if (x >= floor.x && x < ceil.x &&
+				y >= floor.y && y < ceil.y &&
+				z >= floor.z && z < ceil.z)
+			{
+				continue;
+			}
+
+			if (map.isSolid(map.getBlock(x, y, z)))
+			{
+				return true;
+			}
 		}
 
-		if (map.isSolid(map.getBlock(x, y, z)))
-		{
-			return true;
-		}
+		return false;
 	}
-
-	return false;
-}
 
 	bool intersectsVoxel(Vec3f worldPos, Vec3f voxelWorldPos)
 	{
@@ -113,6 +113,11 @@ bool intersectsNewSolid(Vec3f currentPos, Vec3f worldPos)
 			}
 		}
 		return false;
+	}
+
+	AABB@ getBounds()
+	{
+		return this;
 	}
 
 	void Serialize(CBitStream@ bs)
