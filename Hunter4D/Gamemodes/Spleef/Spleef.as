@@ -1,6 +1,7 @@
 #include "Loading.as"
 #include "Map.as"
 #include "SpleefActor.as"
+#include "SpectatorActor.as"
 
 #define SERVER_ONLY
 
@@ -11,6 +12,8 @@ uint timeToStart;
 
 void onInit(CRules@ this)
 {
+	Map::getManager().SetMap(ConfigMap("Ephtracy.cfg"));
+	this.AddScript("ShortPostGame.as");
 	onRestart(this);
 }
 
@@ -51,10 +54,9 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;
 
-		Vec3f spawnPos = map.dimensions * Vec3f(0.5f, 1.0f, 0.5f);
-		Actor::AddActor(SpleefActor(player, spawnPos));
+		SpawnPlayer(this, player);
 
-		if (Loading::areAllPlayersLoaded())
+		if (this.getCurrentState() == WARMUP && getPlayerCount() >= 2 && timeToStart == 0 && Loading::areAllPlayersLoaded())
 		{
 			timeToStart = getGameTime() + countdownDuration + 1;
 		}
@@ -75,16 +77,17 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	// Last player left
-	if (getPlayerCount() == 1)
+	if (getPlayerCount() <= 1)
 	{
+		// No players left
+		LoadNextMap();
+	}
+	else if (getPlayerCount() <= 2)
+	{
+		// One player left
 		if (this.getCurrentState() == WARMUP)
 		{
 			timeToStart = 0;
-		}
-		else
-		{
-			LoadNextMap();
 		}
 	}
 }
@@ -100,6 +103,65 @@ void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 	if (differentTeam && (warmup || newTeam == spectatorTeam))
 	{
 		player.server_setTeamNum(newTeam);
-		Actor::RemoveActor(player);
 	}
+}
+
+void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
+{
+	if (oldTeam == newTeam || !Loading::isPlayerLoaded(player)) return;
+
+	SpawnPlayer(this, player);
+}
+
+void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
+{
+	SpawnPlayer(this, victim);
+}
+
+void SpawnPlayer(CRules@ this, CPlayer@ player)
+{
+	Vec3f spawnPos = Vec3f(4, 2, 4);
+
+	if (player.getTeamNum() == this.getSpectatorTeamNum() || this.getCurrentState() != WARMUP)
+	{
+		Actor@ oldActor = Actor::getActor(player);
+		if (oldActor !is null)
+		{
+			Actor::AddActor(SpectatorActor(oldActor));
+		}
+		else
+		{
+			Actor::AddActor(SpectatorActor(player, spawnPos));
+		}
+	}
+	else
+	{
+		Actor::AddActor(SpleefActor(player, spawnPos));
+	}
+
+	CheckWin(this);
+}
+
+void CheckWin(CRules@ this)
+{
+	if (this.getCurrentState() != GAME) return;
+
+	SpleefActor@ winner;
+
+	Actor@[]@ actors = Actor::getActors();
+	for (uint i = 0; i < actors.size(); i++)
+	{
+		SpleefActor@ actor = cast<SpleefActor@>(actors[i]);
+		if (actor !is null)
+		{
+			if (winner !is null) return;
+
+			@winner = actor;
+		}
+	}
+
+	if (winner is null) return;
+
+	print(winner.getPlayer().getUsername() + " won");
+	this.SetCurrentState(GAME_OVER);
 }

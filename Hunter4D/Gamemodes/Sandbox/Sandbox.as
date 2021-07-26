@@ -33,10 +33,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
-	if (isServer())
-	{
-		SpawnPlayer(this, victim);
-	}
+	SpawnPlayer(this, victim);
 }
 
 void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
@@ -62,14 +59,9 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
 	Vec3f spawnPos = Vec3f(4, 2, 4);
 
-	Actor@ oldActor = Actor::getActor(player);
-	if (oldActor !is null)
-	{
-		Actor::RemoveActor(player);
-	}
-
 	if (player.getTeamNum() == this.getSpectatorTeamNum())
 	{
+		Actor@ oldActor = Actor::getActor(player);
 		if (oldActor !is null)
 		{
 			Actor::AddActor(SpectatorActor(oldActor));
