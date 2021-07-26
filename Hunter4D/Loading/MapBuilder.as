@@ -71,33 +71,20 @@ shared class ConfigMap : MapBuilder
 		{
 			uint value = data[needle];
 
-			if (encodedDamage)
+			if (value > 0)
 			{
-				if (value > 0)
+				if (!encodedDamage)
 				{
-					map.SetBlock(index++, value);
+					value = (value >> 1) | (255 << 24);
+				}
 
-					i++;
-				}
-				else
-				{
-					index += data[++needle] + 1;
-				}
+				map.SetBlock(index++, value);
+
+				i++;
 			}
 			else
 			{
-				if (value & 1 == 1)
-				{
-					SColor color(value >> 1);
-					color.setAlpha(255);
-					map.SetBlock(index++, color);
-
-					i++;
-				}
-				else
-				{
-					index += data[++needle] + 1;
-				}
+				index += data[++needle] + 1;
 			}
 		}
 	}
