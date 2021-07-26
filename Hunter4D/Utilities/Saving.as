@@ -19,15 +19,37 @@ void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
 {
 	if (Loading::isMyPlayerLoaded())
 	{
-		Menu::addContextItem(menu, getTranslatedString("Save Hunter3D Map"), "Saving.as", "void SaveMap()");
+		CContextMenu@ submenu = Menu::addContextMenu(menu, "Save Hunter3D Map");
+		Menu::addContextItem(submenu, getTranslatedString("Save with block damage"), "Saving.as", "void SaveMapWithDamage()");
+		Menu::addContextItem(submenu, getTranslatedString("Save without block damage"), "Saving.as", "void SaveMapWithoutDamage()");
 	}
 }
 
-void SaveMap()
+uint encodeBlock(SColor block, bool damage)
+{
+	if (damage)
+	{
+		return block.color;
+	}
+
+	return (block.getRed() << 17) | (block.getGreen() << 9) | (block.getBlue() << 1) | 1;
+}
+
+void SaveMapWithDamage()
+{
+	SaveMap(true);
+}
+
+void SaveMapWithoutDamage()
+{
+	SaveMap(false);
+}
+
+void SaveMap(bool damage)
 {
 	Menu::CloseAllMenus();
 
-	string data = "1;";
+	string data = (damage ? "1" : "0") + ";";
 	bool prevVisible = true;
 	uint lastVisibleIndex = 0;
 
@@ -43,7 +65,7 @@ void SaveMap()
 				data += "0;" + (i - lastVisibleIndex - 2) + ";";
 			}
 
-			data += block.color + ";";
+			data += encodeBlock(block, damage) + ";";
 			lastVisibleIndex = i;
 		}
 
