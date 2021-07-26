@@ -35,6 +35,8 @@ namespace Actor
 
 	shared void AddActor(Actor@ actor)
 	{
+		Actor::RemoveActor(actor.getPlayer());
+
 		Actor@[]@ actors = Actor::getActors();
 		actors.push_back(actor);
 		getRules().set("actors", @actors);
@@ -87,6 +89,11 @@ namespace Actor
 				return;
 			}
 		}
+	}
+
+	shared bool actorExists(u16 id)
+	{
+		return Actor::getActor(id) !is null;
 	}
 
 	shared bool actorExists(CPlayer@ player)
