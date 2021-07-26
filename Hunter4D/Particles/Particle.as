@@ -261,10 +261,8 @@ shared class ParticleManager
 			Vec3f pos = static[i] ? position[i] : oldPosition[i].lerp(position[i], t);
 			SColor col = color[i];
 
-			// float time = (gt - spawnTime[i]) / timeToLive[i];
-			// float scale = maxScale * (1 - Maths::Pow(time, 10));
-
-			float scale = maxScale;
+			float time = (gt - spawnTime[i]) / timeToLive[i];
+			float scale = maxScale * (1 - Maths::Pow(time, 10));
 
 			vertices[index + 0] = Vertex(pos.x - scale * vec.x, pos.y - scale * vec.y, pos.z - scale * vec.z, 0, 1, col);
 			vertices[index + 1] = Vertex(pos.x - scale * vec.x, pos.y + scale * vec.y, pos.z - scale * vec.z, 0, 0, col);
