@@ -71,7 +71,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	if (!isServer()) return;
+	if (isClient()) return;
 
 	for (uint i = 0; i < getPlayerCount(); i++)
 	{
