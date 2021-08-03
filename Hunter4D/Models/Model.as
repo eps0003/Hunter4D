@@ -11,7 +11,7 @@ shared class Model
 	uint animStartTime = 0;
 	private uint animTransitionDuration = 3;
 
-	Model(string texture, float scale)
+	Model(string texture, float scale = 1.0f)
 	{
 		Matrix::MakeIdentity(matrix);
 		Matrix::SetScale(matrix, scale, scale, scale);
