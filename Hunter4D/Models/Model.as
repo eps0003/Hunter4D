@@ -52,7 +52,10 @@ shared class Model
 
 	void Update()
 	{
-		animation.Update();
+		if (animation !is null)
+		{
+			animation.Update();
+		}
 	}
 
 	void Render()

@@ -12,6 +12,8 @@ shared class ModelSegment
 	Vec3f oldRotation;
 	Vec3f interRotation;
 
+	float scale = 1.0f;
+
 	ModelSegment(string modelPath)
 	{
 		mesh.LoadObjIntoMesh(modelPath);
@@ -62,6 +64,11 @@ shared class ModelSegment
 		Matrix::SetTranslation(this.matrix, interPosition.x, interPosition.y, interPosition.z);
 		Matrix::SetRotationDegrees(this.matrix, -interRotation.x, -interRotation.y, -interRotation.z);
 
+		float[] scaleMatrix;
+		Matrix::MakeIdentity(scaleMatrix);
+		Matrix::SetScale(scaleMatrix, scale, scale, scale);
+
+		Matrix::MultiplyImmediate(this.matrix, scaleMatrix);
 		Matrix::MultiplyImmediate(matrix, this.matrix);
 		Render::SetModelTransform(matrix);
 	}
