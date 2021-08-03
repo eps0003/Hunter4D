@@ -93,6 +93,6 @@ shared class SpleefActor : Actor
 
 	bool canDestroyBlocks()
 	{
-		return mouse.isInControl() && rules.getCurrentState() != WARMUP;
+		return mouse.isInControl() && !rules.isWarmup();
 	}
 }

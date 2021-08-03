@@ -29,7 +29,7 @@ void onTick(CRules@ this)
 {
 	float gt = getGameTime();
 
-	if (this.getCurrentState() == WARMUP && timeToStart > 0)
+	if (this.isWarmup() && timeToStart > 0)
 	{
 		if (gt >= timeToStart)
 		{
@@ -56,7 +56,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		SpawnPlayer(this, player);
 
-		if (this.getCurrentState() == WARMUP && getPlayerCount() >= 2 && timeToStart == 0 && Loading::areAllPlayersLoaded())
+		if (this.isWarmup() && getPlayerCount() >= 2 && timeToStart == 0 && Loading::areAllPlayersLoaded())
 		{
 			timeToStart = getGameTime() + countdownDuration + 1;
 		}
@@ -65,7 +65,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	if (this.getCurrentState() == WARMUP)
+	if (this.isWarmup())
 	{
 		player.server_setTeamNum(0);
 	}
@@ -85,7 +85,7 @@ void onPlayerLeave(CRules@ this, CPlayer@ player)
 	else if (getPlayerCount() <= 2)
 	{
 		// One player left
-		if (this.getCurrentState() == WARMUP)
+		if (this.isWarmup())
 		{
 			timeToStart = 0;
 		}
@@ -97,10 +97,7 @@ void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 	u8 currentTeam = player.getTeamNum();
 	u8 spectatorTeam = this.getSpectatorTeamNum();
 
-	bool differentTeam = currentTeam != newTeam;
-	bool warmup = this.getCurrentState() == WARMUP;
-
-	if (differentTeam && (warmup || newTeam == spectatorTeam))
+	if (currentTeam != newTeam && (this.isWarmup() || newTeam == spectatorTeam))
 	{
 		player.server_setTeamNum(newTeam);
 	}
@@ -122,7 +119,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
 	Vec3f spawnPos = Vec3f(4, 2, 4);
 
-	if (player.getTeamNum() == this.getSpectatorTeamNum() || this.getCurrentState() != WARMUP)
+	if (player.getTeamNum() == this.getSpectatorTeamNum() || !this.isWarmup())
 	{
 		Actor@ oldActor = Actor::getActor(player);
 		if (oldActor !is null)
@@ -144,7 +141,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 
 void CheckWin(CRules@ this)
 {
-	if (this.getCurrentState() != GAME) return;
+	if (!this.isMatchRunning()) return;
 
 	SpleefActor@ winner;
 
