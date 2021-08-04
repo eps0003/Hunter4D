@@ -7,21 +7,34 @@ shared class ActorModel : Model
 {
 	Actor@ actor;
 
-	ModelSegment@ body = ModelSegment("ActorBody.obj");
-	ModelSegment@ head = ModelSegment("ActorHead.obj");
-	ModelSegment@ upperLeftArm = ModelSegment("ActorUpperLeftArm.obj");
-	ModelSegment@ lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj");
-	ModelSegment@ upperRightArm = ModelSegment("ActorUpperRightArm.obj");
-	ModelSegment@ lowerRightArm = ModelSegment("ActorLowerRightArm.obj");
-	ModelSegment@ upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj");
-	ModelSegment@ lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj");
-	ModelSegment@ upperRightLeg = ModelSegment("ActorUpperRightLeg.obj");
-	ModelSegment@ lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj");
+	ModelSegment@ body;
+	ModelSegment@ head;
+	ModelSegment@ upperLeftArm;
+	ModelSegment@ lowerLeftArm;
+	ModelSegment@ upperRightArm;
+	ModelSegment@ lowerRightArm;
+	ModelSegment@ upperLeftLeg;
+	ModelSegment@ lowerLeftLeg;
+	ModelSegment@ upperRightLeg;
+	ModelSegment@ lowerRightLeg;
 
 	ActorModel(Actor@ actor)
 	{
-		super(Skins::getSkinName(actor.getPlayer()), 0.9f * actor.getScale());
+		super(0.9f * actor.getScale());
 		@this.actor = actor;
+
+		string texture = Skins::getSkinName(actor.getPlayer());
+
+		@body = ModelSegment("ActorBody.obj", texture);
+		@head = ModelSegment("ActorHead.obj", texture);
+		@upperLeftArm = ModelSegment("ActorUpperLeftArm.obj", texture);
+		@lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj", texture);
+		@upperRightArm = ModelSegment("ActorUpperRightArm.obj", texture);
+		@lowerRightArm = ModelSegment("ActorLowerRightArm.obj", texture);
+		@upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj", texture);
+		@lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj", texture);
+		@upperRightLeg = ModelSegment("ActorUpperRightLeg.obj", texture);
+		@lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj", texture);
 
 		AddSegment(body);
 		AddSegment(head);

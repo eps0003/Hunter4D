@@ -3,7 +3,6 @@
 shared class Model
 {
 	private float[] matrix;
-	private SMaterial material;
 
 	private ModelSegment@[] segments;
 
@@ -13,23 +12,15 @@ shared class Model
 	uint animStartTime = 0;
 	private uint animTransitionDuration = 3;
 
-	Model(string texture, float scale = 1.0f)
+	Model(float scale = 1.0f)
 	{
 		Matrix::MakeIdentity(matrix);
 		Matrix::SetScale(matrix, scale, scale, scale);
-
-		material.AddTexture(texture);
-		material.SetFlag(SMaterial::LIGHTING, false);
-		material.SetFlag(SMaterial::BILINEAR_FILTER, false);
-		material.SetFlag(SMaterial::BACK_FACE_CULLING, false);
-		material.SetFlag(SMaterial::FOG_ENABLE, true);
-		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 	}
 
 	void AddSegment(ModelSegment@ segment)
 	{
 		segments.push_back(segment);
-		segment.getMesh().SetMaterial(material);
 	}
 
 	void AddAnimation(string name, IAnimation@ animation)
