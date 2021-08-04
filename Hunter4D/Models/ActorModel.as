@@ -1,6 +1,5 @@
 #include "Model.as"
 #include "Camera.as"
-#include "ActorRunAnim.as"
 #include "Skins.as"
 
 shared class ActorModel : Model
