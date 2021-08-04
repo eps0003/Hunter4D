@@ -90,7 +90,7 @@ shared class SandboxActor : Actor
 				}
 				else if (taunting)
 				{
-					model.SetAnimation("taunting");
+					model.SetAnimation("taunt");
 				}
 				else
 				{
