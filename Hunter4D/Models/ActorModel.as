@@ -44,6 +44,13 @@ shared class ActorModel : Model
 		upperRightArm.AddChild(lowerRightArm);
 		upperLeftLeg.AddChild(lowerLeftLeg);
 		upperRightLeg.AddChild(lowerRightLeg);
+
+		AddAnimation("idle", ActorIdleAnim(this));
+		AddAnimation("run", ActorRunAnim(this));
+		AddAnimation("jump", ActorJumpAnim(this));
+		AddAnimation("taunt", ActorJumpingJacksAnim(this));
+
+		SetAnimation("idle");
 	}
 
 	void Update()

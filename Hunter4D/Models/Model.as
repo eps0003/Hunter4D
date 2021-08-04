@@ -7,7 +7,9 @@ shared class Model
 
 	private ModelSegment@[] segments;
 
+	private dictionary animations;
 	private IAnimation@ animation;
+	private string animName;
 	uint animStartTime = 0;
 	private uint animTransitionDuration = 3;
 
@@ -30,24 +32,36 @@ shared class Model
 		segment.getMesh().SetMaterial(material);
 	}
 
-	void SetAnimation(IAnimation@ animation)
+	void AddAnimation(string name, IAnimation@ animation)
 	{
-		if (animation !is this.animation)
+		animations.set(name, @animation);
+	}
+
+	void SetAnimation(string name)
+	{
+		IAnimation@ animation;
+		if (animations.get(name, @animation))
 		{
-			@this.animation = animation;
-
-			if (this.animation !is null)
+			if (animation !is this.animation)
 			{
+				@this.animation = animation;
+
 				animStartTime = getGameTime();
-			}
 
-			for (uint i = 0; i < segments.size(); i++)
-			{
-				ModelSegment@ segment = segments[i];
-				segment.oldPosition = segment.interPosition;
-				segment.oldRotation = segment.interRotation;
+				for (uint i = 0; i < segments.size(); i++)
+				{
+					ModelSegment@ segment = segments[i];
+					segment.oldPosition = segment.interPosition;
+					segment.oldRotation = segment.interRotation;
+				}
 			}
 		}
+		else if (name != animName)
+		{
+			warn("Unable to set nonexistent animation: " + name);
+		}
+
+		animName = name;
 	}
 
 	void Update()

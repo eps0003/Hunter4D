@@ -21,10 +21,6 @@ shared class SandboxActor : Actor
 	};
 
 	private ActorModel@ model;
-	private ActorIdleAnim@ idleAnim;
-	private ActorRunAnim@ runAnim;
-	private ActorJumpAnim@ jumpAnim;
-	private ActorJumpingJacksAnim@ jumpingJacksAnim;
 
 	bool taunting = false;
 
@@ -49,10 +45,6 @@ shared class SandboxActor : Actor
 		if (isClient())
 		{
 			@model = ActorModel(this);
-			@idleAnim = ActorIdleAnim(model);
-			@runAnim = ActorRunAnim(model);
-			@jumpAnim = ActorJumpAnim(model);
-			@jumpingJacksAnim = ActorJumpingJacksAnim(model);
 		}
 	}
 
@@ -94,20 +86,20 @@ shared class SandboxActor : Actor
 			{
 				if (velocity.magSquared() > 0.005f)
 				{
-					model.SetAnimation(runAnim);
+					model.SetAnimation("run");
 				}
 				else if (taunting)
 				{
-					model.SetAnimation(jumpingJacksAnim);
+					model.SetAnimation("taunting");
 				}
 				else
 				{
-					model.SetAnimation(idleAnim);
+					model.SetAnimation("idle");
 				}
 			}
 			else
 			{
-				model.SetAnimation(jumpAnim);
+				model.SetAnimation("jump");
 			}
 		}
 	}
