@@ -50,7 +50,19 @@ shared class MapRenderer
 		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 	}
 
+	void GenerateMesh(int index)
+	{
+		Vec3f pos = map.indexToPos(index);
+		GenerateMesh(index, pos);
+	}
+
 	void GenerateMesh(Vec3f position)
+	{
+		int index = map.posToIndex(position);
+		GenerateMesh(index, position);
+	}
+
+	void GenerateMesh(int index, Vec3f position)
 	{
 		Vec3f chunkPos = worldPosToChunkPos(position);
 		Chunk@ chunk = getChunkSafe(chunkPos);
@@ -70,20 +82,63 @@ shared class MapRenderer
 			int yMod = y % chunkDimension;
 			int zMod = z % chunkDimension;
 
-			UpdateBlockFaces(x, y, z);
+			UpdateBlockFaces(index, x, y, z);
+
+			bool visible = map.isVisible(map.getBlock(index));
 
 			if (x > 0)
-				UpdateBlockFaces(x - 1, y, z);
+			{
+				index = map.posToIndex(x - 1, y, z);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Right;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Right;
+			}
+
 			if (x + 1 < map.dimensions.x)
-				UpdateBlockFaces(x + 1, y, z);
-			if (y > 0)
-				UpdateBlockFaces(x, y - 1, z);
-			if (y + 1 < map.dimensions.y)
-				UpdateBlockFaces(x, y + 1, z);
+			{
+				index = map.posToIndex(x + 1, y, z);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Left;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Left;
+			}
+
 			if (z > 0)
-				UpdateBlockFaces(x, y, z - 1);
+			{
+				index = map.posToIndex(x, y, z - 1);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Back;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Back;
+			}
+
 			if (z + 1 < map.dimensions.z)
-				UpdateBlockFaces(x, y, z + 1);
+			{
+				index = map.posToIndex(x, y, z + 1);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Front;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Front;
+			}
+
+			if (y > 0)
+			{
+				index = map.posToIndex(x, y - 1, z);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Up;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Up;
+			}
+
+			if (y + 1 < map.dimensions.y)
+			{
+				index = map.posToIndex(x, y + 1, z);
+				if (visible)
+					faceFlags[index] &= ~FaceFlag::Down;
+				else if (map.isVisible(map.getBlock(index)))
+					faceFlags[index] |= FaceFlag::Down;
+			}
 
 			if (xMod == 0)
 			{
@@ -169,7 +224,7 @@ shared class MapRenderer
 		UpdateBlockFaces(index, x, y, z);
 	}
 
-	private void UpdateBlockFaces(int index, int x, int y, int z)
+	void UpdateBlockFaces(int index, int x, int y, int z)
 	{
 		u8 faces = FaceFlag::None;
 

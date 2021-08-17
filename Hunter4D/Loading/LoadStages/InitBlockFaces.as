@@ -36,11 +36,11 @@ void onTick(CRules@ this)
 
 	for (; y < map.dimensions.y; y++)
 	{
-		for (; x < map.dimensions.x; x++)
+		for (; z < map.dimensions.z; z++)
 		{
-			for (; z < map.dimensions.z; z++)
+			for (; x < map.dimensions.x; x++)
 			{
-				renderer.UpdateBlockFaces(x, y, z);
+				renderer.UpdateBlockFaces(index, x, y, z);
 
 				if (++index >= map.blockCount)
 				{
@@ -58,9 +58,9 @@ void onTick(CRules@ this)
 				}
 			}
 
-			z = 0;
+			x = 0;
 		}
 
-		x = 0;
+		z = 0;
 	}
 }
