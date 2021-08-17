@@ -29,7 +29,7 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	uint blocksThisTick = getFPS() * 30;
+	uint blocksThisTick = getFPS() * 120;
 	uint i = 0;
 
 	this.set_f32("loading progress", index / Maths::Max(1, map.blockCount));
@@ -40,7 +40,7 @@ void onTick(CRules@ this)
 		{
 			for (; x < map.dimensions.x; x++)
 			{
-				renderer.UpdateBlockFaces(index, x, y, z);
+				renderer.InitBlockFaces(index, x, y, z);
 
 				if (++index >= map.blockCount)
 				{

@@ -212,6 +212,29 @@ shared class MapRenderer
 		}
 	}
 
+	void InitBlockFaces(int index, int x, int y, int z)
+	{
+		if (!map.isVisible(map.getBlock(index))) return;
+
+		u8 faces = FaceFlag::Right | FaceFlag::Back | FaceFlag::Up;
+
+		if (x == 0 || !map.isVisible(map.getBlock(index - 1)))
+			faces |= FaceFlag::Left;
+		if (z == 0 || !map.isVisible(map.getBlock(index - map.dimensions.x)))
+			faces |= FaceFlag::Front;
+		if (y == 0 || !map.isVisible(map.getBlock(index - map.dimensions.x * map.dimensions.z)))
+			faces |= FaceFlag::Down;
+
+		faceFlags[index] = faces;
+
+		if (x > 0)
+			faceFlags[index - 1] &= ~FaceFlag::Right;
+		if (z > 0)
+			faceFlags[index - map.dimensions.x] &= ~FaceFlag::Back;
+		if (y > 0)
+			faceFlags[index - map.dimensions.x * map.dimensions.z] &= ~FaceFlag::Up;
+	}
+
 	void UpdateBlockFaces(int index)
 	{
 		Vec3f pos = map.indexToPos(index);
