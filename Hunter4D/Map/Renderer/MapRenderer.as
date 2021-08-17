@@ -82,7 +82,7 @@ shared class MapRenderer
 				UpdateBlockFaces(x, y + 1, z);
 			if (z > 0)
 				UpdateBlockFaces(x, y, z - 1);
-			if (y + 1 < map.dimensions.z)
+			if (z + 1 < map.dimensions.z)
 				UpdateBlockFaces(x, y, z + 1);
 
 			if (xMod == 0)
