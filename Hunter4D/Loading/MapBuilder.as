@@ -35,7 +35,12 @@ shared class ConfigMap : MapBuilder
 	private uint needle;
 	private uint size;
 	private uint[] data;
-	private bool encodedDamage;
+
+	private SColor fillerBlockColor = SColor(255, 103, 64, 30);
+
+	private uint i;
+	private uint value;
+	private float progressDen;
 
 	ConfigMap(string fileName)
 	{
@@ -59,39 +64,41 @@ shared class ConfigMap : MapBuilder
 		data.clear();
 		cfg.readIntoArray_u32(data, "blocks");
 
-		encodedDamage = data[0] == 1;
-		data.removeAt(0);
-
 		size = data.size();
+		progressDen = Maths::Max(1, size);
 	}
 
 	void Load()
 	{
-		for (uint i = 0; i < blocksPerSection && needle < size; needle++)
+		for (i = 0; i < blocksPerSection && needle < size; needle++)
 		{
-			uint value = data[needle];
+			value = data[needle];
 
-			if (value > 0)
+			// Is visible
+			if (value & 1 == 1)
 			{
-				if (!encodedDamage)
+				// Is filler block
+				if (value & 2 == 2)
 				{
-					value = (value >> 1) | (255 << 24);
+					map.SetBlock(index++, fillerBlockColor);
 				}
-
-				map.SetBlock(index++, value);
+				else
+				{
+					map.SetBlock(index++, (value >> 2) | 4278190080); // 255 << 24 == 4278190080
+				}
 
 				i++;
 			}
 			else
 			{
-				index += data[++needle] + 1;
+				index += (value >> 1) + 1;
 			}
 		}
 	}
 
 	float getProgress()
 	{
-		return needle / Maths::Max(1, size);
+		return needle / progressDen;
 	}
 
 	bool isLoaded()
