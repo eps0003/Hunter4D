@@ -41,7 +41,7 @@ void onRender(CRules@ this)
 {
 	if (isTickPaused()) return;
 
-	float correction = getRenderApproximateCorrectionFactor();
+	float correction = getRenderExactDeltaTime() * getTicksASecond();
 	this.add_f32("inter_frame_time", correction);
 	this.add_f32("inter_game_time", correction);
 
