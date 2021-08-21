@@ -42,6 +42,11 @@ void onTick(CRules@ this)
 			{
 				renderer.InitBlockFaces(index, x, y, z);
 
+				if (++i >= blocksThisTick)
+				{
+					return;
+				}
+
 				if (++index >= map.blockCount)
 				{
 					print("Block faces initialized!");
@@ -49,11 +54,6 @@ void onTick(CRules@ this)
 					this.RemoveScript("InitBlockFaces.as");
 					this.AddScript("GenerateChunks.as");
 
-					return;
-				}
-
-				if (++i >= blocksThisTick)
-				{
 					return;
 				}
 			}
