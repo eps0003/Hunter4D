@@ -523,8 +523,8 @@ shared class Actor : ICollision
 
 		if (damager !is null)
 		{
-			blob.server_Hit(blob, Vec2f_zero, Vec2f_zero, 1.0f, hitter);
-			blob.SetPlayerOfRecentDamage(player, damage);
+			blob.server_Hit(blob, Vec2f_zero, Vec2f_zero, 0.0f, hitter);
+			blob.SetPlayerOfRecentDamage(damager, damage);
 		}
 
 		u8 newHealth = Maths::Max(int(health) - damage, 0);
