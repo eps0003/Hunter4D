@@ -2,6 +2,7 @@
 #include "SpectatorActor.as"
 #include "Loading.as"
 #include "Map.as"
+#include "SoccerBall.as"
 
 #define SERVER_ONLY
 
@@ -57,7 +58,7 @@ void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
 
 void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
-	Vec3f spawnPos = Vec3f(4, 2, 4);
+	Vec3f spawnPos = Vec3f(4, 3, 4);
 
 	if (player.getTeamNum() == this.getSpectatorTeamNum())
 	{
@@ -74,5 +75,6 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	else
 	{
 		Actor::AddActor(SandboxActor(player, spawnPos));
+		Object::AddObject(SoccerBall(spawnPos));
 	}
 }

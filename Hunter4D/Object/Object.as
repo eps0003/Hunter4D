@@ -15,6 +15,7 @@ shared class Object : ICollision
 	private Vec3f gravity;
 	private float scale = 1.0f;
 	private float friction = 1.0f;
+	private float elasticity = 0.0f;
 
 	Vec3f position;
 	private Vec3f oldPosition;
@@ -189,6 +190,26 @@ shared class Object : ICollision
 		}
 	}
 
+	float getElasticity()
+	{
+		return elasticity;
+	}
+
+	void SetElasticity(float elasticity)
+	{
+		if (this.elasticity == elasticity) return;
+
+		this.elasticity = elasticity;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_f32(elasticity);
+			rules.SendCommand(rules.getCommandID("set object elasticity"), bs, true);
+		}
+	}
+
 	void SetCullRadius(float radius)
 	{
 		cullRadius = radius;
@@ -322,12 +343,12 @@ shared class Object : ICollision
 
 			velocity.y = Maths::Clamp(velocity.y, -1, 1);
 
+			Collision();
+
 			//set velocity to zero if low enough
 			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
 			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
 			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
-
-			Collision();
 		}
 	}
 
@@ -335,9 +356,10 @@ shared class Object : ICollision
 	{
 		if (hasCollider())
 		{
-			CollisionX(this, position, velocity);
-			CollisionZ(this, position, velocity);
-			CollisionY(this, position, velocity);
+			Vec3f tempVel = velocity;
+			if (CollisionX(this, position, tempVel)) velocity.x *= -elasticity;
+			if (CollisionZ(this, position, tempVel)) velocity.z *= -elasticity;
+			if (CollisionY(this, position, tempVel)) velocity.y *= -elasticity;
 		}
 		else
 		{

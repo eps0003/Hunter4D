@@ -9,6 +9,7 @@ void onInit(CRules@ this)
 	this.addCommandID("set object collision flags");
 	this.addCommandID("set object gravity");
 	this.addCommandID("set object friction");
+	this.addCommandID("set object elasticity");
 }
 
 
@@ -91,5 +92,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!params.saferead_f32(friction)) return;
 
 		object.SetFriction(friction);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object elasticity"))
+	{
+		Object@ object;
+		if (!Object::saferead(params, @object)) return;
+
+		float elasticity;
+		if (!params.saferead_f32(elasticity)) return;
+
+		object.SetElasticity(elasticity);
 	}
 }
