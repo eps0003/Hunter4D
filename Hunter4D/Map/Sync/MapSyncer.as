@@ -184,13 +184,12 @@ shared class MapSyncer
 			bool visible;
 			if (!packet.saferead_bool(visible)) return;
 
-			if (visible)
-			{
-				uint block;
-				if (!packet.saferead_u32(block)) return;
+			if (!visible) continue;
 
-				map.SetBlock(i, block);
-			}
+			uint block;
+			if (!packet.saferead_u32(block)) return;
+
+			map.SetBlock(i, block);
 		}
 
 		if (index == getTotalPackets() - 1)

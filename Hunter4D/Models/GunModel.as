@@ -20,7 +20,6 @@ shared class GunModel : Model
 	{
 		Model::Update();
 
-		// Matrix::SetTranslation(matrix, actor.interPosition.x, actor.interPosition.y, actor.interPosition.z);
 		Matrix::Multiply(actor.model.lowerRightArm.matrix, matrix, matrix);
 
 		float[] m;
