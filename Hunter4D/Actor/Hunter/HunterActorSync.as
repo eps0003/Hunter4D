@@ -1,15 +1,15 @@
-#include "SpleefActor.as"
+#include "HunterActor.as"
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("init spleef actor");
+	this.addCommandID("init hunter actor");
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (!isServer() && cmd == this.getCommandID("init spleef actor"))
+	if (!isServer() && cmd == this.getCommandID("init hunter actor"))
 	{
-		SpleefActor actor;
+		HunterActor actor;
 		actor.DeserializeInit(params);
 		Actor::AddActor(actor);
 	}

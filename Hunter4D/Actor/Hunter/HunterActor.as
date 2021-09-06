@@ -1,13 +1,16 @@
 #include "Actor.as"
-#include "Ray.as"
+#include "Gun.as"
 
-shared class SpleefActor : Actor
+shared class HunterActor : Actor
 {
 	float acceleration = 0.08f;
 	float friction = 0.3f;
 	float jumpForce = 0.3f;
 
-	SpleefActor(CPlayer@ player, Vec3f position)
+	ActorModel@ model;
+	private Gun@ gun;
+
+	HunterActor(CPlayer@ player, Vec3f position)
 	{
 		super(player, position);
 
@@ -19,8 +22,14 @@ shared class SpleefActor : Actor
 	void OnInit()
 	{
 		Actor::OnInit();
+		SetInitCommand("init hunter actor");
 
-		SetInitCommand("init spleef actor");
+		@gun = Gun(this);
+
+		if (isClient())
+		{
+			@model = ActorModel(this);
+		}
 	}
 
 	void Update()
@@ -30,23 +39,24 @@ shared class SpleefActor : Actor
 		if (isMyActor())
 		{
 			Movement();
+		}
 
-			if (canDestroyBlocks())
+		if (isClient())
+		{
+			if (isOnGround())
 			{
-				bool left = controls.ActionKeyPressed(AK_ACTION1);
-				bool right = controls.ActionKeyPressed(AK_ACTION2);
-
-				if (left || right)
+				if (velocity.magSquared() > 0.005f)
 				{
-					Ray ray(camera.position, camera.rotation.dir());
-
-					RaycastInfo raycast;
-					if (ray.raycastBlock(6, false, raycast))
-					{
-						Vec3f position = raycast.hitWorldPos;
-						map.ClientSetBlockSafe(position, 0);
-					}
+					model.SetAnimation("run");
 				}
+				else
+				{
+					model.SetAnimation("idle");
+				}
+			}
+			else
+			{
+				model.SetAnimation("jump");
 			}
 		}
 	}
@@ -62,6 +72,14 @@ shared class SpleefActor : Actor
 				Kill();
 			}
 		}
+	}
+
+	void Render()
+	{
+		Actor::Render();
+
+		model.Render();
+		gun.Render();
 	}
 
 	private void Movement()
@@ -89,10 +107,5 @@ shared class SpleefActor : Actor
 		// Move actor
 		velocity.x += dir.x * acceleration - friction * velocity.x;
 		velocity.z += dir.y * acceleration - friction * velocity.z;
-	}
-
-	bool canDestroyBlocks()
-	{
-		return mouse.isInControl() && !rules.isWarmup();
 	}
 }

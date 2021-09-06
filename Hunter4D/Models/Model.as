@@ -2,6 +2,8 @@
 
 shared class Model
 {
+	private float scale = 1.0f;
+
 	private float[] matrix;
 
 	private ModelSegment@[] segments;
@@ -12,10 +14,9 @@ shared class Model
 	uint animStartTime = 0;
 	private uint animTransitionDuration = 3;
 
-	Model(float scale = 1.0f)
+	Model(float scale)
 	{
-		Matrix::MakeIdentity(matrix);
-		Matrix::SetScale(matrix, scale, scale, scale);
+		this.scale = scale;
 	}
 
 	void AddSegment(ModelSegment@ segment)
@@ -57,6 +58,9 @@ shared class Model
 
 	void Update()
 	{
+		Matrix::MakeIdentity(matrix);
+		Matrix::SetScale(matrix, scale, scale, scale);
+
 		if (animation !is null)
 		{
 			animation.Update();

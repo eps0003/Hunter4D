@@ -174,12 +174,12 @@ shared class Camera
 		Matrix::MakeIdentity(translation);
 		Matrix::SetTranslation(translation, -interPosition.x, -interPosition.y, -interPosition.z);
 
-		// float[] thirdPerson;
-		// Matrix::MakeIdentity(thirdPerson);
-		// Matrix::SetTranslation(thirdPerson, 0, 0, 4);
+		float[] thirdPerson;
+		Matrix::MakeIdentity(thirdPerson);
+		Matrix::SetTranslation(thirdPerson, 0, 0, 4);
 
 		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
-		// Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
+		Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
 	}
 
 	private void UpdateRotationMatrix()

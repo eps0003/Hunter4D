@@ -439,7 +439,7 @@ shared class Actor : ICollision
 	bool isVisible()
 	{
 		return (
-			!isMyActor() &&
+			// !isMyActor() &&
 			camera.getFrustum().containsSphere(getCenter() - camera.interPosition, cullRadius * scale)
 		);
 	}
