@@ -7,7 +7,6 @@
 #include "ActorRunAnim.as"
 #include "ActorJumpAnim.as"
 #include "ActorJumpingJacksAnim.as"
-#include "Hitters.as"
 
 shared class Actor : ICollision
 {
@@ -517,7 +516,7 @@ shared class Actor : ICollision
 		SetHealth(newHealth);
 	}
 
-	void Damage(uint damage, CPlayer@ damager = null, u8 hitter = Hitters::nothing)
+	void Damage(uint damage, CPlayer@ damager = null, u8 hitter = 0)
 	{
 		if (damage == 0) return;
 
