@@ -3,6 +3,15 @@
 #include "Interpolation.as"
 #include "Config.as"
 #include "Frustum.as"
+#include "Ray.as"
+
+shared enum CameraType
+{
+	FirstPerson,
+	ThirdPersonBehind,
+	ThirdPersonInFront,
+	Count
+}
 
 shared class Camera
 {
@@ -17,6 +26,9 @@ shared class Camera
 	private float fov;
 	private float renderDistance;
 	private SColor fogColor = SColor(255, 165, 189, 200);
+
+	private u16 cameraType = CameraType::ThirdPersonBehind;
+	private float thirdPersonDistance = 4.0f;
 
 	private float[] modelMatrix;
 	private float[] viewMatrix;
@@ -157,6 +169,16 @@ shared class Camera
 		return rotationMatrix;
 	}
 
+	u16 getCameraType()
+	{
+		return cameraType;
+	}
+
+	void NextCameraType()
+	{
+		cameraType = (cameraType + 1) % CameraType::Count;
+	}
+
 	private void UpdateProjectionMatrix()
 	{
 		float ratio = getScreenWidth() / float(getScreenHeight());
@@ -174,12 +196,29 @@ shared class Camera
 		Matrix::MakeIdentity(translation);
 		Matrix::SetTranslation(translation, -interPosition.x, -interPosition.y, -interPosition.z);
 
-		float[] thirdPerson;
-		Matrix::MakeIdentity(thirdPerson);
-		Matrix::SetTranslation(thirdPerson, 0, 0, 4);
-
 		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
-		Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
+
+		if (cameraType == CameraType::ThirdPersonBehind)
+		{
+			float dist = thirdPersonDistance;
+			float padding = 0.05f;
+
+			Ray ray(interPosition, -interRotation.dir());
+
+			RaycastInfo raycast;
+			if (ray.raycastBlock(dist + 1, true, raycast))
+			{
+				float dot = raycast.normal.dot(ray.direction);
+				float angle = Maths::Pi * 0.5f * (1 + dot);
+				float len = padding / Maths::Cos(angle);
+				dist = Maths::Min(raycast.distance - len, thirdPersonDistance);
+			}
+
+			float[] thirdPerson;
+			Matrix::MakeIdentity(thirdPerson);
+			Matrix::SetTranslation(thirdPerson, 0, 0, dist);
+			Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
+		}
 	}
 
 	private void UpdateRotationMatrix()
