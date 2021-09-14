@@ -58,9 +58,6 @@ shared class Model
 
 	void Update()
 	{
-		Matrix::MakeIdentity(matrix);
-		Matrix::SetScale(matrix, scale, scale, scale);
-
 		if (animation !is null)
 		{
 			animation.Update();
@@ -69,7 +66,14 @@ shared class Model
 
 	void Render()
 	{
+		Matrix::MakeIdentity(matrix);
+
 		Update();
+
+		float[] scaleMatrix;
+		Matrix::MakeIdentity(scaleMatrix);
+		Matrix::SetScale(scaleMatrix, scale, scale, scale);
+		Matrix::MultiplyImmediate(matrix, scaleMatrix);
 
 		float t = animStartTime > 0 ? Maths::Clamp01((Interpolation::getGameTime() - animStartTime) / float(animTransitionDuration)) : 1.0f;
 		segments[0].Render(matrix, t);

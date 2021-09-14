@@ -25,7 +25,7 @@ shared class GunModel : Model
 		float[] m;
 		Matrix::MakeIdentity(m);
 		Matrix::SetRotationDegrees(m, 90, 0, 0);
-		Matrix::SetTranslation(m, 0, -10, 14);
+		Matrix::SetTranslation(m, 0, 0.05f * -5, 0.05f * 7);
 		Matrix::MultiplyImmediate(matrix, m);
 	}
 }
