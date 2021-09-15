@@ -53,15 +53,26 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isServer() && cmd == this.getCommandID("init object"))
 	{
-		Object().DeserializeInit(params);
+		Object object;
+		object.DeserializeInit(params);
+		Object::AddObject(object);
 	}
 	else if (cmd == this.getCommandID("sync object"))
 	{
-		Object().DeserializeTick(params);
+		Object object;
+		object.DeserializeTick(params);
+
+		Object@ oldObject = Object::getObject(object.getID());
+		if (oldObject !is null)
+		{
+			oldObject = object;
+		}
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove object"))
 	{
-		Object().DeserializeRemove(params);
+		Object object;
+		object.DeserializeRemove(params);
+		Object::RemoveObject(object.getID());
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{

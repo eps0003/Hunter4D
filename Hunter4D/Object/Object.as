@@ -220,7 +220,7 @@ shared class Object : ICollision
 		return hasCollider() ? interPosition + collider.center : interPosition;
 	}
 
-	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream(), string commandName = "init object")
+	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
@@ -241,29 +241,29 @@ shared class Object : ICollision
 
 		if (player !is null)
 		{
-			rules.SendCommand(rules.getCommandID(commandName), bs, player);
+			rules.SendCommand(rules.getCommandID(initCommand), bs, player);
 		}
 		else
 		{
-			rules.SendCommand(rules.getCommandID(commandName), bs, true);
+			rules.SendCommand(rules.getCommandID(initCommand), bs, true);
 		}
 	}
 
-	void SerializeTick(CBitStream@ bs = CBitStream(), string commandName = "sync object")
+	void SerializeTick(CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 
-		rules.SendCommand(rules.getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(syncCommand), bs, true);
 	}
 
-	void SerializeRemove(CBitStream@ bs = CBitStream(), string commandName = "remove object")
+	void SerializeRemove(CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
 
-		rules.SendCommand(rules.getCommandID(commandName), bs, true);
+		rules.SendCommand(rules.getCommandID(removeCommand), bs, true);
 	}
 
 	void DeserializeInit(CBitStream@ bs)
@@ -287,8 +287,6 @@ shared class Object : ICollision
 		}
 
 		hasSyncedInit = true;
-
-		Object::AddObject(this);
 	}
 
 	void DeserializeTick(CBitStream@ bs)
@@ -297,20 +295,11 @@ shared class Object : ICollision
 		if (!position.deserialize(bs)) return;
 		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
-
-		// Update object
-		Object@ oldObject = Object::getObject(id);
-		if (oldObject !is null)
-		{
-			oldObject = this;
-		}
 	}
 
 	void DeserializeRemove(CBitStream@ bs)
 	{
 		if (!bs.saferead_u16(id)) return;
-
-		Object::RemoveObject(id);
 	}
 
 	void PreUpdate()
