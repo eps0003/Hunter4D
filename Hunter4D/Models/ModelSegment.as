@@ -50,8 +50,8 @@ shared class ModelSegment
 
 	private void Interpolate(float t)
 	{
-		interPosition = oldPosition.lerp(this.position, t);
-		interRotation = oldRotation.lerpAngle(this.rotation, t);
+		interPosition = oldPosition.lerp(position, t);
+		interRotation = oldRotation.lerpAngle(rotation, t);
 	}
 
 	void Render(float[] matrix, float t)

@@ -21,11 +21,12 @@ shared class ActorJumpAnim : IAnimation
 		// Body
 
 		model.body.position = Vec3f(0, 0.75f, 0);
+		model.body.rotation = Vec3f(0, model.body.rotation.y, 0);
 
 		float diff = Maths::AngleDifference(actor.interRotation.y, model.body.rotation.y);
 		if (Maths::Abs(diff) > maxHeadAngle)
 		{
-			model.body.rotation = Vec3f(0, actor.interRotation.y + maxHeadAngle * Maths::Sign(diff), 0);
+			model.body.rotation.y = actor.interRotation.y + maxHeadAngle * Maths::Sign(diff);
 		}
 
 		// Head

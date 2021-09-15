@@ -84,7 +84,7 @@ shared class SandboxActor : Actor
 		{
 			if (isOnGround())
 			{
-				if (velocity.magSquared() > 0.005f)
+				if (velocity.toXZ().LengthSquared() > 0.005f)
 				{
 					model.SetAnimation("run");
 				}
