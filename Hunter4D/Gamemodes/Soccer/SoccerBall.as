@@ -71,7 +71,7 @@ shared class SoccerBall : Object
 	private void FakeRolling()
 	{
 		Vec2f vel = velocity.toXZ();
-		if (vel.LengthSquared() > 0.000001f)
+		if (vel.LengthSquared() > 0)
 		{
 			rotation.y = -vel.AngleDegrees() - 90;
 			rotation.x -= Maths::toDegrees(vel.Length() / radius);

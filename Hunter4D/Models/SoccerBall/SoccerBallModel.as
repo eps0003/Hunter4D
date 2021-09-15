@@ -11,7 +11,7 @@ shared class SoccerBallModel : Model
 		super(2.0f);
 		@this.object = object;
 
-		AddSegment(ModelSegment("SoccerBall.obj", "Pixel.png"));
+		AddSegment(ModelSegment("SoccerBall.obj", "Colors.png"));
 	}
 
 	void Update()
