@@ -50,6 +50,19 @@ shared class SoccerBall : Object
 		}
 	}
 
+	void PostUpdate()
+	{
+		Object::PostUpdate();
+
+		if (isServer())
+		{
+			if (position.y <= -10)
+			{
+				Object::RemoveObject(this);
+			}
+		}
+	}
+
 	void Render()
 	{
 		model.Render();
