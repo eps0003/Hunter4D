@@ -28,6 +28,11 @@ namespace Object
 		}
 	}
 
+	shared void RemoveObject(Object@ object)
+	{
+		Object::RemoveObject(object.getID());
+	}
+
 	shared void RemoveObject(u16 id)
 	{
 		Object@[]@ objects = Object::getObjects();

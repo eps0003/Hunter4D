@@ -70,6 +70,11 @@ namespace Actor
 		}
 	}
 
+	shared void RemoveActor(Actor@ actor)
+	{
+		Actor::RemoveActor(actor.getID());
+	}
+
 	shared void RemoveActor(u16 id)
 	{
 		Actor@[]@ actors = Actor::getActors();

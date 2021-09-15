@@ -72,7 +72,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		Object object;
 		object.DeserializeRemove(params);
-		Object::RemoveObject(object.getID());
+		Object::RemoveObject(object);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{
