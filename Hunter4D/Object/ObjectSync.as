@@ -6,6 +6,7 @@ void onInit(CRules@ this)
 	this.addCommandID("init object");
 	this.addCommandID("sync object");
 	this.addCommandID("remove object");
+	this.addCommandID("set object name");
 	this.addCommandID("set object collision flags");
 	this.addCommandID("set object gravity");
 	this.addCommandID("set object friction");
@@ -73,6 +74,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		Object object;
 		object.DeserializeRemove(params);
 		Object::RemoveObject(object);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set object name"))
+	{
+		Object@ object;
+		if (!Object::saferead(params, @object)) return;
+
+		string name;
+		if (!params.saferead_string(name)) return;
+
+		object.SetName(name);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
 	{

@@ -5,6 +5,7 @@
 shared class Object : ICollision
 {
 	private u16 id = 0;
+	private string name;
 
 	private string initCommand = "init object";
 	private string syncCommand = "sync object";
@@ -42,8 +43,9 @@ shared class Object : ICollision
 	private CRules@ rules = getRules();
 	private Camera@ camera;
 
-	Object(Vec3f position, Vec3f rotation = Vec3f(), float scale = 1.0f)
+	Object(string name, Vec3f position, Vec3f rotation = Vec3f(), float scale = 1.0f)
 	{
+		this.name = name;
 		this.position = position;
 		this.rotation = rotation;
 		this.scale = scale;
@@ -71,6 +73,24 @@ shared class Object : ICollision
 	u16 getID()
 	{
 		return id;
+	}
+
+	string getName()
+	{
+		return name;
+	}
+
+	void SetName(string name)
+	{
+		this.name = name;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_string(name);
+			rules.SendCommand(rules.getCommandID("set object name"), bs, true);
+		}
 	}
 
 	uint getSpawnTime()
@@ -223,6 +243,7 @@ shared class Object : ICollision
 	void SerializeInit(CPlayer@ player = null, CBitStream@ bs = CBitStream())
 	{
 		bs.write_u16(id);
+		bs.write_string(name);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
@@ -269,6 +290,7 @@ shared class Object : ICollision
 	void DeserializeInit(CBitStream@ bs)
 	{
 		if (!bs.saferead_u16(id)) return;
+		if (!bs.saferead_string(name)) return;
 		if (!position.deserialize(bs)) return;
 		if (!rotation.deserialize(bs)) return;
 		if (!velocity.deserialize(bs)) return;
@@ -425,7 +447,7 @@ shared class Object : ICollision
 
 	void OnInit()
 	{
-		print("Added object: " + id);
+		print("Added object: " + name);
 
 		if (isClient())
 		{
@@ -437,6 +459,6 @@ shared class Object : ICollision
 
 	void OnRemove()
 	{
-		print("Removed object: " + id);
+		print("Removed object: " + name);
 	}
 }

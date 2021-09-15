@@ -9,7 +9,7 @@ shared class SoccerBall : Object
 
 	SoccerBall(Vec3f position)
 	{
-		super(position);
+		super("Soccer Ball", position);
 
 		SetCollider(AABB(Vec3f(-radius), Vec3f(radius)));
 		SetCollisionFlags(CollisionFlag::Blocks);

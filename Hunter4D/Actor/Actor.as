@@ -88,6 +88,11 @@ shared class Actor : ICollision
 		return id;
 	}
 
+	string getName()
+	{
+		return player.getUsername();
+	}
+
 	uint getSpawnTime()
 	{
 		return spawnTime;
