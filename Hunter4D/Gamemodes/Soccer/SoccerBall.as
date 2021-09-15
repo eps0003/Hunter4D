@@ -1,17 +1,33 @@
 #include "Object.as"
 #include "Actor.as"
+#include "SoccerBallModel.as"
 
 shared class SoccerBall : Object
 {
+	Model@ model;
+	float radius = 0.25f;
+
 	SoccerBall(Vec3f position)
 	{
 		super(position);
 
-		SetCollider(AABB(Vec3f(-0.3f), Vec3f(0.3f)));
+		SetCollider(AABB(Vec3f(-radius), Vec3f(radius)));
 		SetCollisionFlags(CollisionFlag::Blocks);
 		SetGravity(Vec3f(0, -0.03f, 0));
 		SetFriction(0.95f);
 		SetElasticity(0.6f);
+	}
+
+	void OnInit()
+	{
+		Object::OnInit();
+
+		SetInitCommand("init soccer ball object");
+
+		if (isClient())
+		{
+			@model = SoccerBallModel(this);
+		}
 	}
 
 	void Update()
@@ -29,6 +45,23 @@ shared class SoccerBall : Object
 					velocity = actor.rotation.dir() * 0.5f;
 				}
 			}
+
+			FakeRolling();
+		}
+	}
+
+	void Render()
+	{
+		model.Render();
+	}
+
+	private void FakeRolling()
+	{
+		Vec2f vel = velocity.toXZ();
+		if (vel.LengthSquared() > 0.000001f)
+		{
+			rotation.y = -vel.AngleDegrees() - 90;
+			rotation.x -= Maths::toDegrees(vel.Length() / radius);
 		}
 	}
 }
