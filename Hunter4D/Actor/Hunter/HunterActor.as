@@ -1,5 +1,6 @@
 #include "Actor.as"
 #include "Gun.as"
+#include "Hitters.as"
 
 shared class HunterActor : Actor
 {
@@ -39,6 +40,11 @@ shared class HunterActor : Actor
 		if (isMyActor())
 		{
 			Movement();
+		}
+
+		if (isServer())
+		{
+			DamagePlayers();
 		}
 
 		if (isClient())
@@ -107,5 +113,41 @@ shared class HunterActor : Actor
 		// Move actor
 		velocity.x += dir.x * acceleration - friction * velocity.x;
 		velocity.z += dir.y * acceleration - friction * velocity.z;
+	}
+
+	private void DamagePlayers()
+	{
+		// Press either left or right mouse button to shoot
+		bool left = getBlob().isKeyJustPressed(key_action1);
+		bool right = getBlob().isKeyJustPressed(key_action2);
+		if (!left && !right) return;
+
+		// Create ray
+		Ray ray(position + Vec3f(0, cameraHeight, 0), rotation.dir());
+
+		Actor@[]@ actors = Actor::getActors();
+		for (uint i = 0; i < actors.size(); i++)
+		{
+			// Only kill enemy players
+			Actor@ actor = actors[i];
+			if (actor.getTeamNum() == getTeamNum()) continue;
+
+			// Calculate model matrix for hurtbox
+			float[] modelMatrix;
+			Matrix::MakeIdentity(modelMatrix);
+			Matrix::SetTranslation(modelMatrix, actor.position.x, actor.position.y, actor.position.z);
+			Matrix::SetRotationDegrees(modelMatrix, 0, -actor.rotation.y, 0);
+
+			// Perform raycast
+			float distance;
+			if (ray.intersectsOBB(actor.getCollider(), modelMatrix, distance))
+			{
+				// Damage player
+				uint damage = gun.getDamage(distance);
+				actor.Damage(damage, getPlayer(), Hitters::sword);
+
+				print(getPlayer().getUsername() + " damaged " + actor.getPlayer().getUsername() + " (" + damage + " damage, " + actor.getHealth() + " health)");
+			}
+		}
 	}
 }
