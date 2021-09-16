@@ -28,6 +28,17 @@ namespace Actor
 		return null;
 	}
 
+	shared Actor@ getActorByIndex(int index)
+	{
+		Actor@[]@ actors = Actor::getActors();
+		if (index >= 0 && index < actors.size())
+		{
+			return actors[index];
+		}
+		return null;
+	}
+
+
 	shared Actor@ getMyActor()
 	{
 		return Actor::getActor(getLocalPlayer());
@@ -62,7 +73,9 @@ namespace Actor
 
 				if (!isClient())
 				{
-					actor.SerializeRemove();
+					CBitStream bs;
+					bs.write_u16(i);
+					actor.SerializeRemove(bs);
 				}
 
 				return;
@@ -88,11 +101,31 @@ namespace Actor
 
 				if (!isClient())
 				{
-					actor.SerializeRemove();
+					CBitStream bs;
+					bs.write_u16(i);
+					actor.SerializeRemove(bs);
 				}
 
 				return;
 			}
+		}
+	}
+
+	shared void RemoveActorByIndex(uint index)
+	{
+		Actor@ actor = Actor::getActorByIndex(index);
+		if (actor is null) return;
+
+		actor.OnRemove();
+
+		Actor@[]@ actors = Actor::getActors();
+		actors.removeAt(index);
+
+		if (!isClient())
+		{
+			CBitStream bs;
+			bs.write_u16(index);
+			actor.SerializeRemove(bs);
 		}
 	}
 
@@ -142,11 +175,14 @@ namespace Actor
 	shared void ClearActors()
 	{
 		Actor@[]@ actors = Actor::getActors();
-		for (uint i = 0; i < actors.size(); i++)
+		for (int i = actors.size() - 1; i >= 0; i--)
 		{
 			Actor@ actor = actors[i];
 			actor.OnRemove();
-			actor.SerializeRemove();
+
+			CBitStream bs;
+			bs.write_u16(i);
+			actor.SerializeRemove(bs);
 		}
 		getRules().clear("actors");
 	}
