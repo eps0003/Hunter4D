@@ -18,24 +18,28 @@ void onTick(CRules@ this)
 {
 	Object@[]@ objects = Object::getObjects();
 
-	for (uint i = 0; i < objects.size(); i++)
+	for (int i = objects.size() - 1; i >= 0; i--)
 	{
 		objects[i].PreUpdate();
 	}
 
-	for (uint i = 0; i < objects.size(); i++)
+	for (int i = objects.size() - 1; i >= 0; i--)
 	{
 		objects[i].Update();
 	}
 
-	for (uint i = 0; i < objects.size(); i++)
+	for (int i = objects.size() - 1; i >= 0; i--)
 	{
-		Object@ object = objects[i];
-		object.PostUpdate();
+		objects[i].PostUpdate();
+	}
 
-		if (!isClient())
+	if (!isClient())
+	{
+		for (int i = objects.size() - 1; i >= 0; i--)
 		{
-			object.SerializeTick();
+			CBitStream bs;
+			bs.write_u16(i);
+			objects[i].SerializeTick(bs);
 		}
 	}
 }
@@ -61,20 +65,26 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (cmd == this.getCommandID("sync object"))
 	{
+		u16 index;
+		if (!params.saferead_u16(index)) return;
+
+		Object@ oldObject = Object::getObjectByIndex(index);
+		if (oldObject is null) return;
+
 		Object object;
 		if (!object.deserializeTick(params)) return;
-
-		Object@ oldObject = Object::getObject(object.getID());
-		if (oldObject is null) return;
 
 		oldObject = object;
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove object"))
 	{
+		u16 index;
+		if (!params.saferead_u16(index)) return;
+
 		Object object;
 		if (!object.deserializeRemove(params)) return;
 
-		Object::RemoveObject(object);
+		Object::RemoveObjectByIndex(index);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object name"))
 	{

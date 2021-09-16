@@ -14,10 +14,10 @@ namespace Object
 		return null;
 	}
 
-	shared Object@ getObjectByIndex(uint index)
+	shared Object@ getObjectByIndex(int index)
 	{
 		Object@[]@ objects = Object::getObjects();
-		if (index < objects.size())
+		if (index >= 0 && index < objects.size())
 		{
 			return objects[index];
 		}
@@ -56,11 +56,31 @@ namespace Object
 
 				if (!isClient())
 				{
-					object.SerializeRemove();
+					CBitStream bs;
+					bs.write_u16(i);
+					object.SerializeRemove(bs);
 				}
 
 				return;
 			}
+		}
+	}
+
+	shared void RemoveObjectByIndex(uint index)
+	{
+		Object@ object = Object::getObjectByIndex(index);
+		if (object is null) return;
+
+		object.OnRemove();
+
+		Object@[]@ objects = Object::getObjects();
+		objects.removeAt(index);
+
+		if (!isClient())
+		{
+			CBitStream bs;
+			bs.write_u16(index);
+			object.SerializeRemove(bs);
 		}
 	}
 
@@ -105,11 +125,14 @@ namespace Object
 	shared void ClearObjects()
 	{
 		Object@[]@ objects = Object::getObjects();
-		for (uint i = 0; i < objects.size(); i++)
+		for (int i = objects.size() - 1; i >= 0; i--)
 		{
 			Object@ object = objects[i];
 			object.OnRemove();
-			object.SerializeRemove();
+
+			CBitStream bs;
+			bs.write_u16(i);
+			object.SerializeRemove(bs);
 		}
 		getRules().clear("objects");
 	}

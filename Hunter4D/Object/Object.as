@@ -272,7 +272,6 @@ shared class Object : ICollision
 
 	void SerializeTick(CBitStream@ bs = CBitStream())
 	{
-		bs.write_u16(id);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
@@ -282,8 +281,6 @@ shared class Object : ICollision
 
 	void SerializeRemove(CBitStream@ bs = CBitStream())
 	{
-		bs.write_u16(id);
-
 		rules.SendCommand(rules.getCommandID(removeCommand), bs, true);
 	}
 
@@ -314,7 +311,6 @@ shared class Object : ICollision
 
 	bool deserializeTick(CBitStream@ bs)
 	{
-		if (!bs.saferead_u16(id)) return false;
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
 		if (!velocity.deserialize(bs)) return false;
@@ -324,7 +320,9 @@ shared class Object : ICollision
 
 	bool deserializeRemove(CBitStream@ bs)
 	{
-		return bs.saferead_u16(id);
+		// This can include extra data like who killed the object
+		// to know whether to display something to the client
+		return true;
 	}
 
 	void PreUpdate()
