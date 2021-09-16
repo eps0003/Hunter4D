@@ -462,4 +462,9 @@ shared class Object : ICollision
 	{
 		print("Removed object: " + name);
 	}
+
+	void Destroy()
+	{
+		Object::RemoveObject(this);
+	}
 }

@@ -58,7 +58,7 @@ shared class SoccerBall : Object
 		{
 			if (position.y <= -10)
 			{
-				Object::RemoveObject(this);
+				Destroy();
 			}
 		}
 	}
