@@ -198,12 +198,13 @@ shared class Camera
 
 		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
 
-		if (cameraType == CameraType::ThirdPersonBehind)
+		if (cameraType == CameraType::ThirdPersonBehind || cameraType == CameraType::ThirdPersonInFront)
 		{
 			float dist = thirdPersonDistance;
 			float padding = 0.05f;
 
-			Ray ray(interPosition, -interRotation.dir());
+			Vec3f dir = cameraType == CameraType::ThirdPersonBehind ? -interRotation.dir() : interRotation.dir();
+			Ray ray(interPosition, dir);
 
 			RaycastInfo raycast;
 			if (ray.raycastBlock(dist + 1, true, raycast))
@@ -217,6 +218,12 @@ shared class Camera
 			float[] thirdPerson;
 			Matrix::MakeIdentity(thirdPerson);
 			Matrix::SetTranslation(thirdPerson, 0, 0, dist);
+
+			if (cameraType == CameraType::ThirdPersonInFront)
+			{
+				Matrix::SetRotationDegrees(thirdPerson, 0, 180, 0);
+			}
+
 			Matrix::Multiply(thirdPerson, viewMatrix, viewMatrix);
 		}
 	}
