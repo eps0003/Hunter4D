@@ -281,9 +281,9 @@ shared class SandboxActor : Actor
 		Actor::SerializeTick(bs);
 	}
 
-	void DeserializeTick(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
-		if (!bs.saferead_bool(taunting)) return;
-		Actor::DeserializeTick(bs);
+		if (!bs.saferead_bool(taunting)) return false;
+		return Actor::deserializeTick(bs);
 	}
 }

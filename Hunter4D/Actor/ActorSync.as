@@ -64,24 +64,26 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (!isServer() && cmd == this.getCommandID("init actor"))
 	{
 		Actor actor;
-		actor.DeserializeInit(params);
+		if (!actor.deserializeInit(params)) return;
+
 		Actor::AddActor(actor);
 	}
 	else if (cmd == this.getCommandID("sync actor"))
 	{
 		Actor actor;
-		actor.DeserializeTick(params);
+		if (!actor.deserializeTick(params)) return;
 
 		Actor@ oldActor = Actor::getActor(actor.getID());
-		if (oldActor !is null && !oldActor.isMyActor())
-		{
-			oldActor = actor;
-		}
+		if (oldActor is null || oldActor.isMyActor()) return;
+
+		oldActor = actor;
+
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove actor"))
 	{
 		Actor actor;
-		actor.DeserializeRemove(params);
+		if (!actor.deserializeRemove(params)) return;
+
 		Actor::RemoveActor(actor);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))

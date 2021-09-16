@@ -10,7 +10,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (!isServer() && cmd == this.getCommandID("init hunter actor"))
 	{
 		HunterActor actor;
-		actor.DeserializeInit(params);
+		if (!actor.deserializeInit(params)) return;
+
 		Actor::AddActor(actor);
 	}
 }

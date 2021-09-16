@@ -284,41 +284,44 @@ shared class Actor : ICollision
 		rules.SendCommand(rules.getCommandID(removeCommand), bs, true);
 	}
 
-	void DeserializeInit(CBitStream@ bs)
+	bool deserializeInit(CBitStream@ bs)
 	{
-		if (!saferead_player(bs, @player)) return;
-		if (!bs.saferead_u16(id)) return;
-		if (!position.deserialize(bs)) return;
-		if (!rotation.deserialize(bs)) return;
-		if (!velocity.deserialize(bs)) return;
-		if (!gravity.deserialize(bs)) return;
-		if (!bs.saferead_f32(scale)) return;
-		if (!bs.saferead_u8(collisionFlags)) return;
-		if (!bs.saferead_u8(health)) return;
+		if (!saferead_player(bs, @player)) return false;
+		if (!bs.saferead_u16(id)) return false;
+		if (!position.deserialize(bs)) return false;
+		if (!rotation.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
+		if (!gravity.deserialize(bs)) return false;
+		if (!bs.saferead_f32(scale)) return false;
+		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!bs.saferead_u8(health)) return false;
 
 		bool hasCollider;
-		if (!bs.saferead_bool(hasCollider)) return;
+		if (!bs.saferead_bool(hasCollider)) return false;
 
 		if (hasCollider)
 		{
 			@collider = AABB();
-			if (!collider.deserialize(bs)) return;
+			if (!collider.deserialize(bs)) return false;
 		}
 
 		hasSyncedInit = true;
+		return true;
 	}
 
-	void DeserializeTick(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
-		if (!bs.saferead_u16(id)) return;
-		if (!position.deserialize(bs)) return;
-		if (!rotation.deserialize(bs)) return;
-		if (!velocity.deserialize(bs)) return;
+		if (!bs.saferead_u16(id)) return false;
+		if (!position.deserialize(bs)) return false;
+		if (!rotation.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
+
+		return true;
 	}
 
-	void DeserializeRemove(CBitStream@ bs)
+	bool deserializeRemove(CBitStream@ bs)
 	{
-		if (!bs.saferead_u16(id)) return;
+		return bs.saferead_u16(id);
 	}
 
 	u8 getTeamNum()

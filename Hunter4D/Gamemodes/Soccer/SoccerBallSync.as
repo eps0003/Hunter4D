@@ -10,7 +10,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (!isServer() && cmd == this.getCommandID("init soccer ball object"))
 	{
 		SoccerBall ball;
-		ball.DeserializeInit(params);
+		if (!ball.deserializeInit(params)) return;
+
 		Object::AddObject(ball);
 	}
 }

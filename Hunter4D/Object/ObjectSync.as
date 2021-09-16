@@ -55,24 +55,25 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	if (!isServer() && cmd == this.getCommandID("init object"))
 	{
 		Object object;
-		object.DeserializeInit(params);
+		if (!object.deserializeInit(params)) return;
+
 		Object::AddObject(object);
 	}
 	else if (cmd == this.getCommandID("sync object"))
 	{
 		Object object;
-		object.DeserializeTick(params);
+		if (!object.deserializeTick(params)) return;
 
 		Object@ oldObject = Object::getObject(object.getID());
-		if (oldObject !is null)
-		{
-			oldObject = object;
-		}
+		if (oldObject is null) return;
+
+		oldObject = object;
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove object"))
 	{
 		Object object;
-		object.DeserializeRemove(params);
+		if (!object.deserializeRemove(params)) return;
+
 		Object::RemoveObject(object);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set object name"))

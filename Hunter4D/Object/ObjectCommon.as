@@ -14,6 +14,16 @@ namespace Object
 		return null;
 	}
 
+	shared Object@ getObjectByIndex(uint index)
+	{
+		Object@[]@ objects = Object::getObjects();
+		if (index < objects.size())
+		{
+			return objects[index];
+		}
+		return null;
+	}
+
 	shared void AddObject(Object@ object)
 	{
 		Object@[]@ objects = Object::getObjects();
