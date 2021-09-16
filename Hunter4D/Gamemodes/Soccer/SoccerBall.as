@@ -5,13 +5,12 @@
 shared class SoccerBall : Object
 {
 	Model@ model;
-	float radius = 0.25f;
 
 	SoccerBall(Vec3f position)
 	{
-		super("Soccer Ball", position);
+		super("Soccer Ball", position, Vec3f(), 0.25f);
 
-		SetCollider(AABB(Vec3f(-radius), Vec3f(radius)));
+		SetCollider(AABB(Vec3f(-scale), Vec3f(scale)));
 		SetCollisionFlags(CollisionFlag::Blocks);
 		SetGravity(Vec3f(0, -0.03f, 0));
 		SetFriction(0.95f);
@@ -26,7 +25,8 @@ shared class SoccerBall : Object
 
 		if (isClient())
 		{
-			@model = SoccerBallModel(this);
+			SetCullRadius(1.1f);
+			@model = SoccerBallModel(this, scale);
 		}
 	}
 
@@ -74,7 +74,7 @@ shared class SoccerBall : Object
 		if (vel.LengthSquared() > 0)
 		{
 			rotation.y = -vel.AngleDegrees() - 90;
-			rotation.x -= Maths::toDegrees(vel.Length() / radius);
+			rotation.x -= Maths::toDegrees(vel.Length() / scale);
 		}
 	}
 }

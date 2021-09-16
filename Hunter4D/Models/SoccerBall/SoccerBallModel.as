@@ -6,9 +6,9 @@ shared class SoccerBallModel : Model
 {
     Object@ object;
 
-	SoccerBallModel(Object@ object)
+	SoccerBallModel(Object@ object, float scale = 0.25f)
 	{
-		super(2.0f);
+		super(scale * 8);
 		@this.object = object;
 
 		AddSegment(ModelSegment("SoccerBall.obj", "Colors.png"));
