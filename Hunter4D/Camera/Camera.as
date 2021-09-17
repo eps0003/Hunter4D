@@ -27,7 +27,7 @@ shared class Camera
 	private float renderDistance;
 	private SColor fogColor = SColor(255, 165, 189, 200);
 
-	private u16 cameraType = CameraType::ThirdPersonBehind;
+	private u16 cameraType = CameraType::FirstPerson;
 	private float thirdPersonDistance = 4.0f;
 
 	private float[] modelMatrix;
@@ -38,6 +38,7 @@ shared class Camera
 	private Frustum frustum;
 
 	private Driver@ driver;
+	private CPlayer@ player;
 
 	Camera()
 	{
@@ -63,6 +64,15 @@ shared class Camera
 	{
 		oldPosition = position;
 		oldRotation = rotation;
+
+		if (player is null)
+		{
+			@player = getLocalPlayer();
+		}
+		else if (player.getControls().isKeyJustPressed(KEY_F5))
+		{
+			NextCameraType();
+		}
 	}
 
 	void Render()
@@ -172,6 +182,11 @@ shared class Camera
 	u16 getCameraType()
 	{
 		return cameraType;
+	}
+
+	void SetCameraType(u16 type)
+	{
+		cameraType = type;
 	}
 
 	void NextCameraType()
