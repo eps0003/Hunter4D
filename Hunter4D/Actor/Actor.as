@@ -12,7 +12,6 @@ shared class Actor : ICollision
 {
 	private u16 id = 0;
 	private CPlayer@ player;
-	private CBlob@ blob;
 
 	private string initCommand = "init actor";
 	private string syncCommand = "sync actor";
@@ -57,7 +56,6 @@ shared class Actor : ICollision
 	Actor(CPlayer@ player, Vec3f position, Vec3f rotation = Vec3f(), float scale = 1.0f)
 	{
 		@this.player = player;
-		@blob = player.getBlob();
 
 		this.position = position;
 		this.rotation = rotation;
@@ -105,7 +103,7 @@ shared class Actor : ICollision
 
 	CBlob@ getBlob()
 	{
-		return blob;
+		return player.getBlob();
 	}
 
 	bool isMyActor()
@@ -511,7 +509,7 @@ shared class Actor : ICollision
 
 	void Kill()
 	{
-		blob.server_Die();
+		getBlob().server_Die();
 	}
 
 	void Heal(uint health)
@@ -528,6 +526,7 @@ shared class Actor : ICollision
 
 		if (damager !is null)
 		{
+			CBlob@ blob = getBlob();
 			blob.server_Hit(blob, Vec2f_zero, Vec2f_zero, 0.0f, hitter);
 			blob.SetPlayerOfRecentDamage(damager, damage);
 		}
