@@ -13,6 +13,9 @@ shared class Mouse
 	private bool wasInControl = false;
 
 	private CRules@ rules = getRules();
+	private CControls@ controls = getControls();
+	private Driver@ driver = getDriver();
+	private CHUD@ hud = getHUD();
 
 	Mouse()
 	{
@@ -37,7 +40,7 @@ shared class Mouse
 
 	bool isVisible()
 	{
-		return Menu::getMainMenu() !is null || getHUD().hasMenus() || Engine::hasStandardGUIFocus();
+		return Menu::getMainMenu() !is null || hud.hasMenus() || Engine::hasStandardGUIFocus();
 	}
 
 	float getSensitivity()
@@ -60,28 +63,24 @@ shared class Mouse
 	{
 		oldVelocity = velocity;
 
-		Vec2f mousePos = getControls().getMouseScreenPos();
-		Vec2f center = getDriver().getScreenCenterPos();
+		Vec2f mousePos = controls.getMouseScreenPos();
+		Vec2f center = driver.getScreenCenterPos();
 
 		velocity = Vec2f_zero;
 
-		// Calculate velocity
 		if (isInControl())
 		{
+			// Calculate velocity
 			if (wasInControl)
 			{
-				velocity = center - mousePos;
+				velocity = center - mousePos - Vec2f(5, 5);
 				velocity *= sensitivity * 0.15f;
-
-				// Recenter mouse
-				if (velocity.LengthSquared() > 0)
-				{
-					getControls().setMousePosition(center);
-				}
 			}
-			else
+
+			// Recenter mouse
+			if (!wasInControl || velocity.LengthSquared() > 0)
 			{
-				getControls().setMousePosition(center);
+				controls.setMousePosition(center);
 			}
 		}
 
@@ -92,11 +91,11 @@ shared class Mouse
 	{
 		if (isVisible())
 		{
-			getHUD().ShowCursor();
+			hud.ShowCursor();
 		}
 		else
 		{
-			getHUD().HideCursor();
+			hud.HideCursor();
 		}
 	}
 
