@@ -103,7 +103,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		Actor::RemoveActorByIndex(index);
 	}
-	else if (!isServer() && cmd == this.getCommandID("set object collision flags"))
+	else if (!isServer() && cmd == this.getCommandID("set actor collision flags"))
 	{
 		Actor@ actor;
 		if (!Actor::saferead(params, @actor)) return;
