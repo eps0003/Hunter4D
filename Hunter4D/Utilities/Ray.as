@@ -165,6 +165,8 @@ shared class Ray
 	// https://github.com/opengl-tutorials/ogl/blob/master/misc05_picking/misc05_picking_custom.cpp
 	bool intersectsOBB(AABB@ aabb, float[] modelMatrix, float &out distance)
 	{
+		if (aabb is null) return false;
+
 		float tMin = 0.0f;
 		float tMax = 100000.0f;
 
