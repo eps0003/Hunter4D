@@ -126,6 +126,20 @@ shared class Actor : ICollision
 		removeCommand = cmd;
 	}
 
+	void SetVelocity(Vec3f velocity)
+	{
+		if (isClient())
+		{
+			this.velocity = velocity;
+		}
+		else
+		{
+			CBitStream bs;
+			velocity.Serialize(bs);
+			rules.SendCommand(rules.getCommandID("set actor velocity"), bs, player);
+		}
+	}
+
 	AABB@ getCollider()
 	{
 		return collider;

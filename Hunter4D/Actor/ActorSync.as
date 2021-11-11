@@ -5,6 +5,7 @@ void onInit(CRules@ this)
 	this.addCommandID("init actor");
 	this.addCommandID("sync actor");
 	this.addCommandID("remove actor");
+	this.addCommandID("set actor velocity");
 	this.addCommandID("set actor collision flags");
 	this.addCommandID("set actor gravity");
 	this.addCommandID("set actor health");
@@ -102,6 +103,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!actor.deserializeRemove(params)) return;
 
 		Actor::RemoveActorByIndex(index);
+	}
+	else if (!isServer() && cmd == this.getCommandID("set actor velocity"))
+	{
+		Actor@ actor = Actor::getMyActor();
+		if (actor is null) return;
+
+		Vec3f velocity;
+		if (!velocity.deserialize(params)) return;
+
+		actor.SetVelocity(velocity);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set actor collision flags"))
 	{

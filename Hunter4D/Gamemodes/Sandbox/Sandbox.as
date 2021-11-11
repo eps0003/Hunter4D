@@ -1,4 +1,4 @@
-#include "HunterActor.as"
+#include "SquidGamer.as"
 #include "SpectatorActor.as"
 #include "Loading.as"
 #include "Map.as"
@@ -74,7 +74,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	}
 	else
 	{
-		Actor::AddActor(HunterActor(player, spawnPos));
+		Actor::AddActor(SquidGamer(player, spawnPos));
 		Object::AddObject(SoccerBall(spawnPos));
 	}
 }

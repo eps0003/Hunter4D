@@ -12,6 +12,8 @@ namespace Skins
 
 	shared string getDefaultSkinName(CPlayer@ player)
 	{
-		return "KnightSkin.png";
+		string[] skins = { "GiHun.png", "SaeByeok.png" };
+		uint index = Maths::Abs(player.getUsername().getHash()) % skins.size();
+		return skins[index];
 	}
 }
