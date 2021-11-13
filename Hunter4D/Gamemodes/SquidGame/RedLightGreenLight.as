@@ -4,27 +4,37 @@
 #include "Map.as"
 #include "Doll.as"
 
-#define SERVER_ONLY
-
 MapManager@ mapManager;
 
 void onInit(CRules@ this)
 {
-	@mapManager = Map::getManager();
-	mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
+	if (isServer())
+	{
+		@mapManager = Map::getManager();
+		mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
+	}
+
+	if (isClient())
+	{
+		Skins::AddDefaultSkin("GiHun.png");
+		Skins::AddDefaultSkin("SaeByeok.png");
+	}
 
 	onRestart(this);
 }
 
 void onRestart(CRules@ this)
 {
-	this.SetCurrentState(GAME);
-	Object::AddObject(Doll(Vec3f(4, 3, 4)));
+	if (isServer())
+	{
+		this.SetCurrentState(GAME);
+		Object::AddObject(Doll(Vec3f(4, 3, 4)));
+	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (cmd == this.getCommandID("player loaded"))
+	if (isServer() && cmd == this.getCommandID("player loaded"))
 	{
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;
