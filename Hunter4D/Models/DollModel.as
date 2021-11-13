@@ -10,7 +10,7 @@ shared class DollModel : HumanModel
 		super("Doll.png", 2.0f);
 		@this.doll = doll;
 
-		animator.AddAnimation("look", DollLookAnim(this));
+		animator.AddAnimation("look", DollLookAnim(doll, this));
 		animator.SetAnimation("look");
 	}
 

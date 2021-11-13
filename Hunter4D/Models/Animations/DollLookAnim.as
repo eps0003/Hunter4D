@@ -1,8 +1,10 @@
 #include "IAnimation.as"
 #include "ActorModel.as"
+#include "Camera.as"
 
 shared class DollLookAnim : IAnimation
 {
+	private Doll@ doll;
 	private HumanModel@ model;
 
 	private ModelSegment@ body;
@@ -18,8 +20,9 @@ shared class DollLookAnim : IAnimation
 
 	float maxHeadAngle = 60.0f;
 
-	DollLookAnim(HumanModel@ model)
+	DollLookAnim(Doll@ doll, HumanModel@ model)
 	{
+		@this.doll = doll;
 		@this.model = model;
 
 		@body = model.getSegment("body");
@@ -46,7 +49,17 @@ shared class DollLookAnim : IAnimation
 		head.position = Vec3f(0, 0.75f, 0);
 		head.rotation = Vec3f();
 
-		head.rotation.y -= body.rotation.y;
+		Camera@ camera = Camera::getCamera();
+		if (camera !is null)
+		{
+			Vec3f dollHeadPos = doll.interPosition + Vec3f(0, 0.8f, 0) * model.scale * 2;
+			Vec3f deltaPos = (camera.interPosition - dollHeadPos).normalized();
+
+			head.rotation.y = Maths::toDegrees(-Maths::ATan2(deltaPos.x, deltaPos.z));
+			head.rotation.y -= body.rotation.y;
+
+			head.rotation.x = Maths::Sin(deltaPos.y) * 90;
+		}
 
 		// Left arm
 
