@@ -1,8 +1,8 @@
-#include "HunterActor.as"
+#include "SquidGamer.as"
 #include "SpectatorActor.as"
 #include "Loading.as"
 #include "Map.as"
-#include "SoccerBall.as"
+#include "Doll.as"
 
 #define SERVER_ONLY
 
@@ -74,7 +74,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	}
 	else
 	{
-		Actor::AddActor(HunterActor(player, spawnPos));
-		Object::AddObject(SoccerBall(spawnPos));
+		Actor::AddActor(SquidGamer(player, spawnPos));
+		Object::AddObject(Doll(spawnPos));
 	}
 }
