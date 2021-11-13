@@ -50,6 +50,11 @@ void onRender(CRules@ this)
 		if (actor.isMyActor())
 		{
 			actor.RenderHUD();
+
+			for (uint i = 0; i < objects.size(); i++)
+			{
+				objects[i].RenderHUD();
+			}
 		}
 
 		if (actor.isNameplateVisible())

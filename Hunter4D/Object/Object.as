@@ -428,6 +428,11 @@ shared class Object : ICollision
 		Render::SetBackfaceCull(true);
 	}
 
+	void RenderHUD()
+	{
+
+	}
+
 	void Interpolate()
 	{
 		float t = Interpolation::getFrameTime();
