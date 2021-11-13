@@ -3,10 +3,6 @@
 #include "Collision.as"
 #include "ModelSegment.as"
 #include "ActorModel.as"
-#include "ActorIdleAnim.as"
-#include "ActorRunAnim.as"
-#include "ActorJumpAnim.as"
-#include "ActorJumpingJacksAnim.as"
 
 shared class Actor : ICollision
 {

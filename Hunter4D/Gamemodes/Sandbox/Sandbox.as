@@ -3,6 +3,7 @@
 #include "Loading.as"
 #include "Map.as"
 #include "SoccerBall.as"
+#include "Doll.as"
 
 #define SERVER_ONLY
 
@@ -75,6 +76,6 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	else
 	{
 		Actor::AddActor(SquidGamer(player, spawnPos));
-		Object::AddObject(SoccerBall(spawnPos));
+		Object::AddObject(Doll(spawnPos));
 	}
 }

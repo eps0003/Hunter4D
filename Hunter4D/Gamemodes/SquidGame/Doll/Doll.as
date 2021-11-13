@@ -1,5 +1,6 @@
 #include "Object.as"
 #include "Actor.as"
+#include "DollModel.as"
 
 shared class Doll : Object
 {
@@ -8,11 +9,11 @@ shared class Doll : Object
 	float forwardForce = 0.2f;
 	private bool midJump = false;
 
-	ActorModel@ model;
+	DollModel@ model;
 
 	Doll(Vec3f position)
 	{
-		super(position);
+		super("Doll", position);
 
 		SetCollider(AABB(Vec3f(-0.3f, 0.0f, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
 		SetCollisionFlags(CollisionFlag::All);
@@ -22,17 +23,18 @@ shared class Doll : Object
 
 	void OnInit()
 	{
-		Actor::OnInit();
-		SetInitCommand("init doll object");
+		Object::OnInit();
+		SetInitCommand("init doll");
 
 		if (isClient())
 		{
-			@model = ActorModel(this);
+			SetCullRadius(6.0f);
+			@model = DollModel(this);
 		}
 	}
 
-	void Update()
+	void Render()
 	{
-		Object::Update();
+		model.Render();
 	}
 }

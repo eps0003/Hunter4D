@@ -2,7 +2,7 @@
 
 shared class HumanModel : Model
 {
-	HumanModel(string texture, float scale)
+	HumanModel(string texture, float scale = 1.0f)
 	{
 		super(scale);
 

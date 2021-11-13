@@ -1,6 +1,10 @@
 #include "HumanModel.as"
 #include "Camera.as"
 #include "Skins.as"
+#include "ActorIdleAnim.as"
+#include "ActorRunAnim.as"
+#include "ActorJumpAnim.as"
+#include "ActorJumpingJacksAnim.as"
 
 shared class ActorModel : HumanModel
 {
