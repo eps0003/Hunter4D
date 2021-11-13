@@ -2,7 +2,7 @@
 #include "HumanModel.as"
 #include "Camera.as"
 
-shared class DollLookAnim : IAnimation
+shared class DollFlossAnim : IAnimation
 {
 	private HumanModel@ model;
 	private Doll@ doll;
@@ -18,7 +18,7 @@ shared class DollLookAnim : IAnimation
 	private ModelSegment@ lowerLeftLeg;
 	private ModelSegment@ lowerRightLeg;
 
-	DollLookAnim(HumanModel@ model, Doll@ doll)
+	DollFlossAnim(HumanModel@ model, Doll@ doll)
 	{
 		@this.model = model;
 		@this.doll = doll;
@@ -37,10 +37,17 @@ shared class DollLookAnim : IAnimation
 
 	void Update()
 	{
+		float gt = Interpolation::getGameTime() * 0.13f;
+		float sin = Maths::Sin(gt);
+		float sin2 = Maths::Sin(gt * 3);
+
 		// Body
 
 		body.position = Vec3f(0, 0.75f, 0);
-		body.rotation = Vec3f();
+
+		Vec2f vec = Vec2f_lengthdir(sin2, body.rotation.y);
+		body.position += Vec3f(vec.x, 0, vec.y) * 0.1f;
+		body.rotation.z = sin2 * -6;
 
 		// Head
 
@@ -63,6 +70,8 @@ shared class DollLookAnim : IAnimation
 
 		upperLeftArm.position = Vec3f(-0.25f, 0.75f, 0);
 		upperLeftArm.rotation = Vec3f();
+		upperLeftArm.rotation.x = (Maths::Pow(sin, 4) - 0.5f) * -50.0f;
+		upperLeftArm.rotation.z = sin2 * 50;
 
 		lowerLeftArm.position = Vec3f(-0.125f, -0.375f, -0.125f);
 		lowerLeftArm.rotation = Vec3f();
@@ -71,6 +80,8 @@ shared class DollLookAnim : IAnimation
 
 		upperRightArm.position = Vec3f(0.25f, 0.75f, 0);
 		upperRightArm.rotation = Vec3f();
+		upperRightArm.rotation.x = (Maths::Pow(sin, 4) - 0.5f) * -50.0f;
+		upperRightArm.rotation.z = sin2 * 50;
 
 		lowerRightArm.position = Vec3f(0.125f, -0.375f, -0.125f);
 		lowerRightArm.rotation = Vec3f();
@@ -79,6 +90,7 @@ shared class DollLookAnim : IAnimation
 
 		upperLeftLeg.position = Vec3f();
 		upperLeftLeg.rotation = Vec3f();
+		upperLeftLeg.rotation.z = 16 + (sin2 - 1) * 12;
 
 		lowerLeftLeg.position = Vec3f(-0.125f, -0.375f, 0.125f);
 		lowerLeftLeg.rotation = Vec3f();
@@ -87,6 +99,7 @@ shared class DollLookAnim : IAnimation
 
 		upperRightLeg.position = Vec3f();
 		upperRightLeg.rotation = Vec3f();
+		upperRightLeg.rotation.z = -16 + (sin2 + 1) * 12;
 
 		lowerRightLeg.position = Vec3f(0.125f, -0.375f, 0.125f);
 		lowerRightLeg.rotation = Vec3f();

@@ -5,10 +5,10 @@
 shared class Doll : Object
 {
 	uint interval = getTicksASecond() * 5;
-	bool redLight = false;
 	float moveThreshold = 0.5f;
 	float rotateThreshold = 0.01f;
 
+	private bool redLight = false;
 	DollModel@ model;
 
 	private FreezeState[] freezeStates;
@@ -45,7 +45,7 @@ shared class Doll : Object
 
 			if (redLight != newRedLight)
 			{
-				redLight = newRedLight;
+				SetRedLight(newRedLight);
 				print(redLight ? "Red light" : "Green light");
 
 				UpdateFreezeStates();
@@ -53,11 +53,46 @@ shared class Doll : Object
 
 			FreezeCheck();
 		}
+
+		if (isClient())
+		{
+			model.animator.SetAnimation(redLight ? "floss" : "look");
+		}
+	}
+
+	void RenderHUD()
+	{
+		Object::RenderHUD();
+
+		string text = redLight ? "Red light" : "Green light";
+		Vec2f pos(getDriver().getScreenWidth() / 2.0f, 40);
+		SColor col = redLight ? SColor(255, 255, 100, 100) : SColor(255, 100, 255, 100);
+		GUI::DrawTextCentered(text, pos, col);
 	}
 
 	void Render()
 	{
 		model.Render();
+	}
+
+	bool getRedLight()
+	{
+		return redLight;
+	}
+
+	void SetRedLight(bool redLight)
+	{
+		if (this.redLight == redLight) return;
+
+		this.redLight = redLight;
+
+		if (!isClient() && hasSyncedInit)
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_bool(redLight);
+			rules.SendCommand(rules.getCommandID("set doll red light"), bs, true);
+		}
 	}
 
 	private void UpdateFreezeStates()

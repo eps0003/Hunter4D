@@ -1,5 +1,6 @@
 #include "Model.as"
 #include "DollLookAnim.as"
+#include "DollFlossAnim.as"
 
 shared class DollModel : HumanModel
 {
@@ -11,6 +12,7 @@ shared class DollModel : HumanModel
 		@this.doll = doll;
 
 		animator.AddAnimation("look", DollLookAnim(this, doll));
+		animator.AddAnimation("floss", DollFlossAnim(this, doll));
 		animator.SetAnimation("look");
 	}
 
