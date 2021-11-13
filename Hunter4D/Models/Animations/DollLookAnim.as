@@ -4,8 +4,8 @@
 
 shared class DollLookAnim : IAnimation
 {
-	private Doll@ doll;
 	private HumanModel@ model;
+	private Doll@ doll;
 
 	private ModelSegment@ body;
 	private ModelSegment@ head;
@@ -18,12 +18,10 @@ shared class DollLookAnim : IAnimation
 	private ModelSegment@ lowerLeftLeg;
 	private ModelSegment@ lowerRightLeg;
 
-	float maxHeadAngle = 60.0f;
-
-	DollLookAnim(Doll@ doll, HumanModel@ model)
+	DollLookAnim(HumanModel@ model, Doll@ doll)
 	{
-		@this.doll = doll;
 		@this.model = model;
+		@this.doll = doll;
 
 		@body = model.getSegment("body");
 		@head = model.getSegment("head");
@@ -52,7 +50,7 @@ shared class DollLookAnim : IAnimation
 		Camera@ camera = Camera::getCamera();
 		if (camera !is null)
 		{
-			Vec3f dollHeadPos = doll.interPosition + Vec3f(0, 0.8f, 0) * model.scale * 2;
+			Vec3f dollHeadPos = doll.interPosition + Vec3f(0, 0.85f, 0) * model.scale * 2;
 			Vec3f deltaPos = (camera.interPosition - dollHeadPos).normalized();
 
 			head.rotation.y = Maths::toDegrees(-Maths::ATan2(deltaPos.x, deltaPos.z));

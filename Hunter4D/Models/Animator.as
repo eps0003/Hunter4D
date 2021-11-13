@@ -36,8 +36,12 @@ shared class Animator
 		{
 			if (animation !is this.animation)
 			{
+				if (this.animation !is null)
+				{
+					animStartTime = getGameTime();
+				}
+
 				@this.animation = animation;
-				animStartTime = getGameTime();
 
 				ModelSegment@[] segments = model.getSegments();
 				for (uint i = 0; i < segments.size(); i++)
@@ -58,6 +62,8 @@ shared class Animator
 
 	float getTransitionTime()
 	{
+		if (animStartTime <= 0) return 1.0f;
+
 		float deltaTime = Interpolation::getGameTime() - animStartTime;
 		return Maths::Clamp01(deltaTime / animTransitionDuration);
 	}

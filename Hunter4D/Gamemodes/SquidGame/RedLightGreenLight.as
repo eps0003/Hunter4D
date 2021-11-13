@@ -19,6 +19,7 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	this.SetCurrentState(GAME);
+	Object::AddObject(Doll(Vec3f(4, 3, 4)));
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -34,6 +35,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
+	victim.server_setTeamNum(this.getSpectatorTeamNum());
 	SpawnPlayer(this, victim);
 }
 
@@ -75,6 +77,5 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	else
 	{
 		Actor::AddActor(SquidGamer(player, spawnPos));
-		Object::AddObject(Doll(spawnPos));
 	}
 }

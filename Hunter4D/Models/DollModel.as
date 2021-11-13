@@ -5,12 +5,12 @@ shared class DollModel : HumanModel
 {
 	Doll@ doll;
 
-	DollModel(Doll@ doll)
+	DollModel(Doll@ doll, float scale = 1.0f)
 	{
-		super("Doll.png", 2.0f);
+		super("Doll.png", scale);
 		@this.doll = doll;
 
-		animator.AddAnimation("look", DollLookAnim(doll, this));
+		animator.AddAnimation("look", DollLookAnim(this, doll));
 		animator.SetAnimation("look");
 	}
 
