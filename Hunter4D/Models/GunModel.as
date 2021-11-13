@@ -16,11 +16,12 @@ shared class GunModel : Model
 		AddSegment(gun);
 	}
 
-	void Update()
+	void PreRender()
 	{
-		Model::Update();
+		Model::PreRender();
 
-		Matrix::Multiply(actor.model.lowerRightArm.matrix, matrix, matrix);
+		ModelSegment@ actorArm = actor.model.getSegment("lowerRightArm");
+		Matrix::Multiply(actorArm.matrix, matrix, matrix);
 
 		float[] m;
 		Matrix::MakeIdentity(m);

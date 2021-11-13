@@ -1,81 +1,75 @@
 #include "IAnimation.as"
+#include "Animator.as"
 
 shared class Model
 {
-	private float scale = 1.0f;
+	float scale = 1.0f;
+	Animator@ animator;
 
 	private float[] matrix;
 
-	private ModelSegment@[] segments;
-
-	private dictionary animations;
-	private IAnimation@ animation;
-	private string animName;
-	uint animStartTime = 0;
-	private uint animTransitionDuration = 3;
+	private dictionary segments;
+	private ModelSegment@ rootSegment;
 
 	Model(float scale)
 	{
 		this.scale = scale;
+		@this.animator = Animator(this);
 	}
 
 	void AddSegment(ModelSegment@ segment)
 	{
-		segments.push_back(segment);
+		string uniqueName = "_segment" + segments.getSize();
+		AddSegment(uniqueName, segment);
 	}
 
-	void AddAnimation(string name, IAnimation@ animation)
+	void AddSegment(string name, ModelSegment@ segment)
 	{
-		animations.set(name, @animation);
+		if (segments.isEmpty())
+		{
+			@rootSegment = segment;
+		}
+
+		segments.set(name, @segment);
 	}
 
-	void SetAnimation(string name)
+	ModelSegment@ getSegment(string name)
 	{
-		IAnimation@ animation;
-		if (animations.get(name, @animation))
-		{
-			if (animation !is this.animation)
-			{
-				@this.animation = animation;
-
-				animStartTime = getGameTime();
-
-				for (uint i = 0; i < segments.size(); i++)
-				{
-					ModelSegment@ segment = segments[i];
-					segment.oldPosition = segment.interPosition;
-					segment.oldRotation = segment.interRotation;
-				}
-			}
-		}
-		else if (name != animName)
-		{
-			warn("Unable to set nonexistent animation: " + name);
-		}
-
-		animName = name;
+		ModelSegment@ segment;
+		segments.get(name, @segment);
+		return segment;
 	}
 
-	void Update()
+	ModelSegment@[] getSegments()
 	{
-		if (animation !is null)
+		ModelSegment@[] allSegments;
+
+		string[] segmentKeys = segments.getKeys();
+		for (uint i = 0; i < segmentKeys.size(); i++)
 		{
-			animation.Update();
+			ModelSegment@ segment = getSegment(segmentKeys[i]);
+			allSegments.push_back(segment);
 		}
+
+		return allSegments;
+	}
+
+	void PreRender()
+	{
+		Matrix::MakeIdentity(matrix);
 	}
 
 	void Render()
 	{
-		Matrix::MakeIdentity(matrix);
+		PreRender();
 
-		Update();
+		animator.Update();
 
 		float[] scaleMatrix;
 		Matrix::MakeIdentity(scaleMatrix);
 		Matrix::SetScale(scaleMatrix, scale, scale, scale);
 		Matrix::MultiplyImmediate(matrix, scaleMatrix);
 
-		float t = animStartTime > 0 ? Maths::Clamp01((Interpolation::getGameTime() - animStartTime) / float(animTransitionDuration)) : 1.0f;
-		segments[0].Render(matrix, t);
+		rootSegment.Render(matrix, animator.getTransitionTime());
 	}
 }

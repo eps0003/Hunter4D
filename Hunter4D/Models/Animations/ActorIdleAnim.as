@@ -6,12 +6,34 @@ shared class ActorIdleAnim : IAnimation
 	private ActorModel@ model;
 	private Actor@ actor;
 
+	private ModelSegment@ body;
+	private ModelSegment@ head;
+	private ModelSegment@ upperLeftArm;
+	private ModelSegment@ upperRightArm;
+	private ModelSegment@ lowerLeftArm;
+	private ModelSegment@ lowerRightArm;
+	private ModelSegment@ upperLeftLeg;
+	private ModelSegment@ upperRightLeg;
+	private ModelSegment@ lowerLeftLeg;
+	private ModelSegment@ lowerRightLeg;
+
 	float maxHeadAngle = 60.0f;
 
 	ActorIdleAnim(ActorModel@ model)
 	{
 		@this.model = model;
 		@actor = model.actor;
+
+		@body = model.getSegment("body");
+		@head = model.getSegment("head");
+		@upperLeftArm = model.getSegment("upperLeftArm");
+		@upperRightArm = model.getSegment("upperRightArm");
+		@lowerLeftArm = model.getSegment("lowerLeftArm");
+		@lowerRightArm = model.getSegment("lowerRightArm");
+		@upperLeftLeg = model.getSegment("upperLeftLeg");
+		@upperRightLeg = model.getSegment("upperRightLeg");
+		@lowerLeftLeg = model.getSegment("lowerLeftLeg");
+		@lowerRightLeg = model.getSegment("lowerRightLeg");
 	}
 
 	void Update()
@@ -20,50 +42,50 @@ shared class ActorIdleAnim : IAnimation
 
 		// Body
 
-		model.body.position = Vec3f(0, 0.75f, 0);
-		model.body.rotation = Vec3f(0, model.body.rotation.y, 0);
+		body.position = Vec3f(0, 0.75f, 0);
+		body.rotation = Vec3f(0, body.rotation.y, 0);
 
-		float diff = Maths::AngleDifference(actor.interRotation.y, model.body.rotation.y);
+		float diff = Maths::AngleDifference(actor.interRotation.y, body.rotation.y);
 		if (Maths::Abs(diff) > maxHeadAngle)
 		{
-			model.body.rotation.y = actor.interRotation.y + maxHeadAngle * Maths::Sign(diff);
+			body.rotation.y = actor.interRotation.y + maxHeadAngle * Maths::Sign(diff);
 		}
 
 		// Head
 
-		model.head.position = Vec3f(0, 0.75f, 0);
-		model.head.rotation = actor.interRotation + Vec3f(0, -model.body.rotation.y, 0);
+		head.position = Vec3f(0, 0.75f, 0);
+		head.rotation = actor.interRotation + Vec3f(0, -body.rotation.y, 0);
 
 		// Left arm
 
-		model.upperLeftArm.position = Vec3f(-0.25f, 0.75f, 0);
-		model.upperLeftArm.rotation = Vec3f(0, 0, (Maths::Sin(gt) + 1) * 2);
+		upperLeftArm.position = Vec3f(-0.25f, 0.75f, 0);
+		upperLeftArm.rotation = Vec3f(0, 0, (Maths::Sin(gt) + 1) * 2);
 
-		model.lowerLeftArm.position = Vec3f(-0.125f, -0.375f, -0.125f);
-		model.lowerLeftArm.rotation = Vec3f();
+		lowerLeftArm.position = Vec3f(-0.125f, -0.375f, -0.125f);
+		lowerLeftArm.rotation = Vec3f();
 
 		// Right arm
 
-		model.upperRightArm.position = Vec3f(0.25f, 0.75f, 0);
-		model.upperRightArm.rotation = Vec3f(0, 0, (Maths::Sin(gt) + 1) * -2);
+		upperRightArm.position = Vec3f(0.25f, 0.75f, 0);
+		upperRightArm.rotation = Vec3f(0, 0, (Maths::Sin(gt) + 1) * -2);
 
-		model.lowerRightArm.position = Vec3f(0.125f, -0.375f, -0.125f);
-		model.lowerRightArm.rotation = Vec3f();
+		lowerRightArm.position = Vec3f(0.125f, -0.375f, -0.125f);
+		lowerRightArm.rotation = Vec3f();
 
 		// Left leg
 
-		model.upperLeftLeg.position = Vec3f();
-		model.upperLeftLeg.rotation = Vec3f();
+		upperLeftLeg.position = Vec3f();
+		upperLeftLeg.rotation = Vec3f();
 
-		model.lowerLeftLeg.position = Vec3f(-0.125f, -0.375f, 0.125f);
-		model.lowerLeftLeg.rotation = Vec3f();
+		lowerLeftLeg.position = Vec3f(-0.125f, -0.375f, 0.125f);
+		lowerLeftLeg.rotation = Vec3f();
 
 		// Right leg
 
-		model.upperRightLeg.position = Vec3f();
-		model.upperRightLeg.rotation = Vec3f();
+		upperRightLeg.position = Vec3f();
+		upperRightLeg.rotation = Vec3f();
 
-		model.lowerRightLeg.position = Vec3f(0.125f, -0.375f, 0.125f);
-		model.lowerRightLeg.rotation = Vec3f();
+		lowerRightLeg.position = Vec3f(0.125f, -0.375f, 0.125f);
+		lowerRightLeg.rotation = Vec3f();
 	}
 }

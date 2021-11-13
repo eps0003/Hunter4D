@@ -4,19 +4,19 @@
 
 shared class SoccerBallModel : Model
 {
-    Object@ object;
+	Object@ object;
 
 	SoccerBallModel(Object@ object, float scale = 0.25f)
 	{
 		super(scale * 8);
 		@this.object = object;
 
-		AddSegment(ModelSegment("SoccerBall.obj", "Colors.png"));
+		AddSegment("ball", ModelSegment("SoccerBall.obj", "Colors.png"));
 	}
 
-	void Update()
+	void PreRender()
 	{
-		Model::Update();
+		Model::PreRender();
 		Matrix::SetTranslation(matrix, object.interPosition.x, object.interPosition.y, object.interPosition.z);
 		Matrix::SetRotationDegrees(matrix, -object.interRotation.x, -object.interRotation.y, -object.interRotation.z);
 	}

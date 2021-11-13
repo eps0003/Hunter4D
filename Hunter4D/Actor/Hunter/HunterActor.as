@@ -53,16 +53,16 @@ shared class HunterActor : Actor
 			{
 				if (velocity.toXZ().LengthSquared() > 0.005f)
 				{
-					model.SetAnimation("run");
+					model.animator.SetAnimation("run");
 				}
 				else
 				{
-					model.SetAnimation("idle");
+					model.animator.SetAnimation("idle");
 				}
 			}
 			else
 			{
-				model.SetAnimation("jump");
+				model.animator.SetAnimation("jump");
 			}
 		}
 	}
