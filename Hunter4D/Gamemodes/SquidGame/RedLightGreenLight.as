@@ -19,17 +19,11 @@ void onInit(CRules@ this)
 		Skins::AddDefaultSkin("GiHun.png");
 		Skins::AddDefaultSkin("SaeByeok.png");
 	}
-
-	onRestart(this);
 }
 
 void onRestart(CRules@ this)
 {
-	if (isServer())
-	{
-		this.SetCurrentState(GAME);
-		Object::AddObject(Doll(Vec3f(4, 3, 4)));
-	}
+	this.RemoveScript("RedLightGreenLight.as");
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -40,6 +34,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		if (!saferead_player(params, @player)) return;
 
 		SpawnPlayer(this, player);
+	}
+	else if (isServer() && cmd == this.getCommandID("map generated"))
+	{
+		this.SetCurrentState(GAME);
+		Object::AddObject(Doll(Vec3f(4, 3, 4)));
 	}
 }
 

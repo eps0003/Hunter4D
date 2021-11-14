@@ -2,6 +2,7 @@
 
 MapManager@ mapManager;
 MapBuilder@ mapBuilder;
+bool firstAttempt;
 
 void onInit(CRules@ this)
 {
@@ -14,28 +15,56 @@ void onRestart(CRules@ this)
 	if (isServer())
 	{
 		@mapManager = Map::getManager();
-		@mapBuilder = mapManager.getCurrentMap();
+		@mapBuilder = null;
 
-		if (mapBuilder is null)
-		{
-			error("The map is unable to generate because a map hasn't been set");
-			this.RemoveScript("LoadMap.as");
-			return;
-		}
-
-		mapBuilder.Init();
+		firstAttempt = true;
 
 		this.set_bool("map generated", false);
 		this.Sync("map generated", true);
+
+		this.set_bool("map generation issue", false);
+		this.Sync("map generation issue", true);
 	}
 
-	print("Begin generating map");
+	if (isClient())
+	{
+		print("Begin generating map");
+	}
 }
 
 void onTick(CRules@ this)
 {
 	if (isServer())
 	{
+		bool wasNull = mapBuilder is null;
+		@mapBuilder = mapManager.getCurrentMap();
+
+		if (mapBuilder is null)
+		{
+			if (firstAttempt)
+			{
+				firstAttempt = false;
+			}
+			else
+			{
+				error("The map is unable to generate because a map hasn't been set");
+
+				this.set_bool("map generation issue", true);
+				this.Sync("map generation issue", true);
+
+				this.RemoveScript("LoadMap.as");
+			}
+			return;
+		}
+		else if (wasNull)
+		{
+			print("Begin generating map");
+			mapBuilder.Init();
+		}
+
+		this.set_bool("map generated", false);
+		this.Sync("map generated", true);
+
 		mapBuilder.Load();
 
 		// Set loading progress
@@ -64,8 +93,18 @@ void onTick(CRules@ this)
 
 	if (isClient())
 	{
-		this.set_string("loading message", "Generating map...");
-		this.set_f32("loading progress", this.get_f32("map gen progress"));
+		if (this.get_bool("map generation issue"))
+		{
+			error("An error occurred when generating the map on the server");
+			this.set_string("loading message", "Error generating map. Please contact server host");
+			this.RemoveScript("LoadMap.as");
+			return;
+		}
+		else
+		{
+			this.set_string("loading message", "Generating map...");
+			this.set_f32("loading progress", this.get_f32("map gen progress"));
+		}
 	}
 
 	if (this.get_bool("map generated"))

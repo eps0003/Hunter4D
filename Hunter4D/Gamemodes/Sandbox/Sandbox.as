@@ -13,12 +13,12 @@ void onInit(CRules@ this)
 	@mapManager = Map::getManager();
 	mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
 
-	onRestart(this);
+	this.SetCurrentState(GAME);
 }
 
 void onRestart(CRules@ this)
 {
-	this.SetCurrentState(GAME);
+	this.RemoveScript("Sandbox.as");
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
