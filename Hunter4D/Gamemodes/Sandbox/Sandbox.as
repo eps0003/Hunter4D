@@ -16,11 +16,6 @@ void onInit(CRules@ this)
 	this.SetCurrentState(GAME);
 }
 
-void onRestart(CRules@ this)
-{
-	this.RemoveScript("Sandbox.as");
-}
-
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (cmd == this.getCommandID("player loaded"))

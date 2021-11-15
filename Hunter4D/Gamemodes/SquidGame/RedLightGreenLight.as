@@ -21,11 +21,6 @@ void onInit(CRules@ this)
 	}
 }
 
-void onRestart(CRules@ this)
-{
-	this.RemoveScript("RedLightGreenLight.as");
-}
-
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (isServer() && cmd == this.getCommandID("player loaded"))

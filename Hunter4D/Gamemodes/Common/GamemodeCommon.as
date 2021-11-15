@@ -1,34 +1,13 @@
 namespace Gamemode
 {
-	shared void LoadGamemodes(uint index)
+	shared GamemodeManager@ getManager()
 	{
-		ConfigFile@ cfg = Gamemode::getConfig();
-
-		string[] scripts;
-		if (!cfg.readIntoArray_string(scripts, "gamemodes"))
+		GamemodeManager@ manager;
+		if (!getRules().get("gamemode manager", @manager))
 		{
-			warn("No gamemodes were specified in " + Gamemode::getConfigName());
-			return;
+			@manager = GamemodeManager("gamemodes.cfg");
+			getRules().set("gamemode manager", @manager);
 		}
-
-		getRules().set("gamemode scripts", scripts);
-		getRules().AddScript(scripts[index % scripts.size()]);
-	}
-
-	shared ConfigFile@ getConfig()
-	{
-		ConfigFile@ cfg;
-		if (!getRules().get("gamemodes config", @cfg))
-		{
-			@cfg = ConfigFile();
-			cfg.loadFile(Gamemode::getConfigName());
-			getRules().set("gamemodes config", @cfg);
-		}
-		return cfg;
-	}
-
-	shared string getConfigName()
-	{
-		return "gamemodes.cfg";
+		return manager;
 	}
 }
