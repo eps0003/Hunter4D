@@ -1,12 +1,14 @@
 #include "Object.as"
 #include "Actor.as"
 #include "DollModel.as"
+#include "Ray.as"
 
 shared class Doll : Object
 {
-	uint interval = getTicksASecond() * 5;
+	uint interval = getTicksASecond() * 2;
 	float moveThreshold = 0.5f;
 	float rotateThreshold = 0.01f;
+	float eyeHeight;
 
 	private bool redLight = false;
 	DollModel@ model;
@@ -33,6 +35,8 @@ shared class Doll : Object
 			SetCullRadius(scale);
 			@model = DollModel(this, scale);
 		}
+
+		eyeHeight = 1.8f * scale;
 	}
 
 	void Update()
@@ -124,10 +128,20 @@ shared class Doll : Object
 			{
 				freezeStates.removeAt(i--);
 			}
-			else if (freezeState.hasMoved(moveThreshold) || freezeState.hasRotated(rotateThreshold))
+			else
 			{
-				actor.Kill();
-				freezeStates.removeAt(i--);
+				Vec3f headPos = position + Vec3f(0, eyeHeight, 0);
+				Vec3f deltaPos = actor.position + Vec3f(0, actor.cameraHeight, 0) - headPos;
+				Ray ray(headPos, deltaPos);
+
+				RaycastInfo raycast;
+				if (ray.raycastBlock(100, true, raycast) && raycast.distanceSq < deltaPos.magSquared()) continue;
+
+				if (freezeState.hasMoved(moveThreshold) || freezeState.hasRotated(rotateThreshold))
+				{
+					actor.Kill();
+					freezeStates.removeAt(i--);
+				}
 			}
 		}
 	}

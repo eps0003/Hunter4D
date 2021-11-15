@@ -57,13 +57,13 @@ shared class DollFlossAnim : IAnimation
 		Camera@ camera = Camera::getCamera();
 		if (camera !is null)
 		{
-			Vec3f dollHeadPos = doll.interPosition + Vec3f(0, 0.85f, 0) * model.scale * 2;
-			Vec3f deltaPos = (camera.interPosition - dollHeadPos).normalized();
+			Vec3f dollHeadPos = doll.interPosition + Vec3f(0, doll.eyeHeight, 0);
+			Vec3f lookDir = (camera.interPosition - dollHeadPos).normalized();
 
-			head.rotation.y = Maths::toDegrees(-Maths::ATan2(deltaPos.x, deltaPos.z));
+			head.rotation.y = Maths::toDegrees(-Maths::ATan2(lookDir.x, lookDir.z));
 			head.rotation.y -= body.rotation.y;
 
-			head.rotation.x = Maths::Sin(deltaPos.y) * 90;
+			head.rotation.x = Maths::Sin(lookDir.y) * 90;
 		}
 
 		// Left arm

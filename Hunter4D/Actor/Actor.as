@@ -40,7 +40,7 @@ shared class Actor : ICollision
 
 	private float cullRadius = 3.0f;
 
-	private float cameraHeight = 1.6f;
+	float cameraHeight = 1.6f;
 
 	private CRules@ rules = getRules();
 	private Map@ map = Map::getMap();

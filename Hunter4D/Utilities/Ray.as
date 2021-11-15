@@ -275,7 +275,8 @@ shared class Ray
 shared class RaycastInfo
 {
 	Ray ray;
-	float distance = 0;
+	float distance;
+	float distanceSq;
 	Vec3f normal;
 	Vec3f hitPos;
 	Vec3f hitWorldPos;
@@ -285,6 +286,7 @@ shared class RaycastInfo
 		this.hitWorldPos = hitWorldPos;
 		this.ray = ray;
 		this.distance = distance;
+		this.distanceSq = distance * distance;
 		this.normal = normal;
 		this.hitPos = ray.position + (ray.direction * distance);
 	}
