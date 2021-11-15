@@ -17,7 +17,7 @@ shared class Doll : Object
 
 	Doll(Vec3f position)
 	{
-		super("Doll", position, Vec3f(), 2.0f);
+		super("Doll", position, Vec3f(), 4.0f);
 
 		SetCollider(AABB(Vec3f(-0.3f, 0.0f, -0.3f) * scale, Vec3f(0.3f, 1.8f, 0.3f) * scale));
 		SetCollisionFlags(CollisionFlag::All);

@@ -3,15 +3,16 @@
 #include "Loading.as"
 #include "Map.as"
 #include "Doll.as"
+#include "RedLightGreenLightMap.as"
 
-MapManager@ mapManager;
+RedLightGreenLightMap@ mapBuilder;
 
 void onInit(CRules@ this)
 {
 	if (isServer())
 	{
-		@mapManager = Map::getManager();
-		mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
+		@mapBuilder = RedLightGreenLightMap(Vec3f(48, 1, 128));
+		Map::getManager().SetMap(mapBuilder);
 	}
 
 	if (isClient())
@@ -33,7 +34,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	else if (isServer() && cmd == this.getCommandID("map generated"))
 	{
 		this.SetCurrentState(GAME);
-		Object::AddObject(Doll(Vec3f(4, 3, 4)));
+		Object::AddObject(Doll(mapBuilder.getDollSpawnPos()));
 	}
 }
 

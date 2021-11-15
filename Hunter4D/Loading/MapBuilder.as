@@ -109,17 +109,18 @@ shared class ConfigMap : MapBuilder
 
 shared class MapGenerator : MapBuilder
 {
-	Random@ random;
+	Vec3f dimensions;
 
-	MapGenerator(uint seed)
+	MapGenerator(Vec3f dimensions)
 	{
 		super();
-		@random = Random(seed);
+		this.dimensions = dimensions;
 	}
 
 	void Init()
 	{
-		map = Map(Vec3f(16, 8, 16));
+		MapBuilder::Init();
+		map = Map(dimensions);
 	}
 
 	void Load()
