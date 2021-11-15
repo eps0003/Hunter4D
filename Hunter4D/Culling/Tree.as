@@ -100,40 +100,40 @@ shared class Branch
 		else
 		{
 			// Get bottom chunks
-			@chunk0 = mapRenderer.getChunk(min.x, min.y, min.z);
+			@chunk0 = mapRenderer.getChunkSafe(min.x, min.y, min.z);
 
 			if (dim.x == 2)
 			{
-				@chunk1 = mapRenderer.getChunk(min.x + 1, min.y, min.z);
+				@chunk1 = mapRenderer.getChunkSafe(min.x + 1, min.y, min.z);
 			}
 
 			if (dim.z == 2)
 			{
-				@chunk2 = mapRenderer.getChunk(min.x, min.y, min.z + 1);
+				@chunk2 = mapRenderer.getChunkSafe(min.x, min.y, min.z + 1);
 
 				if (dim.x == 2)
 				{
-					@chunk3 = mapRenderer.getChunk(min.x + 1, min.y, min.z + 1);
+					@chunk3 = mapRenderer.getChunkSafe(min.x + 1, min.y, min.z + 1);
 				}
 			}
 
 			// Get top chunks
 			if (dim.y == 2 && max.y <= chunkDim.y)
 			{
-				@chunk4 = mapRenderer.getChunk(min.x, min.y + 1, min.z);
+				@chunk4 = mapRenderer.getChunkSafe(min.x, min.y + 1, min.z);
 
 				if (dim.x == 2)
 				{
-					@chunk5 = mapRenderer.getChunk(min.x + 1, min.y + 1, min.z);
+					@chunk5 = mapRenderer.getChunkSafe(min.x + 1, min.y + 1, min.z);
 				}
 
 				if (dim.z == 2)
 				{
-					@chunk6 = mapRenderer.getChunk(min.x, min.y + 1, min.z + 1);
+					@chunk6 = mapRenderer.getChunkSafe(min.x, min.y + 1, min.z + 1);
 
 					if (dim.x == 2)
 					{
-						@chunk7 = mapRenderer.getChunk(min.x + 1, min.y + 1, min.z + 1);
+						@chunk7 = mapRenderer.getChunkSafe(min.x + 1, min.y + 1, min.z + 1);
 					}
 				}
 			}
