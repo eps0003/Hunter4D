@@ -14,21 +14,35 @@ namespace Loading
 	{
 		if (loaded == isPlayerLoaded(player)) return;
 
+		CRules@ rules = getRules();
 		string token = player.getNetworkID() + "loaded";
-		getRules().set_bool(token, loaded);
-		getRules().Sync(token, true);
+
+		rules.set_bool(token, loaded);
+		rules.Sync(token, true);
 
 		if (loaded && player.isMyPlayer())
 		{
 			CBitStream bs;
 			bs.write_netid(player.getNetworkID());
-			getRules().SendCommand(getRules().getCommandID("player loaded"), bs, false);
+			rules.SendCommand(rules.getCommandID("player loaded"), bs, false);
 		}
 	}
 
 	shared void SetMyPlayerLoaded(bool loaded)
 	{
 		SetPlayerLoaded(getLocalPlayer(), loaded);
+	}
+
+	shared void SetAllPlayersLoaded(bool loaded)
+	{
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player !is null)
+			{
+				SetPlayerLoaded(player, loaded);
+			}
+		}
 	}
 
 	shared bool areAllPlayersLoaded()
@@ -44,15 +58,30 @@ namespace Loading
 		return true;
 	}
 
-	shared void SetAllPlayersLoaded(bool loaded)
+	shared bool areAnyPlayersLoaded()
 	{
 		for (uint i = 0; i < getPlayerCount(); i++)
 		{
 			CPlayer@ player = getPlayer(i);
-			if (player !is null)
+			if (player !is null && isPlayerLoaded(player))
 			{
-				SetPlayerLoaded(player, loaded);
+				return true;
 			}
 		}
+		return false;
+	}
+
+	shared uint getLoadedPlayerCount()
+	{
+		uint count = 0;
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player !is null && isPlayerLoaded(player))
+			{
+				count++;
+			}
+		}
+		return count;
 	}
 }
