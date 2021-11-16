@@ -38,7 +38,6 @@ namespace Actor
 		return null;
 	}
 
-
 	shared Actor@ getMyActor()
 	{
 		return Actor::getActor(getLocalPlayer());

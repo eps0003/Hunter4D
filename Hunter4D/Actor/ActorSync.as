@@ -15,9 +15,18 @@ void onTick(CRules@ this)
 {
 	Actor@[]@ actors = Actor::getActors();
 
+	Actor@ myActor;
+
 	for (int i = actors.size() - 1; i >= 0; i--)
 	{
-		actors[i].PreUpdate();
+		Actor@ actor = actors[i];
+		actor.PreUpdate();
+
+		// Get my actor
+		if (actor.isMyActor())
+		{
+			@myActor = actor;
+		}
 	}
 
 	for (int i = actors.size() - 1; i >= 0; i--)
@@ -27,24 +36,12 @@ void onTick(CRules@ this)
 
 	for (int i = actors.size() - 1; i >= 0; i--)
 	{
-		Actor@ actor = actors[i];
-		actor.PostUpdate();
-
-		if (actor.isMyActor())
-		{
-			actor.SerializeTick();
-		}
+		actors[i].PostUpdate();
 	}
 
-	for (int i = actors.size() - 1; i >= 0; i--)
+	if (myActor !is null)
 	{
-		Actor@ actor = actors[i];
-		if (actor.isMyActor())
-		{
-			CBitStream bs;
-			bs.write_u16(i);
-			actor.SerializeTick(bs);
-		}
+		myActor.SerializeTick();
 	}
 }
 
@@ -82,17 +79,13 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (cmd == this.getCommandID("sync actor"))
 	{
-		u16 index;
-		if (!params.saferead_u16(index)) return;
-
-		Actor@ oldActor = Actor::getActorByIndex(index);
-		if (oldActor is null || oldActor.isMyActor()) return;
-
 		Actor actor;
 		if (!actor.deserializeTick(params)) return;
 
-		oldActor = actor;
+		Actor@ oldActor = Actor::getActor(actor.getID());
+		if (oldActor is null || oldActor.isMyActor()) return;
 
+		oldActor = actor;
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove actor"))
 	{
@@ -102,7 +95,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		Actor actor;
 		if (!actor.deserializeRemove(params)) return;
 
-		Actor::RemoveActorByIndex(index);
+		Actor::RemoveActor(actor);
 	}
 	else if (!isServer() && cmd == this.getCommandID("set actor velocity"))
 	{

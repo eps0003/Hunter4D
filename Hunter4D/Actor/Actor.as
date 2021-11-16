@@ -277,6 +277,7 @@ shared class Actor : ICollision
 
 	void SerializeTick(CBitStream@ bs = CBitStream())
 	{
+		bs.write_u16(id);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
@@ -316,6 +317,7 @@ shared class Actor : ICollision
 
 	bool deserializeTick(CBitStream@ bs)
 	{
+		if (!bs.saferead_u16(id)) return false;
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
 		if (!velocity.deserialize(bs)) return false;
