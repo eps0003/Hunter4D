@@ -6,8 +6,7 @@ shared class SquidGamer : Actor
 	float friction = 0.3f;
 	float jumpForce = 0.3f;
 	float pushRange = 2.0f;
-
-	Vec3f pushVelocity;
+	float pushForce = 2.0f;
 
 	ActorModel@ model;
 
@@ -124,6 +123,7 @@ shared class SquidGamer : Actor
 		Actor@ closestActor;
 		float closestDistance = pushRange;
 
+		// Find closest actor
 		Actor@[]@ actors = Actor::getActors();
 		for (uint i = 0; i < actors.size(); i++)
 		{
@@ -148,9 +148,10 @@ shared class SquidGamer : Actor
 			}
 		}
 
+		// Push closest actor
 		if (closestActor !is null)
 		{
-			closestActor.SetVelocity(ray.direction * 2);
+			closestActor.SetVelocity(ray.direction * pushForce);
 			print(getPlayer().getUsername() + " pushed " + closestActor.getPlayer().getUsername());
 		}
 	}
