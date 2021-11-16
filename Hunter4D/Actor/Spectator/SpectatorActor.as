@@ -57,6 +57,11 @@ shared class SpectatorActor : Actor
 		return false;
 	}
 
+	bool isNameplateVisible()
+	{
+		return false;
+	}
+
 	bool isCrosshairVisible()
 	{
 		return false;
