@@ -43,7 +43,7 @@ shared class Doll : Object
 	{
 		Object::Update();
 
-		if (isServer())
+		if (isServer() && rules.isMatchRunning())
 		{
 			bool newRedLight = getGameTime() / interval % 2 == 0;
 

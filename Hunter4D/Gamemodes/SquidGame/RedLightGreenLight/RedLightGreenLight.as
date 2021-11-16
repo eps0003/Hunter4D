@@ -9,6 +9,8 @@ RedLightGreenLightMap@ mapBuilder;
 
 void onInit(CRules@ this)
 {
+	this.AddScript("WaitForPlayers.as");
+
 	if (isServer())
 	{
 		@mapBuilder = RedLightGreenLightMap(Vec3f(48, 1, 128));
@@ -33,7 +35,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (isServer() && cmd == this.getCommandID("map generated"))
 	{
-		this.SetCurrentState(GAME);
 		Object::AddObject(Doll(mapBuilder.getDollSpawnPos()));
 	}
 }
