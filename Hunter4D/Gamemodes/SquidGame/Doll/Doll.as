@@ -119,6 +119,8 @@ shared class Doll : Object
 
 	private void FreezeCheck()
 	{
+		Actor@[]@ actors = Actor::getActors();
+
 		for (int i = freezeStates.size() - 1; i >= 0; i--)
 		{
 			FreezeState freezeState = freezeStates[i];
@@ -130,13 +132,42 @@ shared class Doll : Object
 			}
 			else
 			{
-				Vec3f headPos = position + Vec3f(0, eyeHeight, 0);
-				Vec3f deltaPos = actor.position + Vec3f(0, actor.cameraHeight, 0) - headPos;
-				Ray ray(headPos, deltaPos);
+				// Create ray from doll to player
+				Vec3f dollHeadPos = position + Vec3f(0, eyeHeight, 0);
+				Vec3f actorHeadPos = actor.position + Vec3f(0, actor.cameraHeight, 0);
+				Vec3f deltaPos = actorHeadPos - dollHeadPos;
+				Ray ray(dollHeadPos, deltaPos);
 
+				// Check if block is obstructing view
 				RaycastInfo raycast;
 				if (ray.raycastBlock(200, true, raycast) && raycast.distanceSq < deltaPos.magSquared()) continue;
 
+				// Check if another player is obstructing view
+				bool objectBlocking = false;
+
+				for (uint i = 0; i < actors.size(); i++)
+				{
+					Actor@ otherActor = actors[i];
+					if (otherActor is actor) continue;
+
+					// Calculate model matrix for hurtbox
+					float[] modelMatrix;
+					Matrix::MakeIdentity(modelMatrix);
+					Matrix::SetTranslation(modelMatrix, otherActor.position.x, otherActor.position.y, otherActor.position.z);
+					Matrix::SetRotationDegrees(modelMatrix, 0, -otherActor.rotation.y, 0);
+
+					// Perform raycast
+					float distance;
+					if (ray.intersectsOBB(otherActor.getCollider(), modelMatrix, distance) && distance * distance < deltaPos.magSquared())
+					{
+						objectBlocking = true;
+						break;
+					}
+				}
+
+				if (objectBlocking) continue;
+
+				// Kill player if they have moved or rotated
 				if (freezeState.hasMoved(moveThreshold) || freezeState.hasRotated(rotateThreshold))
 				{
 					actor.Kill();
