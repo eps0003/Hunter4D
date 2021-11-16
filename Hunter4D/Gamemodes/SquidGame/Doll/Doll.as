@@ -105,7 +105,7 @@ shared class Doll : Object
 
 		if (redLight)
 		{
-			Actor@[] actors = Actor::getActors();
+			Actor@[]@ actors = Actor::getActors();
 			for (uint i = 0; i < actors.size(); i++)
 			{
 				Actor@ actor = actors[i];
@@ -119,14 +119,14 @@ shared class Doll : Object
 
 	private void FreezeCheck()
 	{
-		for (uint i = 0; i < freezeStates.size(); i++)
+		for (int i = freezeStates.size() - 1; i >= 0; i--)
 		{
 			FreezeState freezeState = freezeStates[i];
 
 			Actor@ actor = freezeState.actor;
 			if (actor is null)
 			{
-				freezeStates.removeAt(i--);
+				freezeStates.removeAt(i);
 			}
 			else
 			{
@@ -135,12 +135,12 @@ shared class Doll : Object
 				Ray ray(headPos, deltaPos);
 
 				RaycastInfo raycast;
-				if (ray.raycastBlock(100, true, raycast) && raycast.distanceSq < deltaPos.magSquared()) continue;
+				if (ray.raycastBlock(200, true, raycast) && raycast.distanceSq < deltaPos.magSquared()) continue;
 
 				if (freezeState.hasMoved(moveThreshold) || freezeState.hasRotated(rotateThreshold))
 				{
 					actor.Kill();
-					freezeStates.removeAt(i--);
+					freezeStates.removeAt(i);
 				}
 			}
 		}

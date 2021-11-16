@@ -42,7 +42,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
 	victim.server_setTeamNum(this.getSpectatorTeamNum());
-	SpawnPlayer(this, victim);
 }
 
 void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
