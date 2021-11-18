@@ -8,6 +8,7 @@ uint startTime = 0;
 void onInit(CRules@ this)
 {
 	print("Waiting for players to begin the game...");
+	this.SetCurrentState(WARMUP);
 }
 
 void onStateChange(CRules@ this, const u8 oldState)
