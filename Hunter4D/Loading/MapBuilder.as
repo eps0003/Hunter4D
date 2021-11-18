@@ -1,4 +1,5 @@
 #include "Map.as"
+#include "Utilities.as"
 
 shared class MapBuilder
 {
@@ -50,7 +51,7 @@ shared class ConfigMap : MapBuilder
 
 	ConfigMap(string fileName)
 	{
-		super(getFilenameWithoutExtension(fileName));
+		super(trimFileExtension(fileName));
 		this.fileName = "../Cache/Hunter4D/Maps/" + fileName;
 	}
 

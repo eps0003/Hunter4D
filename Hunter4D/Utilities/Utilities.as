@@ -21,3 +21,8 @@ shared bool saferead_player(CBitStream@ bs, CPlayer@ &out player)
 	@player = getPlayerByNetworkId(id);
 	return player !is null;
 }
+
+shared string trimFileExtension(string fileName)
+{
+	return fileName.substr(0, fileName.findLast("."));
+}

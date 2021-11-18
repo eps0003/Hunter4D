@@ -1,4 +1,5 @@
 #include "GamemodeCommon.as"
+#include "Utilities.as"
 
 shared class GamemodeManager
 {
@@ -102,6 +103,8 @@ shared class GamemodeManager
 		rules.AddScript(script);
 
 		previousScript = script;
+
+		print("Gamemode: " + trimFileExtension(script));
 	}
 
 	private void SetCurrentGamemode(string name)
