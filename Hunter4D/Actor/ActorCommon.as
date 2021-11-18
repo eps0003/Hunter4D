@@ -138,6 +138,11 @@ namespace Actor
 		return Actor::getActor(player) !is null;
 	}
 
+	shared bool myActorExists()
+	{
+		return Actor::getMyActor() !is null;
+	}
+
 	shared Actor@[]@ getActors()
 	{
 		Actor@[]@ actors;

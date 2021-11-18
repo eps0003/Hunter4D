@@ -76,6 +76,8 @@ void Render(int id)
 	Render::SetBackfaceCull(true);
 	Render::ClearZ();
 
+	if (!Actor::myActorExists()) return;
+
 	camera.Interpolate();
 	camera.Render();
 
