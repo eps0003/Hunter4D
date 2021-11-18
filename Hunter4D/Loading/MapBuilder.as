@@ -2,7 +2,13 @@
 
 shared class MapBuilder
 {
+	string name;
 	Map@ map;
+
+	MapBuilder(string name)
+	{
+		this.name = name;
+	}
 
 	void Init()
 	{
@@ -44,7 +50,7 @@ shared class ConfigMap : MapBuilder
 
 	ConfigMap(string fileName)
 	{
-		super();
+		super(getFilenameWithoutExtension(fileName));
 		this.fileName = "../Cache/Hunter4D/Maps/" + fileName;
 	}
 
@@ -111,9 +117,9 @@ shared class MapGenerator : MapBuilder
 {
 	Vec3f dimensions;
 
-	MapGenerator(Vec3f dimensions)
+	MapGenerator(string name, Vec3f dimensions)
 	{
-		super();
+		super(name);
 		this.dimensions = dimensions;
 	}
 

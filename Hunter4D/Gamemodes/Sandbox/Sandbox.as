@@ -6,12 +6,9 @@
 
 #define SERVER_ONLY
 
-MapManager@ mapManager;
-
 void onInit(CRules@ this)
 {
-	@mapManager = Map::getManager();
-	mapManager.SetMap(ConfigMap("Ephtracy.cfg"));
+	Map::getManager().SetMap(ConfigMap("Ephtracy.cfg"));
 
 	this.SetCurrentState(GAME);
 }

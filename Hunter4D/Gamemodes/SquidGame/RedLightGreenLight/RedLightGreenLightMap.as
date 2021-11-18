@@ -6,7 +6,7 @@ shared class RedLightGreenLightMap : MapGenerator
 
 	RedLightGreenLightMap(Vec3f dimensions)
 	{
-		super(dimensions);
+		super("Checkerboard", dimensions);
 	}
 
 	void Load()

@@ -20,8 +20,6 @@ void onRestart(CRules@ this)
 	@map = Map::getMap();
 	@mapSyncer = Map::getSyncer();
 	@mapManager = Map::getManager();
-
-	@mapManager.currentMap = mapManager.nextMap;
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)

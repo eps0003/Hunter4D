@@ -124,6 +124,7 @@ shared class MapSyncer
 		// Serialize map size
 		if (index == 0)
 		{
+			bs.write_string(Map::getManager().getCurrentMap().name);
 			bs.write_u16(map.dimensions.x);
 			bs.write_u16(map.dimensions.y);
 			bs.write_u16(map.dimensions.z);
@@ -168,6 +169,13 @@ shared class MapSyncer
 
 		if (index == 0)
 		{
+			string mapName;
+			if (!packet.saferead_string(mapName)) return;
+
+			// Set this property to display in vanilla KAG the map name above the scoreboard
+			// Unfortunately the map shown in chat is done engine-side
+			rules.set_string("map_name", mapName);
+
 			u16 x, y, z;
 			if (!packet.saferead_u16(x)) return;
 			if (!packet.saferead_u16(y)) return;
