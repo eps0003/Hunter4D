@@ -1,26 +1,38 @@
+#include "CommandManager.as"
 #include "SensitivityCommand.as"
 #include "FOVCommand.as"
 #include "RenderDistanceCommand.as"
 #include "KillCommand.as"
 
-Command@[] commands = {
-	SensitivityCommand(),
-	FOVCommand(),
-	RenderDistanceCommand(),
-	KillCommand()
-};
+CommandManager@ manager;
+
+void onInit(CRules@ this)
+{
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
+	@manager = Commands::getManager();
+
+	manager.RegisterCommand(SensitivityCommand());
+	manager.RegisterCommand(FOVCommand());
+	manager.RegisterCommand(RenderDistanceCommand());
+	manager.RegisterCommand(KillCommand());
+}
 
 void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
 {
-	CContextMenu@ configMenu = Menu::addContextMenu(menu, getTranslatedString("Hunter3D Commands"));
+	CContextMenu@ contextMenu = Menu::addContextMenu(menu, getTranslatedString("Chat Commands"));
 	CPlayer@ player = getLocalPlayer();
 
+	Command@[] commands = manager.getCommands();
 	for (uint i = 0; i < commands.size(); i++)
 	{
 		Command@ command = commands[i];
-		if (!command.modOnly || player.isMod())
+		if (command.canUse(player))
 		{
-			Menu::addInfoBox(configMenu, getTranslatedString("!" + command.aliases[0]), getTranslatedString(command.description));
+			Menu::addInfoBox(contextMenu, getTranslatedString("!" + command.aliases[0]), getTranslatedString(command.description));
 		}
 	}
 }
@@ -29,7 +41,7 @@ bool onServerProcessChat(CRules@ this, const string &in textIn, string &out text
 {
 	Command@ command;
 	string[] args;
-	if (processCommand(textIn, command, args) && (!command.modOnly || player.isMod()))
+	if (manager.processCommand(textIn, command, args) && command.canUse(player))
 	{
 		command.Execute(args, player);
 	}
@@ -40,65 +52,17 @@ bool onClientProcessChat(CRules@ this, const string& in textIn, string& out text
 {
 	Command@ command;
 	string[] args;
-	if (processCommand(textIn, command, args))
+	if (manager.processCommand(textIn, command, args))
 	{
-		if (!command.modOnly || player.isMod())
+		if (command.canUse(player))
 		{
 			command.Execute(args, player);
 		}
 		else if (player.isMyPlayer())
 		{
-			client_AddToChat("Only admins can use this command", ConsoleColour::ERROR);
+			client_AddToChat("You are unable to use this command", ConsoleColour::ERROR);
 		}
 		return false;
 	}
 	return true;
-}
-
-bool processCommand(string text, Command@ &out command, string[] &out args)
-{
-	text = removeExcessSpaces(text);
-
-	if (text.find("!") == 0)
-	{
-		args = text.split(" ");
-		string cmd = args[0].toLower().substr(1);
-
-		args.removeAt(0);
-
-		for (uint i = 0; i < commands.size(); i++)
-		{
-			@command = commands[i];
-			if (command.aliases.find(cmd) > -1)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-string removeExcessSpaces(string text)
-{
-	// Reduce all spaces down to one space
-	while (text.find("  ") > -1)
-	{
-		text = text.replace("  ", " ");
-	}
-
-	// Remove space at start
-	if (text.find(" ") == 0)
-	{
-		text = text.substr(1);
-	}
-
-	// Remove space at end
-	uint lastIndex = text.size() - 1;
-	if (text.findLast(" ") == lastIndex)
-	{
-		text = text.substr(0, lastIndex);
-	}
-
-	return text;
 }

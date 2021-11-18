@@ -1,4 +1,7 @@
-class Command
+#include "CommandCommon.as"
+#include "CommandManager.as"
+
+shared class Command
 {
 	string[] aliases;
 	string description;
@@ -14,6 +17,11 @@ class Command
 	void AddAlias(string name)
 	{
 		aliases.push_back(name);
+	}
+
+	bool canUse(CPlayer@ player)
+	{
+		return !modOnly || player.isMod();
 	}
 
 	void Execute(string[] args, CPlayer@ player) {}
