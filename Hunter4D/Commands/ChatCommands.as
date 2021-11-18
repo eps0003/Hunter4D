@@ -57,24 +57,7 @@ bool onClientProcessChat(CRules@ this, const string& in textIn, string& out text
 
 bool processCommand(string text, Command@ &out command, string[] &out args)
 {
-	// Reduce all spaces down to one space
-	while (text.find("  ") > -1)
-	{
-		text = text.replace("  ", " ");
-	}
-
-	// Remove space at start
-	if (text.find(" ") == 0)
-	{
-		text = text.substr(1);
-	}
-
-	// Remove space at end
-	uint lastIndex = text.size() - 1;
-	if (text.findLast(" ") == lastIndex)
-	{
-		text = text.substr(0, lastIndex);
-	}
+	text = removeExcessSpaces(text);
 
 	if (text.find("!") == 0)
 	{
@@ -94,4 +77,28 @@ bool processCommand(string text, Command@ &out command, string[] &out args)
 	}
 
 	return false;
+}
+
+string removeExcessSpaces(string text)
+{
+	// Reduce all spaces down to one space
+	while (text.find("  ") > -1)
+	{
+		text = text.replace("  ", " ");
+	}
+
+	// Remove space at start
+	if (text.find(" ") == 0)
+	{
+		text = text.substr(1);
+	}
+
+	// Remove space at end
+	uint lastIndex = text.size() - 1;
+	if (text.findLast(" ") == lastIndex)
+	{
+		text = text.substr(0, lastIndex);
+	}
+
+	return text;
 }
