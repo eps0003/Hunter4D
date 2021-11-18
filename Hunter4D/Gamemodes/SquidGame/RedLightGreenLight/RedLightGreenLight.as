@@ -46,8 +46,7 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 
 void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 {
-	u8 currentTeam = player.getTeamNum();
-	if (currentTeam != newTeam)
+	if (newTeam == this.getSpectatorTeamNum())
 	{
 		player.server_setTeamNum(newTeam);
 	}
