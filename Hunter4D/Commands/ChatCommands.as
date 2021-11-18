@@ -30,7 +30,7 @@ void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
 	for (uint i = 0; i < commands.size(); i++)
 	{
 		Command@ command = commands[i];
-		if (command.canUse(player))
+		if (command.canPlayerExecute(player))
 		{
 			Menu::addInfoBox(contextMenu, getTranslatedString("!" + command.aliases[0]), getTranslatedString(command.description));
 		}
@@ -41,7 +41,7 @@ bool onServerProcessChat(CRules@ this, const string &in textIn, string &out text
 {
 	Command@ command;
 	string[] args;
-	if (manager.processCommand(textIn, command, args) && command.canUse(player))
+	if (manager.processCommand(textIn, command, args) && command.canPlayerExecute(player))
 	{
 		command.Execute(args, player);
 	}
@@ -54,7 +54,7 @@ bool onClientProcessChat(CRules@ this, const string& in textIn, string& out text
 	string[] args;
 	if (manager.processCommand(textIn, command, args))
 	{
-		if (command.canUse(player))
+		if (command.canPlayerExecute(player))
 		{
 			command.Execute(args, player);
 		}

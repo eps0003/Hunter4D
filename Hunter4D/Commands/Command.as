@@ -19,7 +19,7 @@ shared class Command
 		aliases.push_back(name);
 	}
 
-	bool canUse(CPlayer@ player)
+	bool canPlayerExecute(CPlayer@ player)
 	{
 		return !modOnly || player.isMod();
 	}
