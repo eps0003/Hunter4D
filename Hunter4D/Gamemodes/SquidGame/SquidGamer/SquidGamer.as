@@ -39,7 +39,7 @@ shared class SquidGamer : Actor
 			Movement();
 		}
 
-		if (isServer())
+		if (isServer() && !rules.isWarmup())
 		{
 			PushPlayers();
 		}
@@ -88,21 +88,24 @@ shared class SquidGamer : Actor
 		Vec2f dir;
 		s8 verticalDir = 0;
 
-		if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
-		if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
-		if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
-		if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
-
-		float len = dir.Length();
-		if (len > 0)
+		if (!rules.isWarmup())
 		{
-			dir /= len; // Normalize
-			dir = dir.RotateBy(camera.rotation.y);
-		}
+			if (controls.ActionKeyPressed(AK_MOVE_UP)) dir.y++;
+			if (controls.ActionKeyPressed(AK_MOVE_DOWN)) dir.y--;
+			if (controls.ActionKeyPressed(AK_MOVE_RIGHT)) dir.x++;
+			if (controls.ActionKeyPressed(AK_MOVE_LEFT)) dir.x--;
 
-		if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
-		{
-			velocity.y = jumpForce;
+			if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
+			{
+				velocity.y = jumpForce;
+			}
+
+			float len = dir.Length();
+			if (len > 0)
+			{
+				dir /= len; // Normalize
+				dir = dir.RotateBy(camera.rotation.y);
+			}
 		}
 
 		// Move actor
