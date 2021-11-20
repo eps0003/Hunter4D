@@ -4,12 +4,22 @@
 #include "Map.as"
 #include "Doll.as"
 #include "RedLightGreenLightMap.as"
+#include "Stopwatch.as"
+
+const uint GAME_DURATION = 2;
 
 RedLightGreenLightMap@ mapBuilder;
+Stopwatch gameTimer;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	this.AddScript("WaitForPlayers.as");
+	this.AddScript("ShortPostGame.as");
 
 	if (isServer())
 	{
@@ -21,6 +31,16 @@ void onInit(CRules@ this)
 	{
 		Skins::AddDefaultSkin("GiHun.png");
 		Skins::AddDefaultSkin("SaeByeok.png");
+	}
+
+	gameTimer.Reset();
+}
+
+void onTick(CRules@ this)
+{
+	if (isServer() && gameTimer.getTime() >= GAME_DURATION * getTicksASecond())
+	{
+		this.SetCurrentState(GAME_OVER);
 	}
 }
 
@@ -36,6 +56,24 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	else if (isServer() && cmd == this.getCommandID("map generated"))
 	{
 		Object::AddObject(Doll(mapBuilder.getDollSpawnPos()));
+	}
+}
+
+void onStateChange(CRules@ this, const u8 oldState)
+{
+	if (this.isMatchRunning())
+	{
+		gameTimer.Reset();
+		gameTimer.Start();
+	}
+	else
+	{
+		if (!this.isGameOver())
+		{
+			gameTimer.Reset();
+		}
+
+		gameTimer.Pause();
 	}
 }
 
@@ -82,4 +120,10 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	{
 		Actor::AddActor(SquidGamer(player, spawnPos));
 	}
+}
+
+void onRender(CRules@ this)
+{
+	Vec2f screenCenter = getDriver().getScreenCenterPos();
+	GUI::DrawTextCentered(gameTimer.toString(true), Vec2f(screenCenter.x, 60), color_black);
 }
