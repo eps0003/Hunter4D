@@ -3,6 +3,7 @@
 void onInit(CRules@ this)
 {
 	this.addCommandID("init squid gamer");
+	this.addCommandID("squid gamer pushed");
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)

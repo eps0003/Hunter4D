@@ -155,7 +155,13 @@ shared class SquidGamer : Actor
 		if (closestActor !is null)
 		{
 			closestActor.SetVelocity(ray.direction * pushForce);
+
 			print(getPlayer().getUsername() + " pushed " + closestActor.getPlayer().getUsername());
+
+			CBitStream bs;
+			bs.write_netid(getPlayer().getNetworkID());
+			bs.write_netid(closestActor.getPlayer().getNetworkID());
+			rules.SendCommand(rules.getCommandID("squid gamer pushed"), bs, true);
 		}
 	}
 }
