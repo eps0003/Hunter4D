@@ -1,4 +1,5 @@
 #include "Interpolation.as"
+#include "Utilities.as"
 
 shared class Stopwatch
 {
@@ -13,7 +14,7 @@ shared class Stopwatch
 		Reset();
 	}
 
-	private void Reset()
+	void Reset()
 	{
 		startTime = 0;
 		pauseTime = 0;
@@ -26,7 +27,7 @@ shared class Stopwatch
 	{
 		if (isPaused())
 		{
-			extraTime += getGameTime() - pauseTime;
+			extraTime = getPauseDuration();
 			pauseTime = 0;
 			paused = false;
 		}
@@ -39,8 +40,11 @@ shared class Stopwatch
 
 	void Pause()
 	{
-		pauseTime = getGameTime();
-		paused = true;
+		if (isRunning())
+		{
+			pauseTime = getGameTime();
+			paused = true;
+		}
 	}
 
 	void Stop()
