@@ -84,20 +84,6 @@ shared class Stopwatch
 
 	string toString(bool showMilliseconds = false)
 	{
-		float totalSeconds = getTime() / getTicksASecond();
-		uint hours = totalSeconds / 3600;
-		totalSeconds %= 3600;
-		u8 minutes = totalSeconds / 60;
-		u8 seconds = totalSeconds % 60;
-		totalSeconds %= 1;
-		u16 milliseconds = totalSeconds * 1000;
-
-		string text = hours + ":" + formatInt(minutes, "0", 2) + ":" + formatInt(seconds, "0", 2);
-		if (showMilliseconds)
-		{
-			text += "." + formatInt(milliseconds, "0", 3);
-		}
-
-		return text;
+		return formatDuration(getTime(), showMilliseconds);
 	}
 }
