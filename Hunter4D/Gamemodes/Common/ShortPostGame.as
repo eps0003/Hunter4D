@@ -9,12 +9,17 @@ void onStateChange(CRules@ this, const u8 oldState)
 	{
 		endTime = getGameTime() + getTicksASecond() * POST_GAME_SECONDS;
 	}
+	else
+	{
+		endTime = 0;
+	}
 }
 
 void onTick(CRules@ this)
 {
-	if (this.isGameOver() && getGameTime() >= endTime)
+	if (endTime > 0 && getGameTime() >= endTime)
 	{
+		this.RemoveScript("ShortPostGame.as");
 		LoadNextMap();
 	}
 }

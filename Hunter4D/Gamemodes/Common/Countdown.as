@@ -5,6 +5,11 @@ uint startTime = 0;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	print("Game starting in...");
 	startTime = getGameTime() + getTicksASecond() * COUNTDOWN_SECONDS;
 }
@@ -13,7 +18,7 @@ void onStateChange(CRules@ this, const u8 oldState)
 {
 	if (!this.isWarmup())
 	{
-		this.RemoveScript(getCurrentScriptName());
+		this.RemoveScript("Countdown.as");
 	}
 }
 
@@ -29,6 +34,6 @@ void onTick(CRules@ this)
 	if (deltaTime <= 0)
 	{
 		this.SetCurrentState(GAME);
-		this.RemoveScript(getCurrentScriptName());
+		this.RemoveScript("Countdown.as");
 	}
 }

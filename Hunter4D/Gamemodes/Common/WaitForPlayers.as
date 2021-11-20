@@ -7,6 +7,11 @@ uint startTime = 0;
 
 void onInit(CRules@ this)
 {
+	onRestart(this);
+}
+
+void onRestart(CRules@ this)
+{
 	print("Waiting for players to begin the game...");
 	this.SetCurrentState(WARMUP);
 }
@@ -15,7 +20,7 @@ void onStateChange(CRules@ this, const u8 oldState)
 {
 	if (!this.isWarmup())
 	{
-		this.RemoveScript(getCurrentScriptName());
+		this.RemoveScript("WaitForPlayers.as");
 	}
 }
 
@@ -35,6 +40,6 @@ void onTick(CRules@ this)
 	if (Loading::areAllPlayersLoaded() || getGameTime() >= startTime)
 	{
 		this.AddScript("Countdown.as");
-		this.RemoveScript(getCurrentScriptName());
+		this.RemoveScript("WaitForPlayers.as");
 	}
 }
