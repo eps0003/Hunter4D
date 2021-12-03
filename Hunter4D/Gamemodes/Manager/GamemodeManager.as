@@ -89,9 +89,16 @@ shared class GamemodeManager
 		SetGamemode(gamemodeIndex + 1);
 	}
 
-	void SetRandomGamemode(bool updateIndex = true)
+	void SetRandomGamemode(bool different = true, bool updateIndex = true)
 	{
-		uint index = random.NextRanged(gamemodes.size());
+		uint index;
+		uint count = gamemodes.size();
+
+		do
+		{
+			index = random.NextRanged(count);
+		} while(different && count > 1 && index == gamemodeIndex);
+
 		SetGamemode(index, updateIndex);
 	}
 
