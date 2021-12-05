@@ -31,6 +31,12 @@ namespace Loading
 	shared void SetMyPlayerLoaded(bool loaded)
 	{
 		SetPlayerLoaded(getLocalPlayer(), loaded);
+
+		if (loaded)
+		{
+			int id = getRules().get_s32("loading screen id");
+			Render::RemoveScript(id);
+		}
 	}
 
 	shared void SetAllPlayersLoaded(bool loaded)

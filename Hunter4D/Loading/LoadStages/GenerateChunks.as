@@ -40,6 +40,8 @@ void onTick(CRules@ this)
 			this.RemoveScript("LoadingScreen.as");
 			this.AddScript("Client.as");
 
+			Loading::SetMyPlayerLoaded(true);
+
 			break;
 		}
 	}

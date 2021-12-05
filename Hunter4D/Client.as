@@ -16,7 +16,6 @@ ParticleManager@ particleManager;
 void onInit(CRules@ this)
 {
 	print("Hunter3D loaded!", ConsoleColour::CRAZY);
-	Loading::SetMyPlayerLoaded(true);
 
 	id = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 

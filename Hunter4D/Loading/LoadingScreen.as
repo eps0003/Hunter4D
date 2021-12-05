@@ -5,18 +5,19 @@ Driver@ driver;
 void onInit(CRules@ this)
 {
 	@driver = getDriver();
+
+	int id = Render::addScript(Render::layer_posthud, "LoadingScreen.as", "Render", 0);
+	this.set_s32("loading screen id", id);
 }
 
-void onRender(CRules@ this)
+void Render(int id)
 {
-	if (driver is null) return;
-
 	// Background colour
 	Vec2f screenDim = driver.getScreenDimensions();
 	SColor color(255, 165, 189, 200);
 	GUI::DrawRectangle(Vec2f_zero, screenDim, color);
 
-	DrawLoadingBar(this);
+	DrawLoadingBar(getRules());
 }
 
 void DrawLoadingBar(CRules@ this)
