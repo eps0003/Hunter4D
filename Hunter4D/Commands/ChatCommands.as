@@ -3,6 +3,7 @@
 #include "FOVCommand.as"
 #include "RenderDistanceCommand.as"
 #include "KillCommand.as"
+#include "GamemodeCommand.as"
 
 CommandManager@ manager;
 
@@ -19,6 +20,7 @@ void onRestart(CRules@ this)
 	manager.RegisterCommand(FOVCommand());
 	manager.RegisterCommand(RenderDistanceCommand());
 	manager.RegisterCommand(KillCommand());
+	manager.RegisterCommand(GamemodeCommand());
 }
 
 void onMainMenuCreated(CRules@ this, CContextMenu@ menu)
