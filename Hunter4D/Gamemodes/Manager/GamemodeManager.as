@@ -11,14 +11,11 @@ shared class GamemodeManager
 
 	GamemodeManager(string configPath)
 	{
-		if (isServer())
-		{
-			LoadGamemodes(configPath);
+		LoadGamemodes(configPath);
 
-			if (!gamemodes.empty())
-			{
-				SetGamemode(0);
-			}
+		if (isServer() && !gamemodes.empty())
+		{
+			SetGamemode(0);
 		}
 	}
 
@@ -51,17 +48,39 @@ shared class GamemodeManager
 		return gamemodes[index % gamemodes.size()];
 	}
 
-	void SetGamemode(uint index, bool updateIndex = true)
+	string[] getGamemodeNames()
+	{
+		string[] names;
+		for (uint i = 0; i < gamemodes.size(); i++)
+		{
+			names.push_back(trimFileExtension(gamemodes[i]));
+		}
+		return names;
+	}
+
+	string findGamemodeCaseInsensitive(string gamemode)
+	{
+		for (uint i = 0; i < gamemodes.size(); i++)
+		{
+			if (gamemodes[i].toLower() == gamemode.toLower())
+			{
+				return gamemodes[i];
+			}
+		}
+		return "";
+	}
+
+	void LoadGamemode(uint index, bool updateIndex = true)
 	{
 		index = index % gamemodes.size();
 		if (updateIndex)
 		{
 			gamemodeIndex = index;
 		}
-		SetCurrentGamemode(gamemodes[index]);
+		ApplyGamemode(gamemodes[index]);
 	}
 
-	void SetGamemode(string name, bool updateIndex = true)
+	void LoadGamemode(string name, bool updateIndex = true)
 	{
 		if (updateIndex)
 		{
@@ -81,15 +100,15 @@ shared class GamemodeManager
 			}
 		}
 
-		SetCurrentGamemode(name);
+		ApplyGamemode(name);
 	}
 
-	void SetNextGamemode()
+	void LoadNextGamemode()
 	{
-		SetGamemode(gamemodeIndex + 1);
+		LoadGamemode(gamemodeIndex + 1);
 	}
 
-	void SetRandomGamemode(bool different = true, bool updateIndex = true)
+	void LoadRandomGamemode(bool different = true, bool updateIndex = true)
 	{
 		uint index;
 		uint count = gamemodes.size();
@@ -99,7 +118,7 @@ shared class GamemodeManager
 			index = random.NextRanged(count);
 		} while(different && count > 1 && index == gamemodeIndex);
 
-		SetGamemode(index, updateIndex);
+		LoadGamemode(index, updateIndex);
 	}
 
 	void InitCurrentGamemode()
@@ -114,9 +133,10 @@ shared class GamemodeManager
 		print("Gamemode: " + trimFileExtension(script));
 	}
 
-	private void SetCurrentGamemode(string name)
+	private void ApplyGamemode(string name)
 	{
 		rules.set_string("current gamemode", name);
 		rules.Sync("current gamemode", true);
+		LoadNextMap();
 	}
 }
